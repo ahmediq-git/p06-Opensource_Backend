@@ -46,7 +46,7 @@ class EzBaseClient {
                     console.log('Data sent for deletion successfully:', response.data);
                     return response.data;
                 case 'GET':
-                    response = await axios.get(completeApiEndpoint, { params: jsonObject, headers });
+                    response = await axios.get(completeApiEndpoint, { data: jsonObject, headers });
                     console.log('Data received successfully:', response.data);
                     return response.data;
                 default:

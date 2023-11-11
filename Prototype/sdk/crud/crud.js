@@ -6,7 +6,7 @@ class Crud {
     // Validator functions
 
     #isObject(userInput) {
-        return typeof userInput === 'object' && Input !== null && !Array.isArray(input);
+        return typeof userInput === 'object' && userInput !== null && !Array.isArray(userInput);
     }
 
     // checks whether the object is of single key value pair like {field: value1}
@@ -49,9 +49,31 @@ class Crud {
     }
 
     // Inserts a document in a collection, returns the document Id of the given Document
-    async insertDoc(collectionName, doc) { 
-
+    // TODO: After the server functionality is complete, make sure variable size doc can be added to server
+    // Will require edits later
+    async insertDoc(collectionName, doc) {
+        try {
+            if (!this.#isString(collectionName)) {
+                throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
+            }
+    
+            if (!this.#isObject(doc)) {
+                throw new Error(doc, "is not a document")
+            }
+            
+            // For now insertDoc on server handles just one key value pair, will be updated
+            const keys = Object.keys(doc);
+            const key = keys[0];
+            const value = doc[key]; 
+    
+            const sendObject = { "collection_name": collectionName, "field_name": key, "field_value": value};
+            await this.client.sendToBackend(sendObject, "/insert_doc", "POST");
+    
+        } catch (error) {
+            console.log("Error inserting document: ", error)
+        }
     }
+    
 
     // Deletes a document from a collection
     async deleteDoc(collectionName, docId) { //Faraz
@@ -104,18 +126,18 @@ class Crud {
             if (!this.#isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
-
+    
             const sendObject = { "collection_name": collectionName }
-
-            // TODO: If there is error then response handling
-            response = this.client.sendToBackend(sendObject, "/get_all_docs", "GET")
+    
+            // TODO: If there is an error, handle the response
+            const response = await this.client.sendToBackend(sendObject, "/get_all_docs", "GET");
             return response;
-
-        }
-        catch(error){
+    
+        } catch (error) {
             console.log("Error getting Collection: ", error)
         }
     }
+    
 
     //returns all the records from the given collection
     //query is the search criteria, matches is the number of records to be returned
