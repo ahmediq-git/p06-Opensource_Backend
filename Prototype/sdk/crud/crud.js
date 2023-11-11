@@ -55,18 +55,18 @@ class Crud {
             if (!this.#isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
-    
+
             if (!this.#isObject(doc)) {
                 throw new Error(doc, "is not a document")
             }
-            
+
             const keys = Object.keys(doc);
             const key = keys[0];
-            const value = doc[key]; 
-    
-            const sendObject = { "collection_name": collectionName, "field_name": key, "field_value": value};
+            const value = doc[key];
+
+            const sendObject = { "collection_name": collectionName, "field_name": key, "field_value": value };
             await this.client.sendToBackend(sendObject, "/insert_doc", "POST");
-    
+
         } catch (error) {
             console.log("Error inserting document: ", error)
         }
@@ -80,28 +80,40 @@ class Crud {
             if (!this.#isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
-    
+
             if (!this.#isObject(doc)) {
                 throw new Error(doc, "is not a document")
             }
-            
+
             // For now insertDoc on server handles just one key value pair, will be updated
             const keys = Object.keys(doc);
             const key = keys[0];
-            const value = doc[key]; 
-    
-            const sendObject = { "collection_name": collectionName, "field_name": key, "field_value": value};
+            const value = doc[key];
+
+            const sendObject = { "collection_name": collectionName, "field_name": key, "field_value": value };
             await this.client.sendToBackend(sendObject, "/insert_doc", "POST");
-    
+
         } catch (error) {
             console.log("Error inserting document: ", error)
         }
     }
-    
-    
+
+
     // Deletes a document from a collection
     async deleteDoc(collectionName, docId) { //Faraz
+        try {
+            if (!this.#isString(collectionName)) {
+                throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
+            }
+            if (!this.#isString(docId)) { //TODO: Should have a check for the id
+                throw new Error("Invalid document id. Please provide a valid record id for deletion.")
+            }
 
+            const sendObject = { "collection_name": collectionName, "doc_id": docId }
+            await this.client.sendToBackend(sendObject, "/delete_doc", "DELETE");
+        } catch (error) {
+            console.log("Error deleting document: ", error)
+        }
     }
 
     // inserts a single new field into specific document within a collection
@@ -112,7 +124,7 @@ class Crud {
 
     //  inserts many new fields to a specified document within a collection
     // newFields is an object like {"key1": "value1", "key2": "value2",....}
-    async insertManyFields(collectionName, docId, newFields){
+    async insertManyFields(collectionName, docId, newFields) {
 
     }
 
@@ -139,7 +151,7 @@ class Crud {
             return response;
 
         }
-        catch(error){
+        catch (error) {
             console.log("Error getting record: ", error)
         }
     }
@@ -150,18 +162,18 @@ class Crud {
             if (!this.#isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
-    
+
             const sendObject = { "collection_name": collectionName }
-    
+
             // TODO: If there is an error, handle the response
             const response = await this.client.sendToBackend(sendObject, "/get_all_docs", "GET");
             return response;
-    
+
         } catch (error) {
             console.log("Error getting Collection: ", error)
         }
     }
-    
+
 
     //returns all the records from the given collection
     //query is the search criteria, matches is the number of records to be returned
