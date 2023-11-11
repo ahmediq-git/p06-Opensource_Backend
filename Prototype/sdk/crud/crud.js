@@ -48,7 +48,31 @@ class Crud {
         }
     }
 
-    // Inserts a document in a collection, returns the document Id of the given Document
+    // Inserts a document of only one field: (one key and value) in a collection, 
+    // TODO: returns the document Id of the given Document
+    async insertSingleDoc(collectionName, doc) {
+        try {
+            if (!this.#isString(collectionName)) {
+                throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
+            }
+    
+            if (!this.#isObject(doc)) {
+                throw new Error(doc, "is not a document")
+            }
+            
+            const keys = Object.keys(doc);
+            const key = keys[0];
+            const value = doc[key]; 
+    
+            const sendObject = { "collection_name": collectionName, "field_name": key, "field_value": value};
+            await this.client.sendToBackend(sendObject, "/insert_doc", "POST");
+    
+        } catch (error) {
+            console.log("Error inserting document: ", error)
+        }
+    }
+
+    // Inserts a document in a collection, (of many fields) returns the document Id of the given Document
     // TODO: After the server functionality is complete, make sure variable size doc can be added to server
     // Will require edits later
     async insertDoc(collectionName, doc) {
@@ -74,7 +98,7 @@ class Crud {
         }
     }
     
-
+    
     // Deletes a document from a collection
     async deleteDoc(collectionName, docId) { //Faraz
 
