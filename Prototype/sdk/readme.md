@@ -9,5 +9,12 @@
 
 ### After which you  can use the SDK in your javascript project as such
 ```javascript
-    import EzBase from 'ezbase'
+    import ezbase from 'ezbase'
 ```
+
+### If you are using nodejs, also write the following in your package.json file
+
+```package.json
+    "type": "module"
+```
+
