@@ -1,6 +1,6 @@
 {
   "name": "ezbase",
-  "version": "0.1.26",
+  "version": "0.1.27",
   "description": "This is the official sdk of the EzBase Backend service",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.6.1"
+    "axios": "^1.6.1",
+    "ezbase": "^0.1.25"
   }
 }
