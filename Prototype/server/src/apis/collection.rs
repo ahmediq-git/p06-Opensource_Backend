@@ -45,3 +45,15 @@ pub async fn get_all_docs(Json(data): Json<GetAllDocs>) -> Json<Vec<OrderedDocum
     }
     Json(ret_vec)
 }
+
+pub async fn get_collection_names() -> Json<Vec<String>> {
+    let db = Database::open("ezbase.db").unwrap();
+    let db_meta = db.get_metadata().unwrap();
+    let colls_arr = db_meta.get("collections").unwrap().as_array().unwrap();
+    let mut coll_names: Vec<String> = Vec::new();
+    for (i, data) in colls_arr.iter().enumerate() {
+        let name = data.as_document().unwrap().get("name").unwrap().to_string();
+        coll_names.push(name[1..name.len() - 1].to_owned())
+    }
+    Json(coll_names)
+}

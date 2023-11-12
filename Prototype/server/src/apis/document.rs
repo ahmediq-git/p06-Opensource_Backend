@@ -2,8 +2,8 @@ use axum::Json;
 use ejdb::{
     bson,
     bson::ordered::OrderedDocument,
-    query::{Q, QH},
-    Database,
+    query::{Query, Q, QH},
+    Database, QueryResult,
 };
 use serde::Deserialize;
 use serde_json::Value;
@@ -23,8 +23,59 @@ pub async fn insert_doc(Json(data): Json<InsertDoc>) -> Json<String> {
     let doc = bson! {
         field_name => field_value
     };
-    coll.save(&doc).unwrap();
-    Json("Document Created!".to_owned())
+    let doc_id = coll.save(&doc).unwrap();
+    Json(doc_id.to_string())
+}
+
+// Json structure should be like this:
+// {
+//     "collection_name": "Users",
+//     "data": {
+//       "Height": 185,
+//       "Color": "Brown",
+//       "Hand": "Right"
+//     }
+//   }
+pub async fn insert_doc_multifield(Json(data): Json<Value>) -> Json<String> {
+    let db = Database::open("ezbase.db").unwrap();
+    let coll = db
+        .collection(data["collection_name"].as_str().unwrap())
+        .unwrap();
+    let data = bson! {data["data"].clone()};
+
+    let result = coll.save(data.as_document().unwrap()).unwrap();
+    Json(result.to_string())
+}
+
+// Json structure should be like this:
+// {
+//     "collection_name": "Users",
+//     "docs": {
+//       "0": {
+//        "Height": 185,
+//        "Color": "Brown",
+//        "Hand": "Right"
+//       },
+//       "1": {
+//        "Height": 195,
+//        "Color": "Brown",
+//        "Hand": "Left"
+//       }
+//     }
+//   }
+pub async fn insert_docs(Json(data): Json<Value>) -> Json<Vec<String>> {
+    let db = Database::open("ezbase.db").unwrap();
+    let coll = db
+        .collection(data["collection_name"].as_str().unwrap())
+        .unwrap();
+    let docs = data["docs"].as_object().unwrap();
+    let mut ret_ids: Vec<String> = Vec::new();
+    for (doc, data) in docs.iter() {
+        let data = bson! { data.clone() };
+        let doc_id = coll.save(data.as_document().unwrap()).unwrap();
+        ret_ids.push(doc_id.to_string());
+    }
+    Json(ret_ids)
 }
 
 #[derive(Deserialize, Debug)]
@@ -111,4 +162,28 @@ pub async fn insert_many_fields(Json(data): Json<Value>) {
         )
         .update()
         .unwrap();
+}
+
+#[derive(Deserialize, Debug)]
+pub struct OneFieldSearch {
+    collection_name: String,
+    search_key: String,
+    search_value: Value,
+}
+
+pub async fn search_doc_by_one_field(
+    Json(data): Json<OneFieldSearch>,
+) -> Json<Vec<OrderedDocument>> {
+    let db = Database::open("ezbase.db").unwrap();
+    let coll = db.collection(data.collection_name).unwrap();
+    let result = coll
+        .query(Q.field(data.search_key).eq(data.search_value), QH.empty())
+        .find()
+        .unwrap();
+    let mut ret_vec: Vec<OrderedDocument> = Vec::new();
+    for (_x, i) in result.enumerate() {
+        let x = i.unwrap();
+        ret_vec.push(x);
+    }
+    Json(ret_vec)
 }

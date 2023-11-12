@@ -1,5 +1,10 @@
-use crate::apis::collection::{create_collection, delete_collection, get_all_docs};
-use crate::apis::document::{delete_doc, insert_doc, insert_field, insert_many_fields, read_doc};
+use crate::apis::collection::{
+    create_collection, delete_collection, get_all_docs, get_collection_names,
+};
+use crate::apis::document::{
+    delete_doc, insert_doc, insert_doc_multifield, insert_docs, insert_field, insert_many_fields,
+    read_doc, search_doc_by_one_field,
+};
 use axum::{
     http::{header::CONTENT_TYPE, Method},
     routing::{delete, get, post},
@@ -17,10 +22,14 @@ pub fn get_router() -> Router {
         .route("/delete_collection", delete(delete_collection))
         .route("/get_all_docs", get(get_all_docs))
         .route("/insert_doc", post(insert_doc))
+        .route("/insert_doc_multifield", post(insert_doc_multifield))
+        .route("/insert_docs", post(insert_docs))
         .route("/get_doc", get(read_doc))
         .route("/insert_field", post(insert_field))
         .route("/delete_doc", delete(delete_doc))
         .route("/insert_many_fields", post(insert_many_fields))
+        .route("/search_doc", get(search_doc_by_one_field))
+        .route("/get_collection_names", get(get_collection_names))
         .layer(cors);
 
     router
