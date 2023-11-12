@@ -50,7 +50,7 @@ class Crud {
 
     // Inserts a document of only one field: (one key and value) in a collection, 
     // TODO: returns the document Id of the given Document
-    async insertSingleDoc(collectionName, doc) {
+    async insertSingleFieldDoc(collectionName, doc) {
         try {
             if (!this.#isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
@@ -72,9 +72,8 @@ class Crud {
         }
     }
 
-    // Inserts a document in a collection, (of many fields) returns the document Id of the given Document
-    // TODO: After the server functionality is complete, make sure variable size doc can be added to server
-    // Will require edits later
+    // Inserts a document in a collection, (of many fields) 
+    // TODO: returns the document Id of the given Document
     async insertDoc(collectionName, doc) {
         try {
             if (!this.#isString(collectionName)) {
