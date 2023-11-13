@@ -17,7 +17,13 @@ pub async fn create_collection(
     Extension(db): Extension<Arc<Mutex<Database>>>,
     Json(data): Json<CreateCollection>,
 ) -> Json<String> {
-    let db_guard = db.lock().unwrap();
+    let db_guard = match db.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => {
+            let guard = poisoned.into_inner();
+            guard
+        }
+    };
     let _coll = db_guard.collection(data.collection_name).unwrap();
     Json("Collection Created!".to_owned())
 }
@@ -32,7 +38,13 @@ pub async fn delete_collection(
     Extension(db): Extension<Arc<Mutex<Database>>>,
     Json(data): Json<DeleteCollection>,
 ) -> Json<String> {
-    let db_guard = db.lock().unwrap();
+    let db_guard = match db.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => {
+            let guard = poisoned.into_inner();
+            guard
+        }
+    };
     db_guard
         .drop_collection(data.collection_name, data.delete_all_data)
         .unwrap();
@@ -48,7 +60,13 @@ pub async fn get_all_docs(
     Extension(db): Extension<Arc<Mutex<Database>>>,
     Json(data): Json<GetAllDocs>,
 ) -> Json<Vec<OrderedDocument>> {
-    let db_guard = db.lock().unwrap();
+    let db_guard = match db.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => {
+            let guard = poisoned.into_inner();
+            guard
+        }
+    };
     let coll = db_guard.collection(data.collection_name).unwrap();
     let result = coll.query(Q.empty(), QH.empty()).find().unwrap();
     let mut ret_vec: Vec<OrderedDocument> = Vec::new();
@@ -61,7 +79,13 @@ pub async fn get_all_docs(
 pub async fn get_collection_names(
     Extension(db): Extension<Arc<Mutex<Database>>>,
 ) -> Json<Vec<String>> {
-    let db_guard = db.lock().unwrap();
+    let db_guard = match db.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => {
+            let guard = poisoned.into_inner();
+            guard
+        }
+    };
     let db_meta = db_guard.get_metadata().unwrap();
     let colls_arr = db_meta.get("collections").unwrap().as_array().unwrap();
     let mut coll_names: Vec<String> = Vec::new();

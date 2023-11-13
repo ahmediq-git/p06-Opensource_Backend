@@ -21,7 +21,13 @@ pub async fn insert_doc(
     Extension(db): Extension<Arc<Mutex<Database>>>,
     Json(data): Json<InsertDoc>,
 ) -> Json<String> {
-    let db_guard = db.lock().unwrap();
+    let db_guard = match db.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => {
+            let guard = poisoned.into_inner();
+            guard
+        }
+    };
     let coll = db_guard.collection(data.collection_name).unwrap();
     let field_name = data.field_name;
     let field_value = data.field_value;
@@ -45,7 +51,13 @@ pub async fn insert_doc_multifield(
     Extension(db): Extension<Arc<Mutex<Database>>>,
     Json(data): Json<Value>,
 ) -> Json<String> {
-    let db_guard = db.lock().unwrap();
+    let db_guard = match db.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => {
+            let guard = poisoned.into_inner();
+            guard
+        }
+    };
     let coll = db_guard
         .collection(data["collection_name"].as_str().unwrap())
         .unwrap();
@@ -75,7 +87,13 @@ pub async fn insert_docs(
     Extension(db): Extension<Arc<Mutex<Database>>>,
     Json(data): Json<Value>,
 ) -> Json<Vec<String>> {
-    let db_guard = db.lock().unwrap();
+    let db_guard = match db.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => {
+            let guard = poisoned.into_inner();
+            guard
+        }
+    };
     let coll = db_guard
         .collection(data["collection_name"].as_str().unwrap())
         .unwrap();
@@ -99,7 +117,13 @@ pub async fn read_doc(
     Extension(db): Extension<Arc<Mutex<Database>>>,
     Json(data): Json<GetDoc>,
 ) -> Json<Vec<OrderedDocument>> {
-    let db_guard = db.lock().unwrap();
+    let db_guard = match db.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => {
+            let guard = poisoned.into_inner();
+            guard
+        }
+    };
     let coll = db_guard.collection(data.collection_name).unwrap();
     let result = coll
         .query(Q.field("_id").eq(data.doc_id), QH.empty())
@@ -124,7 +148,13 @@ pub async fn insert_field(
     Extension(db): Extension<Arc<Mutex<Database>>>,
     Json(data): Json<InsertField>,
 ) -> Json<String> {
-    let db_guard = db.lock().unwrap();
+    let db_guard = match db.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => {
+            let guard = poisoned.into_inner();
+            guard
+        }
+    };
     let coll = db_guard.collection(data.collection_name).unwrap();
     let _result = coll
         .query(
@@ -148,7 +178,13 @@ pub async fn delete_doc(
     Extension(db): Extension<Arc<Mutex<Database>>>,
     Json(data): Json<DeleteDoc>,
 ) -> Json<String> {
-    let db_guard = db.lock().unwrap();
+    let db_guard = match db.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => {
+            let guard = poisoned.into_inner();
+            guard
+        }
+    };
     let coll = db_guard.collection(data.collection_name).unwrap();
     let q = Q.field("_id").eq(data.doc_id).drop_all();
     coll.query(q, QH.empty()).update().unwrap();
@@ -170,7 +206,13 @@ pub async fn insert_many_fields(
     Extension(db): Extension<Arc<Mutex<Database>>>,
     Json(data): Json<Value>,
 ) {
-    let db_guard = db.lock().unwrap();
+    let db_guard = match db.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => {
+            let guard = poisoned.into_inner();
+            guard
+        }
+    };
     let coll = db_guard
         .collection(data["collection_name"].as_str().unwrap())
         .unwrap();
@@ -198,7 +240,13 @@ pub async fn search_doc_by_one_field(
     Extension(db): Extension<Arc<Mutex<Database>>>,
     Json(data): Json<OneFieldSearch>,
 ) -> Json<Vec<OrderedDocument>> {
-    let db_guard = db.lock().unwrap();
+    let db_guard = match db.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => {
+            let guard = poisoned.into_inner();
+            guard
+        }
+    };
     let coll = db_guard.collection(data.collection_name).unwrap();
     let result = coll
         .query(Q.field(data.search_key).eq(data.search_value), QH.empty())
