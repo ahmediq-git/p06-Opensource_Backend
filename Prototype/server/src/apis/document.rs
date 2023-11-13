@@ -1,4 +1,6 @@
-use axum::Json;
+use std::sync::{Arc, Mutex};
+
+use axum::{Extension, Json};
 use ejdb::{
     bson,
     bson::ordered::OrderedDocument,
@@ -15,9 +17,12 @@ pub struct InsertDoc {
     field_value: Value,
 }
 
-pub async fn insert_doc(Json(data): Json<InsertDoc>) -> Json<String> {
-    let db = Database::open("ezbase.db").unwrap();
-    let coll = db.collection(data.collection_name).unwrap();
+pub async fn insert_doc(
+    Extension(db): Extension<Arc<Mutex<Database>>>,
+    Json(data): Json<InsertDoc>,
+) -> Json<String> {
+    let db_guard = db.lock().unwrap();
+    let coll = db_guard.collection(data.collection_name).unwrap();
     let field_name = data.field_name;
     let field_value = data.field_value;
     let doc = bson! {
@@ -36,9 +41,12 @@ pub async fn insert_doc(Json(data): Json<InsertDoc>) -> Json<String> {
 //       "Hand": "Right"
 //     }
 //   }
-pub async fn insert_doc_multifield(Json(data): Json<Value>) -> Json<String> {
-    let db = Database::open("ezbase.db").unwrap();
-    let coll = db
+pub async fn insert_doc_multifield(
+    Extension(db): Extension<Arc<Mutex<Database>>>,
+    Json(data): Json<Value>,
+) -> Json<String> {
+    let db_guard = db.lock().unwrap();
+    let coll = db_guard
         .collection(data["collection_name"].as_str().unwrap())
         .unwrap();
     let data = bson! {data["data"].clone()};
@@ -63,9 +71,12 @@ pub async fn insert_doc_multifield(Json(data): Json<Value>) -> Json<String> {
 //       }
 //     }
 //   }
-pub async fn insert_docs(Json(data): Json<Value>) -> Json<Vec<String>> {
-    let db = Database::open("ezbase.db").unwrap();
-    let coll = db
+pub async fn insert_docs(
+    Extension(db): Extension<Arc<Mutex<Database>>>,
+    Json(data): Json<Value>,
+) -> Json<Vec<String>> {
+    let db_guard = db.lock().unwrap();
+    let coll = db_guard
         .collection(data["collection_name"].as_str().unwrap())
         .unwrap();
     let docs = data["docs"].as_object().unwrap();
@@ -84,9 +95,12 @@ pub struct GetDoc {
     doc_id: String,
 }
 
-pub async fn read_doc(Json(data): Json<GetDoc>) -> Json<Vec<OrderedDocument>> {
-    let db = Database::open("ezbase.db").unwrap();
-    let coll = db.collection(data.collection_name).unwrap();
+pub async fn read_doc(
+    Extension(db): Extension<Arc<Mutex<Database>>>,
+    Json(data): Json<GetDoc>,
+) -> Json<Vec<OrderedDocument>> {
+    let db_guard = db.lock().unwrap();
+    let coll = db_guard.collection(data.collection_name).unwrap();
     let result = coll
         .query(Q.field("_id").eq(data.doc_id), QH.empty())
         .find()
@@ -106,9 +120,12 @@ pub struct InsertField {
     field_name: String,
     field_value: Value,
 }
-pub async fn insert_field(Json(data): Json<InsertField>) -> Json<String> {
-    let db = Database::open("ezbase.db").unwrap();
-    let coll = db.collection(data.collection_name).unwrap();
+pub async fn insert_field(
+    Extension(db): Extension<Arc<Mutex<Database>>>,
+    Json(data): Json<InsertField>,
+) -> Json<String> {
+    let db_guard = db.lock().unwrap();
+    let coll = db_guard.collection(data.collection_name).unwrap();
     let _result = coll
         .query(
             Q.field("_id")
@@ -127,9 +144,12 @@ pub struct DeleteDoc {
     doc_id: String,
 }
 
-pub async fn delete_doc(Json(data): Json<DeleteDoc>) -> Json<String> {
-    let db = Database::open("ezbase.db").unwrap();
-    let coll = db.collection(data.collection_name).unwrap();
+pub async fn delete_doc(
+    Extension(db): Extension<Arc<Mutex<Database>>>,
+    Json(data): Json<DeleteDoc>,
+) -> Json<String> {
+    let db_guard = db.lock().unwrap();
+    let coll = db_guard.collection(data.collection_name).unwrap();
     let q = Q.field("_id").eq(data.doc_id).drop_all();
     coll.query(q, QH.empty()).update().unwrap();
 
@@ -146,9 +166,12 @@ pub async fn delete_doc(Json(data): Json<DeleteDoc>) -> Json<String> {
 //       "Hand": "Right"
 //     }
 //   }
-pub async fn insert_many_fields(Json(data): Json<Value>) {
-    let db = Database::open("ezbase.db").unwrap();
-    let coll = db
+pub async fn insert_many_fields(
+    Extension(db): Extension<Arc<Mutex<Database>>>,
+    Json(data): Json<Value>,
+) {
+    let db_guard = db.lock().unwrap();
+    let coll = db_guard
         .collection(data["collection_name"].as_str().unwrap())
         .unwrap();
     let fields_to_insert = bson! {data["fields_to_insert"].clone()};
@@ -172,10 +195,11 @@ pub struct OneFieldSearch {
 }
 
 pub async fn search_doc_by_one_field(
+    Extension(db): Extension<Arc<Mutex<Database>>>,
     Json(data): Json<OneFieldSearch>,
 ) -> Json<Vec<OrderedDocument>> {
-    let db = Database::open("ezbase.db").unwrap();
-    let coll = db.collection(data.collection_name).unwrap();
+    let db_guard = db.lock().unwrap();
+    let coll = db_guard.collection(data.collection_name).unwrap();
     let result = coll
         .query(Q.field(data.search_key).eq(data.search_value), QH.empty())
         .find()
