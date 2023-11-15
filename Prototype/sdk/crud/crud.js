@@ -18,6 +18,20 @@ class Crud {
         return typeof userInput === 'string';
     }
 
+   #isArrayOfObjects(userInput) {
+        return Array.isArray(userInput) && userInput.every(item => typeof item === 'object' && item !== null);
+    }
+    
+    // Helper function to convert from array of objects to object of objects
+    #objectFromArrayOfObjects(arrayOfObjects){
+        const objectFromArrayOfObjects = {};
+        arrayOfObjects.forEach((obj, index) => {
+            objectFromArrayOfObjects[index.toString()] = obj;
+        })
+
+        return objectFromArrayOfObjects
+    }
+
     //creates a collection with the given name
     async createCollection(collectionName) {
         try {
@@ -41,15 +55,14 @@ class Crud {
             }
 
             const sendObject = { "collection_name": collectionName, "delete_all_data": true }
-            this.client.sendToBackend(sendObject, "/delete_collection", "DELETE")
+            await this.client.sendToBackend(sendObject, "/delete_collection", "DELETE")
 
         } catch (error) {
             console.log("Error deleting collection: ", error)
         }
     }
 
-    // Inserts a document of only one field: (one key and value) in a collection, 
-    // TODO: returns the document Id of the given Document
+    // Inserts a document of only one field: (one key and value) in a collection and returns the index of the inserted document
     async insertSingleFieldDoc(collectionName, doc) {
         try {
             if (!this.#isString(collectionName)) {
@@ -65,15 +78,15 @@ class Crud {
             const value = doc[key];
 
             const sendObject = { "collection_name": collectionName, "field_name": key, "field_value": value };
-            await this.client.sendToBackend(sendObject, "/insert_doc", "POST");
+            const response =await this.client.sendToBackend(sendObject, "/insert_doc", "POST");
+            return response
 
         } catch (error) {
             console.log("Error inserting document: ", error)
         }
     }
 
-    // Inserts a document in a collection, (of many fields) 
-    // TODO: returns the document Id of the given Document
+    // Inserts a document in a collection, (of many fields)  and returns the id
     async insertDoc(collectionName, doc) {
         try {
             if (!this.#isString(collectionName)) {
@@ -84,20 +97,38 @@ class Crud {
                 throw new Error(doc, "is not a document")
             }
 
-            // For now insertDoc on server handles just one key value pair, will be updated
-            const keys = Object.keys(doc);
-            const key = keys[0];
-            const value = doc[key];
 
             const sendObject = { "collection_name": collectionName, "field_name": key, "field_value": value };
-            await this.client.sendToBackend(sendObject, "/insert_doc", "POST");
-
+            const response =await this.client.sendToBackend(sendObject, "/insert_doc_multifield", "POST");
+            // returns the id of the doc
+            return response
         } catch (error) {
             console.log("Error inserting document: ", error)
         }
     }
+    
+    // Inserts many documents in a collection and returns the id
+    async insertManyDocs(collectionName, docs) {
+        try {
+            if (!this.#isString(collectionName)) {
+                throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
+            }
 
+            if (!this.#isArrayOfObjects(docs)) {
+                throw new Error(docs, "is not an array of documents")
+            }
 
+            const convertedDocs = this.#objectFromArrayOfObjects(docs);
+
+            const sendObject = { "collection_name": collectionName, "docs": convertedDocs};
+            const response =await this.client.sendToBackend(sendObject, "/insert_docs", "POST");
+            // returns the id of the doc
+            return response
+        } catch (error) {
+            console.log("Error inserting documents: ", error)
+        }
+        
+    }
     // Deletes a document from a collection
     async deleteDoc(collectionName, docId) { //Faraz
         try {
@@ -164,6 +195,8 @@ class Crud {
 
     // updates the given fields in a document in a collection
     // all the fields in the record will be updated with fields of current record
+
+    //TODO: replace only the new fields
     async updateDoc(collectionName, docId, newRecord) { // Faraz
         try {
             if (!this.#isString(collectionName)) {
@@ -176,8 +209,8 @@ class Crud {
                 throw new Error("Invalid record. Please provide a valid record for updation.")
             }
 
-            const sendObject = { "collection_name": collectionName, "doc_id": docId, "new_record": newRecord }
-            await this.client.sendToBackend(sendObject, "/update_doc", "POST");
+            const sendObject = { "collection_name": collectionName, "doc_id": docId, "fields_to_insert": newFields }
+            await this.client.sendToBackend(sendObject, "/insert_many_fields", "POST");
         } catch (error) {
             console.log("Error updating document: ", error)
         }
@@ -196,7 +229,7 @@ class Crud {
             const sendObject = { "collection_name": collectionName, "doc_id": docId }
 
             // TODO: If there is error then response handling
-            response = this.client.sendToBackend(sendObject, "/get_doc", "GET")
+            response = await this.client.sendToBackend(sendObject, "/get_doc", "GET")
             return response;
 
         }
@@ -224,51 +257,43 @@ class Crud {
     }
 
 
-    //returns all the records from the given collection
-    //query is the search criteria, matches is the number of records to be returned
-    // if matches is -1, all records are returned, else the exact number of matches of records is returned
-
-    // it returns 2 objects. The first is the object containing all records,
-    // the second is the object containing all record Ids
-    async findDoc(collectionName, query, matches = -1) { //Faraz
+    // returns all the records from the given collection
+    // query is the search criteria
+    // it returns the exact doc if it exists to the user
+    // query at the moment is a single key value pair like {key: value}
+    async findDoc(collectionName, query) {
         try {
             if (!this.#isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
-            if (!this.#isObject(query)) {
-                throw new Error("Invalid query. Please provide a valid query for finding records.")
-            }
-            if (!this.#isString(matches) && matches !== -1) {
-                throw new Error("Invalid matches. Please provide a valid number of matches for finding records.")
+            if (!this.#isSingleKeyValuePair(query)) {
+                throw new Error("Invalid query, should be a single key value pair")
             }
 
-            const sendObject = { "collection_name": collectionName, "query": query, "matches": matches }
+            const { key, value } = query;
+            
+            const sendObject = { "collection_name": collectionName, "search_key": key, "search_value": value }
 
-            response = this.client.sendToBackend(sendObject, "/find_doc", "GET")
+            const response = await this.client.sendToBackend(sendObject, "/search_doc", "GET")
             return response;
+
         } catch (error) {
             console.log("Error finding document: ", error)
         }
     }
 
-
+    // Gets name of all collections
+    async getCollectionNames() {
+        try {
+            const response = await this.client.sendToBackend({}, "/get_collection_names", "GET")
+            return response
+        }
+        catch (error) {
+            console.log("Error returning collection names: ", error)
+        }
+    }
 
 
 }
 
 export default Crud;
-
-
-// structure of collection documents and fields
-
-// collection: doc_id1 {
-//                     
-//                     field1: value1,
-//                     field2: value2,
-//                 }
-//
-//             doc_id2 {
-//                     
-//                     field1: value1,
-//                     field2: value2,
-//                 }

@@ -32,7 +32,7 @@ class EzBaseClient {
         const headers = {
             'Content-Type': 'application/json',
         };
-    
+        // console.log(jsonObject, apiEndpoint, method);
         try {
             let response;
     
@@ -55,11 +55,11 @@ class EzBaseClient {
             }
         } catch (error) {
             if (error.response) {
-                console.error('Error sending data to server:', error.response.status, error.response.statusText, error.response.data);
+                console.error('Error sending data to server:', error);
             } else if (error.request) {
-                console.error('No response received from server:', error.request);
+                console.error('No response received from server:', error);
             } else {
-                console.error('Request failed with error:', error.message);
+                console.error('Request failed with error:', error);
             }
         }
     }
