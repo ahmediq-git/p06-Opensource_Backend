@@ -18,7 +18,7 @@ class Crud {
         return typeof userInput === 'string';
     }
 
-   #isArrayOfObjects(userInput) {
+    #isArrayOfObjects(userInput) {
         return Array.isArray(userInput) && userInput.every(item => typeof item === 'object' && item !== null);
     }
     
@@ -32,7 +32,8 @@ class Crud {
         return objectFromArrayOfObjects
     }
 
-    //creates a collection with the given name
+    // creates a collection with the given name
+    // if the collection already exists, then the collection remains as is unchanged
     async createCollection(collectionName) {
         try {
             if (!this.#isString(collectionName)) {
@@ -41,7 +42,7 @@ class Crud {
 
             const sendObject = { "collection_name": collectionName }
 
-            this.client.sendToBackend(sendObject, "/create_collection", "POST")
+            await this.client.sendToBackend(sendObject, "/create_collection", "POST")
         } catch (error) {
             console.log("Error creating collection: ", error)
         }
@@ -98,7 +99,7 @@ class Crud {
             }
 
 
-            const sendObject = { "collection_name": collectionName, "field_name": key, "field_value": value };
+            const sendObject = { "collection_name": collectionName, "data": doc };
             const response =await this.client.sendToBackend(sendObject, "/insert_doc_multifield", "POST");
             // returns the id of the doc
             return response
@@ -108,6 +109,7 @@ class Crud {
     }
     
     // Inserts many documents in a collection and returns the id
+    // returns array of IDs
     async insertManyDocs(collectionName, docs) {
         try {
             if (!this.#isString(collectionName)) {
@@ -130,12 +132,12 @@ class Crud {
         
     }
     // Deletes a document from a collection
-    async deleteDoc(collectionName, docId) { //Faraz
+    async deleteDoc(collectionName, docId) {
         try {
             if (!this.#isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
-            if (!this.#isString(docId)) { //TODO: Should have a check for the id
+            if (!this.#isString(docId)) { 
                 throw new Error("Invalid document id. Please provide a valid record id for deletion.")
             }
 
@@ -148,8 +150,7 @@ class Crud {
 
     // inserts a single new field into specific document within a collection
     // newField is a key value pair
-    async insertField(collectionName, docId, newField) { //Faraz
-        // use isSingleKeyValuePair here
+    async insertField(collectionName, docId, newField) {
         try {
             if (!this.#isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
@@ -195,9 +196,7 @@ class Crud {
 
     // updates the given fields in a document in a collection
     // all the fields in the record will be updated with fields of current record
-
-    //TODO: replace only the new fields
-    async updateDoc(collectionName, docId, newRecord) { // Faraz
+    async updateDoc(collectionName, docId, newRecord) {
         try {
             if (!this.#isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
@@ -209,7 +208,7 @@ class Crud {
                 throw new Error("Invalid record. Please provide a valid record for updation.")
             }
 
-            const sendObject = { "collection_name": collectionName, "doc_id": docId, "fields_to_insert": newFields }
+            const sendObject = { "collection_name": collectionName, "doc_id": docId, "fields_to_insert": newRecord }
             await this.client.sendToBackend(sendObject, "/insert_many_fields", "POST");
         } catch (error) {
             console.log("Error updating document: ", error)
@@ -222,14 +221,13 @@ class Crud {
             if (!this.#isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
-            if (!this.#isString(docId)) { //TODO: Should have a check for the id
+            if (!this.#isString(docId)) { 
                 throw new Error("Invalid document id. Please provide a valid record id for deletion.")
             }
 
             const sendObject = { "collection_name": collectionName, "doc_id": docId }
 
-            // TODO: If there is error then response handling
-            response = await this.client.sendToBackend(sendObject, "/get_doc", "GET")
+            const response = await this.client.sendToBackend(sendObject, "/get_doc", "GET")
             return response;
 
         }
@@ -247,7 +245,6 @@ class Crud {
 
             const sendObject = { "collection_name": collectionName }
 
-            // TODO: If there is an error, handle the response
             const response = await this.client.sendToBackend(sendObject, "/get_all_docs", "GET");
             return response;
 
@@ -270,7 +267,9 @@ class Crud {
                 throw new Error("Invalid query, should be a single key value pair")
             }
 
-            const { key, value } = query;
+            const keys = Object.keys(query);
+            const key = keys[0];
+            const value = query[key];
             
             const sendObject = { "collection_name": collectionName, "search_key": key, "search_value": value }
 
