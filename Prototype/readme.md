@@ -8,7 +8,7 @@ The server is the main component and must be running to allow for proper working
 #### A. Cargo
 Cargo is a package manager for rust. The install process is documented here: https://doc.rust-lang.org/cargo/getting-started/installation.html . The command "cargo run" in the server directory is used to start the server.
 #### B. Rust binaries
-We have uploaded two executable binaries to the releases section of the repository. The binary suitable for your OS can be downloaded and after moving to the directory where it is the command "{binary_name}" will start the server. Currently the binary is limited to Linux and Mac systems due to limitations with the zlib library that is core to the embedded database we utilize.
+We have uploaded two executable binaries to the releases section of the repository. The binary suitable for your OS can be downloaded and after moving to the directory where it is,  the command "{binary_name}" will start the server. Currently the binary is limited to Linux and Mac systems due to limitations with the zlib library that is core to the embedded database we utilize.
 #### C. Containerized Solution
 A Containerized server instance avoids any external library management problems however the creation of a Containerized server is a difficult task and hence is projected to be completed in the future.
 
