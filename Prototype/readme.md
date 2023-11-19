@@ -23,6 +23,8 @@ Running the admin UI requires the following steps:
 * ii) pnpm install
 * iii) pnpm run dev
 
+Prototype frontend deployed at: https://p06-opensource-backend-in-rust.vercel.app/
+
 #### Note: The "deployment" of our project revolves around an executable which we have tried to provide for the server since that is the more difficult component to run. A demo video has also been uploaded to show the prototype.
 # DEMO Videos:
 * Drive: https://drive.google.com/drive/folders/1B7tLvybsaX6nY_CKcW7OHGqmZrFqOnIU?usp=sharing
