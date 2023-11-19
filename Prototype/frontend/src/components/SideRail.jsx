@@ -1,6 +1,9 @@
 import { Database, BarChart3, Settings, Code2 } from "lucide-react";
+import { useState } from "react";
 
 export default function SideRail() {
+	const [active, setActive] = useState("database");
+
 	return (
 		<aside className="sidebar h-full justify-start w-24">
 			<section className="sidebar-title items-center p-4 gap-2">
@@ -13,14 +16,14 @@ export default function SideRail() {
 				<nav className="menu rounded-md">
 					<section className="menu-section px-4">
 						<ul className="menu-items gap-4">
-							<li className="menu-item">
+							<li onClick={() => setActive('database')} className={`menu-item ${active === "database" && 'menu-active'}`}>
 								<Database />
 							</li>
 
-							<li className="menu-item menu-active">
+							<li onClick={() => setActive('logs')} className={`menu-item ${active === "logs" && 'menu-active'}`}>
 								<BarChart3 />
 							</li>
-							<li className="menu-item">
+							<li onClick={() => setActive('settings')} className={`menu-item ${active === "settings" && 'menu-active'}`}>
 								<Settings />
 							</li>
 						</ul>

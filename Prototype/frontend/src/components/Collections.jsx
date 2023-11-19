@@ -1,35 +1,35 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { selectionAtom } from "../lib/state/selection";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import { fetcher } from "../lib/utils/fetcher";
 import { z } from "zod";
 
 // Define a function to validate data types associated with fields
-const dataSchema = z.union([
-	z.literal("boolean"),
-	z.literal("number"),
-	z.literal("string"),
-	z.literal("object"),
-	z.literal("array"),
-]);
+// const dataSchema = z.union([
+// 	z.literal("boolean"),
+// 	z.literal("number"),
+// 	z.literal("string"),
+// 	z.literal("object"),
+// 	z.literal("array"),
+// ]);
 
-// Define the main schema for an array of objects
-const fieldSchema = z.object({
-	field: z.string().refine((val) => !/\d|\s|[^A-Za-z]/.test(val), {
-		message: "Field should not contain numbers, spaces, or special characters.",
-	}),
-	type: dataSchema,
-	data: z.lazy(() => {
-		return z.union([
-			z.boolean(),
-			z.number(),
-			z.string(),
-			z.lazy(() => fieldSchema), // For nested objects, refers back to the same schema
-			z.array(z.lazy(() => fieldSchema)), // For arrays of objects
-		]);
-	}),
-});
+// // Define the main schema for an array of objects
+// const fieldSchema = z.object({
+// 	field: z.string().refine((val) => !/\d|\s|[^A-Za-z]/.test(val), {
+// 		message: "Field should not contain numbers, spaces, or special characters.",
+// 	}),
+// 	type: dataSchema,
+// 	data: z.lazy(() => {
+// 		return z.union([
+// 			z.boolean(),
+// 			z.number(),
+// 			z.string(),
+// 			z.lazy(() => fieldSchema), // For nested objects, refers back to the same schema
+// 			z.array(z.lazy(() => fieldSchema)), // For arrays of objects
+// 		]);
+// 	}),
+// });
 
 const collectionNameSchema = z
 	.string({
@@ -43,13 +43,14 @@ export default function Collections() {
 	const [modal, setModal] = useState(false);
 	const [selection, setSelection] = useAtom(selectionAtom);
 	const [collectionName, setCollectionName] = useState(null);
-	const [record, setRecord] = useState([
-		{
-			field: "fielder",
-			type: "string",
-			value: "values",
-		},
-	]);
+	const { mutate } = useSWRConfig();
+	// const [record, setRecord] = useState([
+	// 	{
+	// 		field: "fielder",
+	// 		type: "string",
+	// 		value: "values",
+	// 	},
+	// ]);
 	const [collectionNameError, setCollectionNameError] = useState(null);
 
 	const { data, error, isLoading } = useSWR(
@@ -60,16 +61,7 @@ export default function Collections() {
 	const setCollectionSelected = (e) => {
 		const name = e.target.textContent;
 		setSelection((prev) => ({ ...prev, collection: name }));
-	}
-
-	// // validate collection
-	// useEffect(() => {
-	// 	try {
-	// 		collectionSchema.parse(collection);
-	// 	} catch (err) {
-	// 		console.log(err);
-	// 	}
-	// }, [collection]);
+	};
 
 	useEffect(() => {
 		console.log("data", data);
@@ -112,7 +104,7 @@ export default function Collections() {
 		setCollectionName(name);
 	};
 
-	const createCollection = () => {
+	const createCollection = async () => {
 		// get value of collectionName from document
 		const name = document.querySelector("input[name='collectionName']").value;
 		console.log(name);
@@ -131,7 +123,24 @@ export default function Collections() {
 		}
 
 		// set collectionName
-		setCollectionName(name);
+		try {
+			const response = await fetch("http://0.0.0.0:3690/create_collection", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ collection_name: name }),
+			});
+
+			const data = await response.json();
+
+			console.log("data", data);
+
+			setModal(false);
+			mutate('http://0.0.0.0:3690/get_collection_names');
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	return (
@@ -306,21 +315,21 @@ export default function Collections() {
 					</div>
 
 					<div className="flex gap-3">
-						{collectionName !== "" ? (
+						{/* {collectionName !== "" ? (
 							<button
 								className="btn btn-primary hover:btn-secondary btn-block"
 								onClick={selectCollectionName}
 							>
 								Create
 							</button>
-						) : (
-							<button
-								className="btn btn-primary hover:btn-secondary btn-block"
-								onClick={createCollection}
-							>
-								Create
-							</button>
-						)}
+						) : ( */}
+						<button
+							className="btn btn-primary hover:btn-secondary btn-block"
+							onClick={createCollection}
+						>
+							Create
+						</button>
+						{/* )} */}
 
 						<button className="btn btn-block" onClick={closeModal}>
 							Cancel
@@ -335,21 +344,28 @@ export default function Collections() {
 						<section className="menu-section px-4">
 							<span className="menu-title">Collections</span>
 							<ul className="menu-items gap-4">
-								{data?.length > 0 &&
-									data.map((collection, index) => (
-										<li key={index} className={`menu-item ${selection.collection === collection ? "menu-active" : null}`} onClick={setCollectionSelected}>
-											<span>{collection}</span>
-										</li>
-									))}
-
 								<button
 									onClick={() => {
 										setModal((val) => !val);
 									}}
-									className="btn btn-outline-primary hover:btn-secondary w-full menu-item shadow-2xl shadow-secondary duration-75 transition-all"
+									className="btn btn-outline-primary hover:btn-secondary w-full menu-item shadow-2xl shadow-secondary duration-75 transition-all mt-10"
 								>
 									New Collection
 								</button>
+								{data?.length > 0 &&
+									data.map((collection, index) => (
+										<li
+											key={index}
+											className={`menu-item ${
+												selection.collection === collection
+													? "menu-active"
+													: null
+											}`}
+											onClick={setCollectionSelected}
+										>
+											<span>{collection}</span>
+										</li>
+									))}
 							</ul>
 						</section>
 					</nav>
