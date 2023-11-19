@@ -24,5 +24,8 @@ Running the admin UI requires the following steps:
 * iii) pnpm run dev
 
 #### Note: The "deployment" of our project revolves around an executable which we have tried to provide for the server since that is the more difficult component to run. A demo video has also been uploaded to show the prototype.
+# DEMO Videos:
+* Drive: https://drive.google.com/drive/folders/1B7tLvybsaX6nY_CKcW7OHGqmZrFqOnIU?usp=sharing
+* Youtube: https://www.youtube.com/watch?v=cVT2AGpP9Q0&list=PLP6U9qN9PVOG3pccBb7cTRX5_wpYrVL_t
 
 
