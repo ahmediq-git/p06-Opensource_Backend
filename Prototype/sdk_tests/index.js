@@ -117,8 +117,8 @@ function deleteCollection(){
 // getDocTest("6559ab93e0730f6200000000")
 // updateDocTest("6557af222815ab5f00000000")
 
-// insertManyDocsTest()
-// findDocTest()
+insertManyDocsTest()
+findDocTest()
 
-// getCollectionNamesTest()
-// deleteCollection()
+getCollectionNamesTest()
+deleteCollection()
