@@ -4,8 +4,8 @@ use crate::apis::collection::{
     create_collection, delete_collection, get_all_docs, get_collection_names,
 };
 use crate::apis::document::{
-    delete_doc, insert_doc, insert_doc_multifield, insert_docs, insert_field, insert_many_fields,
-    read_doc, search_doc_by_one_field,
+    create_index, delete_all_indices, delete_doc, delete_index, insert_doc, insert_doc_multifield,
+    insert_docs, insert_field, insert_many_fields, read_doc, search_doc_by_one_field,
 };
 use axum::Extension;
 use axum::{
@@ -27,16 +27,22 @@ pub fn get_router() -> Router {
     let router = Router::new()
         .route("/create_collection", post(create_collection))
         .route("/delete_collection", delete(delete_collection))
-        .route("/get_all_docs", get(get_all_docs))
+        .route("/get_all_docs/:collection_name", get(get_all_docs))
         .route("/insert_doc", post(insert_doc))
         .route("/insert_doc_multifield", post(insert_doc_multifield))
         .route("/insert_docs", post(insert_docs))
-        .route("/get_doc", get(read_doc))
+        .route("/get_doc/:collection_name/:doc_id", get(read_doc))
         .route("/insert_field", post(insert_field))
         .route("/delete_doc", delete(delete_doc))
         .route("/insert_many_fields", post(insert_many_fields))
-        .route("/search_doc", get(search_doc_by_one_field))
+        .route(
+            "/search_doc/:collection_name/:search_key/:search_value",
+            get(search_doc_by_one_field),
+        )
         .route("/get_collection_names", get(get_collection_names))
+        .route("/create_index", post(create_index))
+        .route("/delete_index", delete(delete_index))
+        .route("/delete_all_indices", delete(delete_all_indices))
         .layer(cors)
         .layer(Extension(db));
 

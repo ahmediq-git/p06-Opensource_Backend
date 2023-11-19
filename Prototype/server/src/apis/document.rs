@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 
-use axum::{Extension, Json};
+use axum::{extract::Path, Extension, Json};
 use ejdb::{
     bson,
     bson::ordered::OrderedDocument,
@@ -115,8 +115,11 @@ pub struct GetDoc {
 
 pub async fn read_doc(
     Extension(db): Extension<Arc<Mutex<Database>>>,
-    Json(data): Json<GetDoc>,
-) -> Json<Vec<OrderedDocument>> {
+    Path(GetDoc {
+        collection_name,
+        doc_id,
+    }): Path<GetDoc>,
+) -> Result<Json<Vec<OrderedDocument>>, Json<String>> {
     let db_guard = match db.lock() {
         Ok(guard) => guard,
         Err(poisoned) => {
@@ -124,17 +127,21 @@ pub async fn read_doc(
             guard
         }
     };
-    let coll = db_guard.collection(data.collection_name).unwrap();
-    let result = coll
-        .query(Q.field("_id").eq(data.doc_id), QH.empty())
-        .find()
-        .unwrap();
-    let mut ret_vec: Vec<OrderedDocument> = Vec::new();
-    for (_x, i) in result.enumerate() {
-        let x = i.unwrap();
-        ret_vec.push(x);
+    match db_guard.get_collection(collection_name).unwrap() {
+        Some(coll) => {
+            let result = coll
+                .query(Q.field("_id").eq(doc_id), QH.empty())
+                .find()
+                .unwrap();
+            let mut ret_vec: Vec<OrderedDocument> = Vec::new();
+            for (_x, i) in result.enumerate() {
+                let x = i.unwrap();
+                ret_vec.push(x);
+            }
+            Ok(Json(ret_vec))
+        }
+        None => Err(Json("Collection does not exist!".to_owned())),
     }
-    Json(ret_vec)
 }
 
 #[derive(Deserialize, Debug)]
@@ -238,8 +245,12 @@ pub struct OneFieldSearch {
 
 pub async fn search_doc_by_one_field(
     Extension(db): Extension<Arc<Mutex<Database>>>,
-    Json(data): Json<OneFieldSearch>,
-) -> Json<Vec<OrderedDocument>> {
+    Path(OneFieldSearch {
+        collection_name,
+        search_key,
+        search_value,
+    }): Path<OneFieldSearch>,
+) -> Result<Json<Vec<OrderedDocument>>, Json<String>> {
     let db_guard = match db.lock() {
         Ok(guard) => guard,
         Err(poisoned) => {
@@ -247,15 +258,105 @@ pub async fn search_doc_by_one_field(
             guard
         }
     };
-    let coll = db_guard.collection(data.collection_name).unwrap();
-    let result = coll
-        .query(Q.field(data.search_key).eq(data.search_value), QH.empty())
-        .find()
-        .unwrap();
-    let mut ret_vec: Vec<OrderedDocument> = Vec::new();
-    for (_x, i) in result.enumerate() {
-        let x = i.unwrap();
-        ret_vec.push(x);
+    match db_guard.get_collection(collection_name).unwrap() {
+        Some(coll) => {
+            let result = coll
+                .query(Q.field(search_key).eq(search_value), QH.empty())
+                .find()
+                .unwrap();
+            let mut ret_vec: Vec<OrderedDocument> = Vec::new();
+            for (_x, i) in result.enumerate() {
+                let x = i.unwrap();
+                ret_vec.push(x);
+            }
+            Ok(Json(ret_vec))
+        }
+        None => Err(Json("Collection does not exist!".to_owned())),
     }
-    Json(ret_vec)
+}
+
+#[derive(Deserialize, Debug)]
+pub struct CreateIndex {
+    collection_name: String,
+    field_name: String,
+    index_type: String, //ejdb has "string", "number", "array"
+}
+
+pub async fn create_index(
+    Extension(db): Extension<Arc<Mutex<Database>>>,
+    Json(data): Json<CreateIndex>,
+) -> Json<String> {
+    let db_guard = match db.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => {
+            let guard = poisoned.into_inner();
+            guard
+        }
+    };
+    match db_guard.get_collection(data.collection_name).unwrap() {
+        Some(coll) => {
+            if data.index_type == "string" {
+                coll.index(data.field_name).string(true).set().unwrap();
+            } else if data.index_type == "number" {
+                coll.index(data.field_name).number().set().unwrap();
+            } else if data.index_type == "array" {
+                coll.index(data.field_name).array().set().unwrap();
+            }
+            Json("Index created".to_owned())
+        }
+        None => Json("Collection does not exist!".to_owned()),
+    }
+}
+
+#[derive(Deserialize, Debug)]
+pub struct DeleteIndex {
+    collection_name: String,
+    field_name: String,
+    index_type: String,
+}
+
+pub async fn delete_index(
+    Extension(db): Extension<Arc<Mutex<Database>>>,
+    Json(data): Json<DeleteIndex>,
+) -> Json<String> {
+    let db_guard = match db.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => {
+            let guard = poisoned.into_inner();
+            guard
+        }
+    };
+    match db_guard.get_collection(data.collection_name).unwrap() {
+        Some(coll) => {
+            if data.index_type == "string" {
+                coll.index(data.field_name).string(true).drop().unwrap();
+            } else if data.index_type == "number" {
+                coll.index(data.field_name).number().drop().unwrap();
+            } else if data.index_type == "array" {
+                coll.index(data.field_name).array().drop().unwrap();
+            }
+            Json("Index Deleted".to_owned())
+        }
+        None => Json("Collection does not exist!".to_owned()),
+    }
+}
+
+pub async fn delete_all_indices(
+    Extension(db): Extension<Arc<Mutex<Database>>>,
+    Json(data): Json<DeleteIndex>,
+) -> Json<String> {
+    let db_guard = match db.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => {
+            let guard = poisoned.into_inner();
+            guard
+        }
+    };
+    match db_guard.get_collection(data.collection_name).unwrap() {
+        Some(coll) => {
+            coll.index(data.field_name).drop_all().unwrap();
+            Json("All indices deleted".to_owned())
+        }
+        None => Json("Collection does not exist!".to_owned()),
+    }
 }

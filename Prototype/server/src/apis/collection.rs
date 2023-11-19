@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 
-use axum::{Extension, Json};
+use axum::{extract::Path, Extension, Json};
 use ejdb::{
     bson::ordered::OrderedDocument,
     query::{Q, QH},
@@ -58,7 +58,7 @@ pub struct GetAllDocs {
 
 pub async fn get_all_docs(
     Extension(db): Extension<Arc<Mutex<Database>>>,
-    Json(data): Json<GetAllDocs>,
+    Path(GetAllDocs { collection_name }): Path<GetAllDocs>,
 ) -> Json<Vec<OrderedDocument>> {
     let db_guard = match db.lock() {
         Ok(guard) => guard,
@@ -67,7 +67,7 @@ pub async fn get_all_docs(
             guard
         }
     };
-    let coll = db_guard.collection(data.collection_name).unwrap();
+    let coll = db_guard.collection(collection_name).unwrap();
     let result = coll.query(Q.empty(), QH.empty()).find().unwrap();
     let mut ret_vec: Vec<OrderedDocument> = Vec::new();
     for (_x, document) in result.enumerate() {
