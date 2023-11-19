@@ -2,4 +2,5 @@
 Reviews/~$*.docx
 Management/.DS_Store
 Prototype/sdk/node_modules/
+Prototype/sdk_tests/node_modules/
 package-lock.json

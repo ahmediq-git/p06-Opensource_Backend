@@ -226,7 +226,7 @@ class Crud {
             }
 
             const sendObject = { "collection_name": collectionName, "doc_id": docId }
-
+           
             const response = await this.client.sendToBackend(sendObject, "/get_doc", "GET")
             return response;
 
@@ -272,8 +272,7 @@ class Crud {
             const value = query[key];
             
             const sendObject = { "collection_name": collectionName, "search_key": key, "search_value": value }
-
-            const response = await this.client.sendToBackend(sendObject, "/search_doc", "GET")
+            const response = await this.client.sendToBackend(sendObject, "/search_doc", "POST")
             return response;
 
         } catch (error) {

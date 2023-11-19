@@ -8,8 +8,8 @@
   },
   "author": "",
   "license": "ISC",
-  "type":"module",
+  "type": "module",
   "dependencies": {
-    "ezbase": "^0.1.36"
+    "ezbase": "^0.1.43"
   }
 }
