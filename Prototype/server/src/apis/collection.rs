@@ -1,12 +1,19 @@
 use std::sync::{Arc, Mutex};
 
-use axum::{extract::Path, Extension, Json};
+use axum::{
+    extract::Path,
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Extension, Json,
+};
 use ejdb::{
     bson::ordered::OrderedDocument,
     query::{Q, QH},
     Database,
 };
 use serde::Deserialize;
+
+use crate::error::CustomError;
 
 #[derive(Deserialize, Debug)]
 pub struct CreateCollection {
@@ -16,7 +23,7 @@ pub struct CreateCollection {
 pub async fn create_collection(
     Extension(db): Extension<Arc<Mutex<Database>>>,
     Json(data): Json<CreateCollection>,
-) -> Json<String> {
+) -> Result<Json<String>, Response> {
     let db_guard = match db.lock() {
         Ok(guard) => guard,
         Err(poisoned) => {
@@ -24,8 +31,14 @@ pub async fn create_collection(
             guard
         }
     };
-    let _coll = db_guard.collection(data.collection_name).unwrap();
-    Json("Collection Created!".to_owned())
+    db_guard.collection(data.collection_name).map_err(|_| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to create collection",
+        )
+            .into_response()
+    })?;
+    Ok(Json("Collection Created!".to_owned()))
 }
 
 #[derive(Deserialize, Debug)]
@@ -37,7 +50,7 @@ pub struct DeleteCollection {
 pub async fn delete_collection(
     Extension(db): Extension<Arc<Mutex<Database>>>,
     Json(data): Json<DeleteCollection>,
-) -> Json<String> {
+) -> Result<Json<String>, Response> {
     let db_guard = match db.lock() {
         Ok(guard) => guard,
         Err(poisoned) => {
@@ -48,7 +61,7 @@ pub async fn delete_collection(
     db_guard
         .drop_collection(data.collection_name, data.delete_all_data)
         .unwrap();
-    Json("Collection Deleted!".to_owned())
+    Ok(Json("Collection Deleted!".to_owned()))
 }
 
 #[derive(Deserialize, Debug)]
@@ -59,7 +72,7 @@ pub struct GetAllDocs {
 pub async fn get_all_docs(
     Extension(db): Extension<Arc<Mutex<Database>>>,
     Path(GetAllDocs { collection_name }): Path<GetAllDocs>,
-) -> Json<Vec<OrderedDocument>> {
+) -> Result<Json<Vec<OrderedDocument>>, Response> {
     let db_guard = match db.lock() {
         Ok(guard) => guard,
         Err(poisoned) => {
@@ -67,18 +80,30 @@ pub async fn get_all_docs(
             guard
         }
     };
-    let coll = db_guard.collection(collection_name).unwrap();
-    let result = coll.query(Q.empty(), QH.empty()).find().unwrap();
-    let mut ret_vec: Vec<OrderedDocument> = Vec::new();
-    for (_x, document) in result.enumerate() {
-        ret_vec.push(document.unwrap());
-    }
-    Json(ret_vec)
+    let coll = db_guard
+        .collection(collection_name)
+        .map_err(|_| (StatusCode::NOT_FOUND, "Collection does not exist").into_response())?;
+    let result = coll.query(Q.empty(), QH.empty()).find().map_err(|_| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to query documents",
+        )
+            .into_response()
+    })?;
+
+    let ret_vec: Vec<OrderedDocument> = result.collect::<Result<_, _>>().map_err(|_| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to process documents",
+        )
+            .into_response()
+    })?;
+    Ok(Json(ret_vec))
 }
 
 pub async fn get_collection_names(
     Extension(db): Extension<Arc<Mutex<Database>>>,
-) -> Json<Vec<String>> {
+) -> Result<Json<Vec<String>>, Response> {
     let db_guard = match db.lock() {
         Ok(guard) => guard,
         Err(poisoned) => {
@@ -86,12 +111,28 @@ pub async fn get_collection_names(
             guard
         }
     };
-    let db_meta = db_guard.get_metadata().unwrap();
-    let colls_arr = db_meta.get("collections").unwrap().as_array().unwrap();
-    let mut coll_names: Vec<String> = Vec::new();
-    for (i, data) in colls_arr.iter().enumerate() {
-        let name = data.as_document().unwrap().get("name").unwrap().to_string();
-        coll_names.push(name[1..name.len() - 1].to_owned())
-    }
-    Json(coll_names)
+    let db_meta = db_guard.get_metadata().map_err(|_| {
+        (StatusCode::INTERNAL_SERVER_ERROR, "Failed to get metadata").into_response()
+    })?;
+    let colls_arr = db_meta
+        .get("collections")
+        .and_then(|doc| doc.as_array())
+        .ok_or_else(|| {
+            (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to get collection names",
+            )
+                .into_response()
+        })?;
+
+    let coll_names = colls_arr
+        .iter()
+        .filter_map(|data| {
+            data.as_document()
+                .and_then(|doc| doc.get("name").and_then(|name| name.as_str()))
+        })
+        .map(String::from)
+        .collect();
+
+    Ok(Json(coll_names))
 }

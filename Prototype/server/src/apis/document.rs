@@ -1,6 +1,11 @@
 use std::sync::{Arc, Mutex};
 
-use axum::{extract::Path, Extension, Json};
+use axum::{
+    extract::Path,
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Extension, Json,
+};
 use ejdb::{
     bson,
     bson::ordered::OrderedDocument,
@@ -245,7 +250,11 @@ pub struct OneFieldSearch {
 
 pub async fn search_doc_by_one_field(
     Extension(db): Extension<Arc<Mutex<Database>>>,
-    Json(data): Json<OneFieldSearch>,
+    Path(OneFieldSearch {
+        collection_name,
+        search_key,
+        search_value,
+    }): Path<OneFieldSearch>,
 ) -> Result<Json<Vec<OrderedDocument>>, Json<String>> {
     let db_guard = match db.lock() {
         Ok(guard) => guard,
@@ -254,10 +263,10 @@ pub async fn search_doc_by_one_field(
             guard
         }
     };
-    match db_guard.get_collection(data.collection_name).unwrap() {
+    match db_guard.get_collection(collection_name).unwrap() {
         Some(coll) => {
             let result = coll
-                .query(Q.field(data.search_key).eq(data.search_value), QH.empty())
+                .query(Q.field(search_key).eq(search_value), QH.empty())
                 .find()
                 .unwrap();
             let mut ret_vec: Vec<OrderedDocument> = Vec::new();
