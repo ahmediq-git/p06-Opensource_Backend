@@ -35,10 +35,7 @@ pub fn get_router() -> Router {
         .route("/insert_field", post(insert_field))
         .route("/delete_doc", delete(delete_doc))
         .route("/insert_many_fields", post(insert_many_fields))
-        .route(
-            "/search_doc/:collection_name/:search_key/:search_value",
-            get(search_doc_by_one_field),
-        )
+        .route("/search_doc", post(search_doc_by_one_field))
         .route("/get_collection_names", get(get_collection_names))
         .route("/create_index", post(create_index))
         .route("/delete_index", delete(delete_index))
