@@ -21,9 +21,9 @@ class Crud {
     #isArrayOfObjects(userInput) {
         return Array.isArray(userInput) && userInput.every(item => typeof item === 'object' && item !== null);
     }
-    
+
     // Helper function to convert from array of objects to object of objects
-    #objectFromArrayOfObjects(arrayOfObjects){
+    #objectFromArrayOfObjects(arrayOfObjects) {
         const objectFromArrayOfObjects = {};
         arrayOfObjects.forEach((obj, index) => {
             objectFromArrayOfObjects[index.toString()] = obj;
@@ -79,7 +79,7 @@ class Crud {
             const value = doc[key];
 
             const sendObject = { "collection_name": collectionName, "field_name": key, "field_value": value };
-            const response =await this.client.sendToBackend(sendObject, "/insert_doc", "POST");
+            const response = await this.client.sendToBackend(sendObject, "/insert_doc", "POST");
             return response
 
         } catch (error) {
@@ -100,14 +100,14 @@ class Crud {
 
 
             const sendObject = { "collection_name": collectionName, "data": doc };
-            const response =await this.client.sendToBackend(sendObject, "/insert_doc_multifield", "POST");
+            const response = await this.client.sendToBackend(sendObject, "/insert_doc_multifield", "POST");
             // returns the id of the doc
             return response
         } catch (error) {
             console.log("Error inserting document: ", error)
         }
     }
-    
+
     // Inserts many documents in a collection and returns the id
     // returns array of IDs
     async insertManyDocs(collectionName, docs) {
@@ -122,14 +122,14 @@ class Crud {
 
             const convertedDocs = this.#objectFromArrayOfObjects(docs);
 
-            const sendObject = { "collection_name": collectionName, "docs": convertedDocs};
-            const response =await this.client.sendToBackend(sendObject, "/insert_docs", "POST");
+            const sendObject = { "collection_name": collectionName, "docs": convertedDocs };
+            const response = await this.client.sendToBackend(sendObject, "/insert_docs", "POST");
             // returns the id of the doc
             return response
         } catch (error) {
             console.log("Error inserting documents: ", error)
         }
-        
+
     }
     // Deletes a document from a collection
     async deleteDoc(collectionName, docId) {
@@ -137,7 +137,7 @@ class Crud {
             if (!this.#isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
-            if (!this.#isString(docId)) { 
+            if (!this.#isString(docId)) {
                 throw new Error("Invalid document id. Please provide a valid record id for deletion.")
             }
 
@@ -221,7 +221,7 @@ class Crud {
             if (!this.#isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
-            if (!this.#isString(docId)) { 
+            if (!this.#isString(docId)) {
                 throw new Error("Invalid document id. Please provide a valid record id for deletion.")
             }
 
@@ -270,7 +270,7 @@ class Crud {
             const keys = Object.keys(query);
             const key = keys[0];
             const value = query[key];
-            
+
             const sendObject = { "collection_name": collectionName, "search_key": key, "search_value": value }
 
             const response = await this.client.sendToBackend(sendObject, "/search_doc", "GET")
