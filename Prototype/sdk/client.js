@@ -27,7 +27,7 @@ class EzBaseClient {
 
     // Sends to the backend using the given method and api endpoint
     async sendToBackend(jsonObject, apiEndpoint, method) {
-        const completeApiEndpoint = `${this.#backendUrl}${apiEndpoint}`;
+        let completeApiEndpoint = `${this.#backendUrl}${apiEndpoint}`;
     
         const headers = {
             'Content-Type': 'application/json',
@@ -46,7 +46,10 @@ class EzBaseClient {
                     console.log('Data sent for deletion successfully:', response.data);
                     return response.data;
                 case 'GET':
-                    response = await axios.get(completeApiEndpoint, { data: jsonObject, headers });
+                    const values = Object.values(jsonObject);
+                    completeApiEndpoint += values.map(value => `/${value}`).join('');
+                    console.log(completeApiEndpoint)
+                    response = await axios.get(completeApiEndpoint, { headers });
                     console.log('Data received successfully:', response.data);
                     return response.data;
                 default:

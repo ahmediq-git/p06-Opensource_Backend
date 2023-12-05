@@ -28,7 +28,7 @@ function insertSingleFieldDocTest(){
 //3 getAllDocs
 function getAllDocsTest(){
   console.log("Testing of getAllDocs on newcol1")
-  eb.database.getAllDocs("newcol1").then(ans=>console.log(ans))
+  eb.database.getAllDocs("newcol3").then(ans=>console.log(ans))
   console.log("")
 }
 
@@ -84,7 +84,7 @@ function insertManyDocsTest(){
 //11 findDoc
 function findDocTest(){
   console.log("Testing findDoc")
-  eb.database.findDoc("newcol2", {"age":2}).then((ans)=>console.log(ans))
+  eb.database.findDoc("newcol2", {"age":20}).then((ans)=>console.log(ans))
 }
 
 //12 getCollectionNames()
@@ -104,20 +104,21 @@ function deleteCollection(){
 
 // where id is written change id according to what is received from server when testing
 
-createCollectionTest()
+// createCollectionTest()
 // insertSingleFieldDocTest()
-// getAllDocsTest()
-// insertDocTest() // issue
+
+// insertDocTest()
 // insertFieldTest("6557a315adeb935c00000000")
 // deleteDocTest("6557a315adeb935c00000000")
-
+// getAllDocsTest()
+// 
 
 // insertManyFieldsTest("6557a47cdefcef5c00000000")
-// getDocTest("6557af222815ab5f00020000")
+// getDocTest("6559ab93e0730f6200000000")
 // updateDocTest("6557af222815ab5f00000000")
 
-// insertManyDocsTest()
-// findDocTest()
+insertManyDocsTest()
+findDocTest()
 
-// getCollectionNamesTest()
-// deleteCollection()
+getCollectionNamesTest()
+deleteCollection()
