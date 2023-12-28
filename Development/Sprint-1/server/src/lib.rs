@@ -7,3 +7,7 @@ pub mod apis {
     pub mod collection;
     pub mod document;
 }
+
+pub mod middleware {
+    pub mod validate_session;
+}
