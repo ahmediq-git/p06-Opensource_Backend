@@ -54,7 +54,7 @@ pub fn create_user(
     let coll = db.collection("user").unwrap();
     let user_id = rand_string(15);
     let user = match create_key(db, user_id.clone(), provider_id, provider_userid, password) {
-        Ok(key) => {
+        Ok(_key) => {
             let user = bson! {
                 "user_id" => user_id
             };
@@ -88,4 +88,4 @@ pub fn create_session(db: &MutexGuard<'_, Database>, user_id: String) -> Ordered
     session
 }
 
-todo!(validate session, delete session )
+// todo!(validate session, delete session )
