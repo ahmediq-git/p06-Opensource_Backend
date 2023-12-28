@@ -87,5 +87,3 @@ pub fn create_session(db: &MutexGuard<'_, Database>, user_id: String) -> Ordered
     coll.save(&session).unwrap();
     session
 }
-
-todo!(validate session, delete session )

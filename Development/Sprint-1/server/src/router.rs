@@ -8,14 +8,14 @@ use crate::apis::document::{
     create_index, delete_all_indices, delete_doc, delete_index, insert_doc, insert_doc_multifield,
     insert_docs, insert_field, insert_many_fields, read_doc, search_doc_by_one_field,
 };
-use axum::Extension;
+use crate::middleware::validate_session::validate;
 use axum::{
     http::{header::CONTENT_TYPE, Method},
     routing::{delete, get, post},
     Router,
 };
+use axum::{middleware, Extension};
 use ejdb::Database;
-use tower_cookies::CookieManagerLayer;
 use tower_http::cors::{Any, CorsLayer};
 pub fn get_router() -> Router {
     let cors = CorsLayer::new()
@@ -45,6 +45,7 @@ pub fn get_router() -> Router {
         .route("/signup_email", post(signup_email))
         .route("/login_email", post(login_email))
         .layer(cors)
+        // .route_layer(middleware::from_fn(validate))
         .layer(Extension(db));
 
     router
