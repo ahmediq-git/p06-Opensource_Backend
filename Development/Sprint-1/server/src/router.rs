@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 
-use crate::apis::auth::{login_email, signup_email};
+use crate::apis::auth::{login_email, logout, signup_email};
 use crate::apis::collection::{
     create_collection, delete_collection, get_all_docs, get_collection_names,
 };
@@ -8,7 +8,6 @@ use crate::apis::document::{
     create_index, delete_all_indices, delete_doc, delete_index, insert_doc, insert_doc_multifield,
     insert_docs, insert_field, insert_many_fields, read_doc, search_doc_by_one_field,
 };
-use crate::middleware::validate_session::validate;
 use axum::{
     http::{header::CONTENT_TYPE, Method},
     routing::{delete, get, post},
@@ -44,8 +43,8 @@ pub fn get_router() -> Router {
         .route("/delete_all_indices", delete(delete_all_indices))
         .route("/signup_email", post(signup_email))
         .route("/login_email", post(login_email))
+        .route("/logout", get(logout))
         .layer(cors)
-        // .route_layer(middleware::from_fn(validate))
         .layer(Extension(db));
 
     router
