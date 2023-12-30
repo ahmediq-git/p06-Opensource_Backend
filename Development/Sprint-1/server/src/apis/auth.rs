@@ -4,7 +4,7 @@ use axum::{
     debug_handler,
     http::{header::SET_COOKIE, HeaderMap, HeaderName, StatusCode},
     response::AppendHeaders,
-    Extension, Json,
+    Error, Extension, Json,
 };
 use ejdb::{
     bson::ordered::OrderedDocument,
@@ -16,7 +16,7 @@ use tower_cookies::{cookie::CookieJar, CookieManager, Cookies};
 
 use crate::{
     auth::{create_key, create_session, create_user, delete_session},
-    utils::hash_verify,
+    utils::{hash_verify, validate_credentials},
 };
 
 #[derive(Deserialize, Debug)]
@@ -34,8 +34,11 @@ pub async fn signup_email(
         AppendHeaders<[(HeaderName, std::string::String); 1]>,
         Json<OrderedDocument>,
     ),
-    Json<String>,
+    (StatusCode, Json<String>),
 > {
+    if let Err(msg) = validate_credentials(&data.email, &data.password) {
+        return Err((StatusCode::BAD_REQUEST, Json(msg)));
+    }
     let db_guard = match db.lock() {
         Ok(guard) => guard,
         Err(poisoned) => {
@@ -53,7 +56,7 @@ pub async fn signup_email(
             let session = create_session(&db_guard, user.get("user_id").unwrap().to_string());
             session
         }
-        Err(error) => return Err(Json(error)),
+        Err(error) => return Err((StatusCode::BAD_REQUEST, Json(error))),
     };
     let session_id = session.get("session_id").unwrap().to_string();
     let headers = AppendHeaders([(SET_COOKIE, format!("session={}", session_id))]);

@@ -488,6 +488,7 @@ dependencies = [
  "ejdb",
  "rand 0.8.5",
  "random-string",
+ "regex",
  "serde",
  "serde_json",
  "tokio",

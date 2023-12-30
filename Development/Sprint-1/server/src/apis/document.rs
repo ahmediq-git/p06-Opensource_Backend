@@ -146,7 +146,7 @@ pub async fn read_doc(
         collection_name,
         doc_id,
     }): Path<GetDoc>,
-) -> Result<Json<Vec<OrderedDocument>>, Json<String>> {
+) -> Result<Json<Vec<OrderedDocument>>, (StatusCode, Json<String>)> {
     let db_guard = match db.lock() {
         Ok(guard) => guard,
         Err(poisoned) => {
@@ -167,7 +167,10 @@ pub async fn read_doc(
             }
             Ok(Json(ret_vec))
         }
-        None => Err(Json("Collection does not exist!".to_string())),
+        None => Err((
+            StatusCode::NOT_FOUND,
+            Json("Collection does not exist!".to_string()),
+        )),
     }
 }
 
@@ -292,7 +295,7 @@ pub struct OneFieldSearch {
 pub async fn search_doc_by_one_field(
     Extension(db): Extension<Arc<Mutex<Database>>>,
     Json(data): Json<OneFieldSearch>,
-) -> Result<Json<Vec<OrderedDocument>>, Json<String>> {
+) -> Result<Json<Vec<OrderedDocument>>, (StatusCode, Json<String>)> {
     let db_guard = match db.lock() {
         Ok(guard) => guard,
         Err(poisoned) => {
@@ -313,7 +316,10 @@ pub async fn search_doc_by_one_field(
             }
             Ok(Json(ret_vec))
         }
-        None => Err(Json("Collection does not exist!".to_owned())),
+        None => Err((
+            StatusCode::NOT_FOUND,
+            Json("Collection does not exist!".to_owned()),
+        )),
     }
 }
 
@@ -327,7 +333,7 @@ pub struct CreateIndex {
 pub async fn create_index(
     Extension(db): Extension<Arc<Mutex<Database>>>,
     Json(data): Json<CreateIndex>,
-) -> Json<String> {
+) -> (StatusCode, Json<String>) {
     let db_guard = match db.lock() {
         Ok(guard) => guard,
         Err(poisoned) => {
@@ -344,9 +350,12 @@ pub async fn create_index(
             } else if data.index_type == "array" {
                 coll.index(data.field_name).array().set().unwrap();
             }
-            Json("Index created".to_owned())
+            (StatusCode::OK, Json("Index created".to_owned()))
         }
-        None => Json("Collection does not exist!".to_owned()),
+        None => (
+            StatusCode::NOT_FOUND,
+            Json("Collection does not exist!".to_owned()),
+        ),
     }
 }
 
@@ -360,7 +369,7 @@ pub struct DeleteIndex {
 pub async fn delete_index(
     Extension(db): Extension<Arc<Mutex<Database>>>,
     Json(data): Json<DeleteIndex>,
-) -> Json<String> {
+) -> (StatusCode, Json<String>) {
     let db_guard = match db.lock() {
         Ok(guard) => guard,
         Err(poisoned) => {
@@ -377,16 +386,19 @@ pub async fn delete_index(
             } else if data.index_type == "array" {
                 coll.index(data.field_name).array().drop().unwrap();
             }
-            Json("Index Deleted".to_owned())
+            (StatusCode::OK, Json("Index Deleted".to_owned()))
         }
-        None => Json("Collection does not exist!".to_owned()),
+        None => (
+            StatusCode::NOT_FOUND,
+            Json("Collection does not exist!".to_owned()),
+        ),
     }
 }
 
 pub async fn delete_all_indices(
     Extension(db): Extension<Arc<Mutex<Database>>>,
     Json(data): Json<DeleteIndex>,
-) -> Json<String> {
+) -> (StatusCode, Json<String>) {
     let db_guard = match db.lock() {
         Ok(guard) => guard,
         Err(poisoned) => {
@@ -397,8 +409,11 @@ pub async fn delete_all_indices(
     match db_guard.get_collection(data.collection_name).unwrap() {
         Some(coll) => {
             coll.index(data.field_name).drop_all().unwrap();
-            Json("All indices deleted".to_owned())
+            (StatusCode::OK, Json("All indices deleted".to_owned()))
         }
-        None => Json("Collection does not exist!".to_owned()),
+        None => (
+            StatusCode::NOT_FOUND,
+            Json("Collection does not exist!".to_owned()),
+        ),
     }
 }

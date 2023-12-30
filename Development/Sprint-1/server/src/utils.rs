@@ -1,11 +1,11 @@
-use std::collections::HashMap;
-
 use argon2::{
     password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
     Argon2,
 };
 use axum::http::{header::COOKIE, HeaderMap};
 use random_string::generate;
+use regex::Regex;
+use std::collections::HashMap;
 
 pub fn rand_string(len: usize) -> String {
     let charset = "1234567890abcdefghijklmnopqrstuvwxyz";
@@ -50,4 +50,19 @@ pub fn hash_verify(input: String, to_match: String) -> bool {
         Ok(_) => return true,
         Err(_) => return false,
     }
+}
+
+pub fn validate_credentials(email: &str, password: &str) -> Result<(), String> {
+    // Validate the email
+    let email_re = Regex::new(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$").unwrap();
+    if !email_re.is_match(&email) {
+        return Err("Invalid email.".to_string());
+    }
+
+    // Validate the password length
+    if password.len() < 8 {
+        return Err("Password must be at least 8 characters.".to_string());
+    }
+
+    Ok(())
 }

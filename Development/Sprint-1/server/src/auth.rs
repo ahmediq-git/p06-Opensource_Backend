@@ -13,6 +13,7 @@ use ejdb::{
     Database,
 };
 
+const SESSION_TIME: i64 = 60;
 pub fn create_key(
     db: &MutexGuard<'_, Database>,
     user_id: String,
@@ -95,7 +96,7 @@ pub fn create_session(db: &MutexGuard<'_, Database>, user_id: String) -> Ordered
 
     let coll = db.collection("user_session").unwrap();
     let session_id = rand_string(40);
-    let active_expiry = Utc::now().timestamp() + 60;
+    let active_expiry = Utc::now().timestamp() + SESSION_TIME;
     let session = bson! {
        "session_id" => session_id,
        "user_id" => trimmed_id,
@@ -118,7 +119,7 @@ pub fn validate_session(
     if session_id != "Error" {
         let coll = db.collection("user_session").unwrap();
         match coll
-            .query(Q.field("session_id").eq(trimmed_session_id), QH.empty())
+            .query(Q.field("session_id").eq(&trimmed_session_id), QH.empty())
             .find_one()
         {
             Ok(session) => match session {
@@ -129,14 +130,23 @@ pub fn validate_session(
                         .as_i64()
                         .unwrap();
 
-                    let current_time = SystemTime::now()
-                        .duration_since(UNIX_EPOCH)
-                        .unwrap()
-                        .as_secs();
-                    if current_time > active_time as u64 {
+                    let current_time = Utc::now().timestamp();
+                    if current_time > active_time {
                         Err(StatusCode::UNAUTHORIZED)
                     } else {
-                        Ok(StatusCode::OK)
+                        let new_time = current_time + SESSION_TIME;
+                        match coll
+                            .query(
+                                Q.field("session_id")
+                                    .eq(&trimmed_session_id)
+                                    .set("active_period_expires_at", new_time),
+                                QH.empty(),
+                            )
+                            .update()
+                        {
+                            Ok(_) => Ok(StatusCode::OK),
+                            Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
+                        }
                     }
                 }
                 None => return Err(StatusCode::INTERNAL_SERVER_ERROR),
