@@ -8,7 +8,7 @@ use crate::apis::document::{
     create_index, delete_all_indices, delete_doc, delete_index, insert_doc, insert_doc_multifield,
     insert_docs, insert_field, insert_many_fields, read_doc, search_doc_by_one_field,
 };
-use crate::middleware::validate_session::validate;
+
 use axum::{
     http::{header::CONTENT_TYPE, Method},
     routing::{delete, get, post},
@@ -42,10 +42,10 @@ pub fn get_router() -> Router {
         .route("/create_index", post(create_index))
         .route("/delete_index", delete(delete_index))
         .route("/delete_all_indices", delete(delete_all_indices))
+        //.layer(middleware::from_fn(validate))
         .route("/signup_email", post(signup_email))
         .route("/login_email", post(login_email))
         .layer(cors)
-        // .route_layer(middleware::from_fn(validate))
         .layer(Extension(db));
 
     router
