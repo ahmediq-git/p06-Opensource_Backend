@@ -1,6 +1,10 @@
-use std::sync::{Arc, Mutex, MutexGuard};
+use std::{
+    sync::{Arc, Mutex, MutexGuard},
+    time::{SystemTime, UNIX_EPOCH},
+};
 
-use crate::utils::rand_string;
+use crate::utils::{hasher, rand_string, read_cookie_handler};
+use axum::http::{HeaderMap, StatusCode};
 use chrono::Utc;
 use ejdb::{
     bson,
@@ -30,14 +34,28 @@ pub fn create_key(
     if existing_count > 0 {
         Err("User already exists".to_string())
     } else {
-        let key = bson! {
-            "user_id" => user_id,
-            "provider_id" => provider_id,
-            "provider_userid" => provider_userid,
-            "password" => (opt password)
-        };
-        coll.save(&key).unwrap();
-        Ok(key)
+        match password {
+            Some(password) => {
+                let hashed_pass = hasher(password);
+                let key = bson! {
+                    "user_id" => user_id,
+                    "provider_id" => provider_id,
+                    "provider_userid" => provider_userid,
+                    "password" => (hashed_pass)
+                };
+                coll.save(&key).unwrap();
+                Ok(key)
+            }
+            None => {
+                let key = bson! {
+                    "user_id" => user_id,
+                    "provider_id" => provider_id,
+                    "provider_userid" => provider_userid
+                };
+                coll.save(&key).unwrap();
+                Ok(key)
+            }
+        }
     }
 }
 
@@ -77,7 +95,7 @@ pub fn create_session(db: &MutexGuard<'_, Database>, user_id: String) -> Ordered
 
     let coll = db.collection("user_session").unwrap();
     let session_id = rand_string(40);
-    let active_expiry = Utc::now().timestamp() + 86400;
+    let active_expiry = Utc::now().timestamp() + 60;
     let session = bson! {
        "session_id" => session_id,
        "user_id" => trimmed_id,
@@ -88,4 +106,62 @@ pub fn create_session(db: &MutexGuard<'_, Database>, user_id: String) -> Ordered
     session
 }
 
-// todo!(validate session, delete session )
+// get session id, compare to session id from db
+// check if active time left, if yes then continue,
+// otherwise error
+pub fn validate_session(
+    db: &MutexGuard<'_, Database>,
+    headers: HeaderMap,
+) -> Result<StatusCode, StatusCode> {
+    let session_id = read_cookie_handler(headers.clone(), "session".to_string());
+    let trimmed_session_id = session_id.trim_matches('"').to_string();
+    if session_id != "Error" {
+        let coll = db.collection("user_session").unwrap();
+        match coll
+            .query(Q.field("session_id").eq(trimmed_session_id), QH.empty())
+            .find_one()
+        {
+            Ok(session) => match session {
+                Some(doc) => {
+                    let active_time = doc
+                        .get("active_period_expires_at")
+                        .unwrap()
+                        .as_i64()
+                        .unwrap();
+
+                    let current_time = SystemTime::now()
+                        .duration_since(UNIX_EPOCH)
+                        .unwrap()
+                        .as_secs();
+                    if current_time > active_time as u64 {
+                        Err(StatusCode::UNAUTHORIZED)
+                    } else {
+                        Ok(StatusCode::OK)
+                    }
+                }
+                None => return Err(StatusCode::INTERNAL_SERVER_ERROR),
+            },
+            Err(_) => Err(StatusCode::UNAUTHORIZED),
+        }
+    } else {
+        Err(StatusCode::UNAUTHORIZED)
+    }
+}
+
+pub fn delete_session(
+    db: &MutexGuard<'_, Database>,
+    headers: HeaderMap,
+) -> Result<StatusCode, StatusCode> {
+    let session_id = read_cookie_handler(headers.clone(), "session".to_string());
+    let trimmed_session_id = session_id.trim_matches('"').to_string();
+    if session_id != "Error" {
+        let coll = db.collection("user_session").unwrap();
+        let q = Q.field("session_id").eq(trimmed_session_id).drop_all();
+        match coll.query(q, QH.empty()).update() {
+            Ok(_) => return Ok(StatusCode::OK),
+            Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
+        }
+    } else {
+        Err(StatusCode::INTERNAL_SERVER_ERROR)
+    }
+}

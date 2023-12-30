@@ -13,7 +13,7 @@ export default function Documents() {
 
 	const deleteDoc = async () => {
 		try {
-			const res = await fetch(`http://0.0.0.0:3690/delete_doc`, {
+			const res = await fetch(`http://127.0.0.1:3690/delete_doc`, {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
@@ -28,7 +28,7 @@ export default function Documents() {
 			console.log(data);
 
 			// remove the deleted collection from the list of collections
-			mutate(`http://0.0.0.0:3690/get_all_docs/${selection.collection}}`);
+			mutate(`http://127.0.0.1:3690/get_all_docs/${selection.collection}}`);
 			setSelection({ collection: "", document: "" });
 
 			setShowDeleteModal(false);

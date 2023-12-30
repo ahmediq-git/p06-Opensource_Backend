@@ -6,9 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+argon2 = "0.5.2"
 axum = { version = "0.6.20", features = ["macros"] }
 chrono = "0.4.31"
 ejdb = "0.4.1"
+rand = "0.8.5"
 random-string = "1.0.1"
 serde = { version = "1.0.190", features = ["derive"] }
 serde_json = "1.0.108"

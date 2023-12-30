@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 
-use crate::apis::auth::{login_email, signup_email};
+use crate::apis::auth::{login_email, logout, signup_email};
 use crate::apis::collection::{
     create_collection, delete_collection, get_all_docs, get_collection_names,
 };
@@ -45,6 +45,7 @@ pub fn get_router() -> Router {
         //.layer(middleware::from_fn(validate))
         .route("/signup_email", post(signup_email))
         .route("/login_email", post(login_email))
+        .route("/logout", get(logout))
         .layer(cors)
         .layer(Extension(db));
 

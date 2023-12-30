@@ -19,7 +19,7 @@ export default function Documents() {
 	]);
 
 	const { data, error } = useSwr(
-		`http://0.0.0.0:3690/get_all_docs/${selection.collection}`,
+		`http://127.0.0.1:3690/get_all_docs/${selection.collection}`,
 		fetcher
 	);
 
@@ -52,7 +52,7 @@ export default function Documents() {
 				collection_name: selection.collection,
 				data: obj,
 			});
-			const res = await fetch(`http://0.0.0.0:3690/insert_doc_multifield`, {
+			const res = await fetch(`http://127.0.0.1:3690/insert_doc_multifield`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -67,7 +67,7 @@ export default function Documents() {
 
 			console.log(adsa);
 
-			mutate(`http://0.0.0.0:3690/get_all_docs/${selection.collection}`);
+			mutate(`http://127.0.0.1:3690/get_all_docs/${selection.collection}`);
 			setDocumentModal(false);
 
 		} catch (error) {

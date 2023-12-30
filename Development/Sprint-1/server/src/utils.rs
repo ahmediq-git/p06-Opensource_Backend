@@ -1,5 +1,9 @@
 use std::collections::HashMap;
 
+use argon2::{
+    password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
+    Argon2,
+};
 use axum::http::{header::COOKIE, HeaderMap};
 use random_string::generate;
 
@@ -28,4 +32,22 @@ pub fn parse_cookies(cookie_header: &str) -> HashMap<String, String> {
             Some((name, value))
         })
         .collect()
+}
+
+pub fn hasher(input: String) -> String {
+    let salt = SaltString::generate(&mut OsRng);
+    let argon2 = Argon2::default();
+    let password_hash = argon2
+        .hash_password(input.as_bytes(), &salt)
+        .unwrap()
+        .to_string();
+    password_hash
+}
+
+pub fn hash_verify(input: String, to_match: String) -> bool {
+    let parsed_hash = PasswordHash::new(&to_match).unwrap();
+    match Argon2::default().verify_password(input.as_bytes(), &parsed_hash) {
+        Ok(_) => return true,
+        Err(_) => return false,
+    }
 }

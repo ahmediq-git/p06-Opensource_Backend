@@ -15,7 +15,7 @@ function App() {
 
 	const deleteCollection = async () => {
 		try {
-			const res = await fetch(`http://0.0.0.0:3690/delete_collection`, {
+			const res = await fetch(`http://127.0.0.1:3690/delete_collection`, {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
@@ -30,7 +30,7 @@ function App() {
 
       // remove the deleted collection from the list of collections
       setSelection({ collection: "", document: "" })
-			mutate('http://0.0.0.0:3690/get_collection_names')
+			mutate('http://127.0.0.1:3690/get_collection_names')
       setShowDeleteModal(false);
       
 		} catch (error) {

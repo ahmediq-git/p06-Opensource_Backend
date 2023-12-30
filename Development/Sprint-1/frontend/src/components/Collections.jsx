@@ -54,7 +54,7 @@ export default function Collections() {
 	const [collectionNameError, setCollectionNameError] = useState(null);
 
 	const { data, error, isLoading } = useSWR(
-		"http://0.0.0.0:3690/get_collection_names",
+		"http://127.0.0.1:3690/get_collection_names",
 		fetcher
 	);
 
@@ -124,7 +124,7 @@ export default function Collections() {
 
 		// set collectionName
 		try {
-			const response = await fetch("http://0.0.0.0:3690/create_collection", {
+			const response = await fetch("http://127.0.0.1:3690/create_collection", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -137,7 +137,7 @@ export default function Collections() {
 			console.log("data", data);
 
 			setModal(false);
-			mutate('http://0.0.0.0:3690/get_collection_names');
+			mutate('http://127.0.0.1:3690/get_collection_names');
 		} catch (error) {
 			console.log(error);
 		}
