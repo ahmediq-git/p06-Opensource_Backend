@@ -23,6 +23,11 @@ pub struct SignupLogin {
     email: String,
     password: String,
 }
+#[derive(Serialize)]
+pub struct AuthResponse {
+    user_id: String,
+    session_id: String, // TODO: this is only for testing
+}
 
 #[debug_handler]
 pub async fn signup_email(
@@ -31,7 +36,7 @@ pub async fn signup_email(
 ) -> Result<
     (
         AppendHeaders<[(HeaderName, std::string::String); 1]>,
-        Json<OrderedDocument>,
+        Json<AuthResponse>,
     ),
     (StatusCode, Json<String>),
 > {
@@ -45,21 +50,35 @@ pub async fn signup_email(
             guard
         }
     };
-    let session = match create_user(
+    let response = match create_user(
         &db_guard,
         "email".to_string(),
         data.email,
         Some(data.password),
     ) {
         Ok(user) => {
+            let user_id = user
+                .get("user_id")
+                .unwrap()
+                .to_string()
+                .trim_matches('"')
+                .to_string();
             let session = create_session(&db_guard, user.get("user_id").unwrap().to_string());
-            session
+            AuthResponse {
+                user_id,
+                session_id: session
+                    .get("session_id")
+                    .unwrap()
+                    .to_string()
+                    .trim_matches('"')
+                    .to_string(),
+            }
         }
         Err(error) => return Err((StatusCode::BAD_REQUEST, Json(error))),
     };
-    let session_id = session.get("session_id").unwrap().to_string();
+    let session_id = response.session_id.clone();
     let headers = AppendHeaders([(SET_COOKIE, format!("session={}", session_id))]);
-    Ok((headers, Json(session)))
+    Ok((headers, Json(response)))
 }
 
 #[debug_handler]
@@ -69,7 +88,7 @@ pub async fn login_email(
 ) -> Result<
     (
         AppendHeaders<[(HeaderName, std::string::String); 1]>,
-        Json<OrderedDocument>,
+        Json<AuthResponse>,
     ),
     Json<String>,
 > {
@@ -96,11 +115,19 @@ pub async fn login_email(
         let trimmed_pass = stored_pass.trim_matches('"').to_string();
         if hash_verify(data.password, trimmed_pass) {
             let user_id = user_key.get("user_id").unwrap().to_string();
+            let user_copy = user_id.clone().trim_matches('"').to_string();
             let session = create_session(&db_guard, user_id);
             let session_id = session.get("session_id").unwrap().to_string();
+            let session_id_copy = session_id.clone().trim_matches('"').to_string();
             let headers = AppendHeaders([(SET_COOKIE, format!("session={}", session_id))]);
 
-            Ok((headers, Json(session)))
+            Ok((
+                headers,
+                Json(AuthResponse {
+                    user_id: user_copy,
+                    session_id: session_id_copy,
+                }),
+            ))
         } else {
             return Err(Json("Passwords do not match".to_string()));
         }
