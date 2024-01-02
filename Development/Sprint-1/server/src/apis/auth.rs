@@ -12,7 +12,6 @@ use ejdb::{
     Database,
 };
 use serde::Deserialize;
-use tower_cookies::{cookie::CookieJar, CookieManager, Cookies};
 
 use crate::{
     auth::{create_key, create_session, create_user, delete_session},
