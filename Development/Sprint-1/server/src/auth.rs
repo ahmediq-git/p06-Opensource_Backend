@@ -14,6 +14,7 @@ use ejdb::{
 };
 
 const SESSION_TIME: i64 = 60;
+
 pub fn create_key(
     db: &MutexGuard<'_, Database>,
     user_id: String,

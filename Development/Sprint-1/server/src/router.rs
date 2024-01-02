@@ -1,3 +1,4 @@
+use std::convert::Infallible;
 use std::sync::{Arc, Mutex};
 
 use crate::apis::auth::{login_email, logout, signup_email};
@@ -8,7 +9,13 @@ use crate::apis::document::{
     create_index, delete_all_indices, delete_doc, delete_index, insert_doc, insert_doc_multifield,
     insert_docs, insert_field, insert_many_fields, read_doc, search_doc_by_one_field,
 };
+use crate::apis::logs::get_logs;
+use crate::middleware::tracer::trace;
 
+use axum::body::{Bytes, Full};
+use axum::extract::State;
+use axum::http::{Request, Response, StatusCode};
+use axum::middleware::Next;
 use axum::{
     http::{header::CONTENT_TYPE, Method},
     routing::{delete, get, post},
@@ -17,6 +24,7 @@ use axum::{
 use axum::{middleware, Extension};
 use ejdb::Database;
 use tower_http::cors::{Any, CorsLayer};
+
 pub fn get_router() -> Router {
     let cors = CorsLayer::new()
         .allow_methods([Method::POST, Method::GET, Method::PATCH, Method::DELETE])
@@ -25,6 +33,8 @@ pub fn get_router() -> Router {
 
     //Arc and Mutex allow for Sync and Clone
     let db: Arc<Mutex<Database>> = Arc::new(Mutex::new(Database::open("ezbase.db").unwrap()));
+
+    let log_db = Arc::new(Mutex::new(Database::open("logs.db").unwrap()));
 
     let router = Router::new()
         .route("/create_collection", post(create_collection))
@@ -42,12 +52,14 @@ pub fn get_router() -> Router {
         .route("/create_index", post(create_index))
         .route("/delete_index", delete(delete_index))
         .route("/delete_all_indices", delete(delete_all_indices))
-        //.layer(middleware::from_fn(validate))
         .route("/signup_email", post(signup_email))
         .route("/login_email", post(login_email))
         .route("/logout", get(logout))
         .layer(cors)
-        .layer(Extension(db));
+        .layer(Extension(db))
+        .route("/get_logs", get(get_logs))
+        .route_layer(Extension(Arc::clone(&log_db)))
+        .layer(middleware::from_fn_with_state(log_db, trace));
 
     router
 }
