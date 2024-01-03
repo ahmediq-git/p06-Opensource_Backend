@@ -11,7 +11,7 @@ use ejdb::{
     query::{Q, QH},
     Database,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     auth::{create_key, create_session, create_user, delete_session},
