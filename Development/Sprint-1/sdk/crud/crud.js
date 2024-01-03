@@ -1,42 +1,15 @@
+import ValidationUtils from "../validators/validators";
+
 class Crud {
     constructor(ezBaseClient) {
         this.client = ezBaseClient; //passing the client object to send to the user.
-    }
-
-    // Validator functions
-
-    #isObject(userInput) {
-        return typeof userInput === 'object' && userInput !== null && !Array.isArray(userInput);
-    }
-
-    // checks whether the object is of single key value pair like {field: value1}
-    #isSingleKeyValuePair(obj) {
-        return typeof obj === 'object' && obj !== null && !Array.isArray(obj) && Object.keys(obj).length === 1;
-    }
-
-    #isString(userInput) {
-        return typeof userInput === 'string';
-    }
-
-    #isArrayOfObjects(userInput) {
-        return Array.isArray(userInput) && userInput.every(item => typeof item === 'object' && item !== null);
-    }
-
-    // Helper function to convert from array of objects to object of objects
-    #objectFromArrayOfObjects(arrayOfObjects) {
-        const objectFromArrayOfObjects = {};
-        arrayOfObjects.forEach((obj, index) => {
-            objectFromArrayOfObjects[index.toString()] = obj;
-        })
-
-        return objectFromArrayOfObjects
     }
 
     // creates a collection with the given name
     // if the collection already exists, then the collection remains as is unchanged
     async createCollection(collectionName) {
         try {
-            if (!this.#isString(collectionName)) {
+            if (!ValidationUtils.isString(collectionName)) {
                 throw new Error("Invalid collection name, please provide a valid collection name for creation.")
             }
 
@@ -51,7 +24,7 @@ class Crud {
     //deletes a collection with the given name
     async deleteCollection(collectionName) {
         try {
-            if (!this.#isString(collectionName)) {
+            if (!ValidationUtils.isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
 
@@ -66,11 +39,11 @@ class Crud {
     // Inserts a document of only one field: (one key and value) in a collection and returns the index of the inserted document
     async insertSingleFieldDoc(collectionName, doc) {
         try {
-            if (!this.#isString(collectionName)) {
+            if (!ValidationUtils.isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
 
-            if (!this.#isObject(doc)) {
+            if (!ValidationUtils.isObject(doc)) {
                 throw new Error(doc, "is not a document")
             }
 
@@ -90,11 +63,11 @@ class Crud {
     // Inserts a document in a collection, (of many fields)  and returns the id
     async insertDoc(collectionName, doc) {
         try {
-            if (!this.#isString(collectionName)) {
+            if (!ValidationUtils.isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
 
-            if (!this.#isObject(doc)) {
+            if (!ValidationUtils.isObject(doc)) {
                 throw new Error(doc, "is not a document")
             }
 
@@ -112,15 +85,15 @@ class Crud {
     // returns array of IDs
     async insertManyDocs(collectionName, docs) {
         try {
-            if (!this.#isString(collectionName)) {
+            if (!ValidationUtils.isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
 
-            if (!this.#isArrayOfObjects(docs)) {
+            if (!ValidationUtils.isArrayOfObjects(docs)) {
                 throw new Error(docs, "is not an array of documents")
             }
 
-            const convertedDocs = this.#objectFromArrayOfObjects(docs);
+            const convertedDocs = ValidationUtils.objectFromArrayOfObjects(docs);
 
             const sendObject = { "collection_name": collectionName, "docs": convertedDocs };
             const response = await this.client.sendToBackend(sendObject, "/insert_docs", "POST");
@@ -134,10 +107,10 @@ class Crud {
     // Deletes a document from a collection
     async deleteDoc(collectionName, docId) {
         try {
-            if (!this.#isString(collectionName)) {
+            if (!ValidationUtils.isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
-            if (!this.#isString(docId)) {
+            if (!ValidationUtils.isString(docId)) {
                 throw new Error("Invalid document id. Please provide a valid record id for deletion.")
             }
 
@@ -152,13 +125,13 @@ class Crud {
     // newField is a key value pair
     async insertField(collectionName, docId, newField) {
         try {
-            if (!this.#isString(collectionName)) {
+            if (!ValidationUtils.isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
-            if (!this.#isString(docId)) {
+            if (!ValidationUtils.isString(docId)) {
                 throw new Error("Invalid document id. Please provide a valid record id for deletion.")
             }
-            if (!this.#isSingleKeyValuePair(newField)) {
+            if (!ValidationUtils.isSingleKeyValuePair(newField)) {
                 throw new Error("Invalid field. Please provide a valid field for insertion.")
             }
 
@@ -177,13 +150,13 @@ class Crud {
     // newFields is an object like {"key1": "value1", "key2": "value2",....}
     async insertManyFields(collectionName, docId, newFields) {
         try {
-            if (!this.#isString(collectionName)) {
+            if (!ValidationUtils.isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
-            if (!this.#isString(docId)) {
+            if (!ValidationUtils.isString(docId)) {
                 throw new Error("Invalid document id. Please provide a valid record id for deletion.")
             }
-            if (!this.#isObject(newFields)) {
+            if (!ValidationUtils.isObject(newFields)) {
                 throw new Error("Invalid fields. Please provide valid fields for insertion.")
             }
 
@@ -198,13 +171,13 @@ class Crud {
     // all the fields in the record will be updated with fields of current record
     async updateDoc(collectionName, docId, newRecord) {
         try {
-            if (!this.#isString(collectionName)) {
+            if (!ValidationUtils.isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
-            if (!this.#isString(docId)) {
+            if (!ValidationUtils.isString(docId)) {
                 throw new Error("Invalid document id. Please provide a valid record id for deletion.")
             }
-            if (!this.#isObject(newRecord)) {
+            if (!ValidationUtils.isObject(newRecord)) {
                 throw new Error("Invalid record. Please provide a valid record for updation.")
             }
 
@@ -218,10 +191,10 @@ class Crud {
     //returns a single document from the given collection
     async getDoc(collectionName, docId) {
         try {
-            if (!this.#isString(collectionName)) {
+            if (!ValidationUtils.isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
-            if (!this.#isString(docId)) {
+            if (!ValidationUtils.isString(docId)) {
                 throw new Error("Invalid document id. Please provide a valid record id for deletion.")
             }
 
@@ -239,7 +212,7 @@ class Crud {
     //returns all the documents from the given collection
     async getAllDocs(collectionName) {
         try {
-            if (!this.#isString(collectionName)) {
+            if (!ValidationUtils.isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
 
@@ -260,10 +233,10 @@ class Crud {
     // query at the moment is a single key value pair like {key: value}
     async findDoc(collectionName, query) {
         try {
-            if (!this.#isString(collectionName)) {
+            if (!ValidationUtils.isString(collectionName)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
-            if (!this.#isSingleKeyValuePair(query)) {
+            if (!ValidationUtils.isSingleKeyValuePair(query)) {
                 throw new Error("Invalid query, should be a single key value pair")
             }
 

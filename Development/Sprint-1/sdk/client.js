@@ -1,10 +1,11 @@
 import axios from "axios";
+import ValidationUtils from "./validators/validators";
 class EzBaseClient {
     #backendUrl;//declare private variable for backendURL
 
     constructor(backendUrl) {
     
-        if (!this.#isValidUrl(backendUrl)) {
+        if (!ValidationUtils.isValidUrl(backendUrl)) {
             throw new Error('Invalid URL for backend. Please provide a valid URL.');
         }
 
@@ -13,16 +14,6 @@ class EzBaseClient {
         }
 
         this.#backendUrl = backendUrl;
-    }
-
-    // checks if URL is valid
-    #isValidUrl(url) {
-        try {
-            new URL(url);
-            return true;
-        } catch (error) {
-            return false;
-        }
     }
 
     // Sends to the backend using the given method and api endpoint
