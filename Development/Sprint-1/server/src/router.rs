@@ -1,4 +1,5 @@
 use std::sync::{Arc, Mutex};
+use std::sync::MutexGuard;
 
 use crate::apis::auth::{login_email, logout, signin_admin, signup_admin, signup_email};
 use crate::apis::collection::{
@@ -30,6 +31,9 @@ pub fn get_router() -> Router {
 
     //Arc and Mutex allow for Sync and Clone
     let db: Arc<Mutex<Database>> = Arc::new(Mutex::new(Database::open("ezbase.db").unwrap()));
+
+    initialize_auth_collections(&db.lock().unwrap());
+
     let db_guard = db.clone();
     let db_guard = db_guard.lock().unwrap();
     //settings collection = {{key: secret, value: secret_value}, {key:smtp_credntials, value: {username, password, host, port}}, {key: smtp_server, value: smtp_server_url}}
@@ -96,10 +100,10 @@ pub fn get_router() -> Router {
         .route("/create_index", post(create_index))
         .route("/delete_index", delete(delete_index))
         .route("/delete_all_indices", delete(delete_all_indices))
-        .route_layer(middleware::from_fn_with_state(
-            Arc::clone(&db),
-            auth_validate,
-        ))
+        // .route_layer(middleware::from_fn_with_state(
+        //     Arc::clone(&db),
+        //     auth_validate,
+        // ))
         .route("/signup_email", post(signup_email))
         .route("/signin_email", post(login_email))
         .route("/signout", get(logout))
@@ -112,4 +116,12 @@ pub fn get_router() -> Router {
         .layer(middleware::from_fn_with_state(log_db, trace));
 
     router
+}
+
+fn initialize_auth_collections(db: &MutexGuard<'_, Database>) {
+    let coll = db.collection("user_key").unwrap();
+
+    let coll = db.collection("user").unwrap();
+
+    let coll = db.collection("session").unwrap();
 }
