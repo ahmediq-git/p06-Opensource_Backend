@@ -1,12 +1,11 @@
 use std::sync::{Arc, Mutex};
 
-use crate::utils::{rand_string, read_cookie_handler};
+use crate::utils::{read_cookie_handler};
 use axum::{
     extract::State,
-    http::{request, HeaderMap, Request, StatusCode},
+    http::{HeaderMap, Request, StatusCode},
     middleware::Next,
     response::{IntoResponse, Response},
-    Extension,
 };
 use chrono::Utc;
 use ejdb::{

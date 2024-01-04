@@ -1,6 +1,5 @@
 use std::{
-    sync::{Arc, Mutex, MutexGuard},
-    time::{SystemTime, UNIX_EPOCH},
+    sync::{MutexGuard},
 };
 
 use crate::utils::{hasher, rand_string, read_cookie_handler};
@@ -8,7 +7,7 @@ use axum::http::{HeaderMap, StatusCode};
 use chrono::Utc;
 use ejdb::{
     bson,
-    bson::{doc, ordered::OrderedDocument},
+    bson::{ordered::OrderedDocument},
     query::{Q, QH},
     Database,
 };

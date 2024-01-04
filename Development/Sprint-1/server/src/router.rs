@@ -1,4 +1,4 @@
-use std::convert::Infallible;
+
 use std::sync::{Arc, Mutex};
 
 use crate::apis::auth::{login_email, logout, signin_admin, signup_admin, signup_email};
@@ -12,10 +12,10 @@ use crate::apis::document::{
 use crate::apis::logs::get_logs;
 use crate::middleware::{auth::auth_validate, tracer::trace};
 
-use axum::body::{Bytes, Full};
-use axum::extract::State;
-use axum::http::{Request, Response, StatusCode};
-use axum::middleware::Next;
+
+
+
+
 use axum::{
     http::{header::CONTENT_TYPE, Method},
     routing::{delete, get, post},

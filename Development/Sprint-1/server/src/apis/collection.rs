@@ -89,7 +89,7 @@ pub async fn get_collection_names(
     let db_meta = db_guard.get_metadata().unwrap();
     let colls_arr = db_meta.get("collections").unwrap().as_array().unwrap();
     let mut coll_names: Vec<String> = Vec::new();
-    for (i, data) in colls_arr.iter().enumerate() {
+    for (_i, data) in colls_arr.iter().enumerate() {
         let name = data.as_document().unwrap().get("name").unwrap().to_string();
         coll_names.push(name[1..name.len() - 1].to_owned())
     }
