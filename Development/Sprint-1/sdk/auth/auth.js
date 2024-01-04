@@ -1,4 +1,4 @@
-import ValidationUtils from "../validators/validators";
+import ValidationUtils from "../validators/validators.js";
 
 class Auth {
     constructor(ezBaseClient) {
@@ -38,14 +38,10 @@ class Auth {
     // signs out the current user logged in
     async signOut() {
         try {
-            if (!ValidationUtils.isString(collectionName)) {
-                throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
-            }
-
             await this.client.sendToBackend({}, "/logout", "GET")
 
         } catch (error) {
-            console.log("Error deleting collection: ", error)
+            console.log("Error signing out: ", error)
         }
     }
 

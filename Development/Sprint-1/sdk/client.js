@@ -1,5 +1,5 @@
 import axios from "axios";
-import ValidationUtils from "./validators/validators";
+import ValidationUtils from "./validators/validators.js";
 class EzBaseClient {
     #backendUrl;//declare private variable for backendURL
 

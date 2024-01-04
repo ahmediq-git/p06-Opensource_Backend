@@ -28,7 +28,7 @@ function insertSingleFieldDocTest(){
 //3 getAllDocs
 function getAllDocsTest(){
   console.log("Testing of getAllDocs on newcol1")
-  eb.database.getAllDocs("newcol3").then(ans=>console.log(ans))
+  eb.database.getAllDocs("user_session").then(ans=>console.log(ans))
   console.log("")
 }
 
@@ -117,8 +117,29 @@ function deleteCollection(){
 // getDocTest("6559ab93e0730f6200000000")
 // updateDocTest("6557af222815ab5f00000000")
 
-insertManyDocsTest()
-findDocTest()
+// insertManyDocsTest()
+// findDocTest()
 
-getCollectionNamesTest()
-deleteCollection()
+// getCollectionNamesTest()
+// deleteCollection()
+
+
+function signupTest(){
+  console.log("Testing sign up")
+  eb.auth.signUp("email@gmail.com", "hehehehe")
+}
+
+function signinTest(){
+  console.log("Testing sign in")
+  eb.auth.signIn("email1@gmail.com", "hehehe")
+}
+
+function signoutTest(){
+  console.log("Sign out test")
+  eb.auth.signOut()
+}
+
+// signupTest()
+// signinTest()
+// getAllDocsTest()
+signoutTest()

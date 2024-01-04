@@ -1,4 +1,4 @@
-import ValidationUtils from "../validators/validators";
+import ValidationUtils from "../validators/validators.js";
 
 class Crud {
     constructor(ezBaseClient) {
