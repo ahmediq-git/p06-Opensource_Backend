@@ -8,8 +8,8 @@ use axum::{
 use ejdb::{
     bson,
     bson::ordered::OrderedDocument,
-    query::{Query, Q, QH},
-    Database, QueryResult,
+    query::{Q, QH},
+    Database,
 };
 use serde::Deserialize;
 use serde_json::Value;
@@ -103,7 +103,7 @@ pub async fn insert_doc_multifield(
 //   }
 pub async fn insert_docs(
     Extension(db): Extension<Arc<Mutex<Database>>>,
-    headers: HeaderMap,
+    _headers: HeaderMap,
     Json(data): Json<Value>,
 ) -> (StatusCode, Json<Vec<String>>) {
     let db_guard = match db.lock() {
@@ -120,7 +120,7 @@ pub async fn insert_docs(
     };
     let docs = data["docs"].as_object().unwrap();
     let mut ret_ids: Vec<String> = Vec::new();
-    for (doc, data) in docs.iter() {
+    for (_doc, data) in docs.iter() {
         let data = bson! { data.clone() };
         let doc_id = coll.save(data.as_document().unwrap()).unwrap();
         ret_ids.push(doc_id.to_string());
@@ -177,7 +177,7 @@ pub struct InsertField {
 }
 pub async fn insert_field(
     Extension(db): Extension<Arc<Mutex<Database>>>,
-    headers: HeaderMap,
+    _headers: HeaderMap,
     Json(data): Json<InsertField>,
 ) -> (StatusCode, Json<String>) {
     let db_guard = match db.lock() {
@@ -221,7 +221,7 @@ pub struct DeleteDoc {
 
 pub async fn delete_doc(
     Extension(db): Extension<Arc<Mutex<Database>>>,
-    headers: HeaderMap,
+    _headers: HeaderMap,
     Json(data): Json<DeleteDoc>,
 ) -> (StatusCode, Json<String>) {
     let db_guard = match db.lock() {
@@ -258,7 +258,7 @@ pub async fn delete_doc(
 //   }
 pub async fn insert_many_fields(
     Extension(db): Extension<Arc<Mutex<Database>>>,
-    headers: HeaderMap,
+    _headers: HeaderMap,
     Json(data): Json<Value>,
 ) -> (StatusCode, Json<String>) {
     let db_guard = match db.lock() {

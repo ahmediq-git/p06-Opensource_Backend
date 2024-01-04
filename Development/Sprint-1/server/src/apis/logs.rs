@@ -1,4 +1,4 @@
-use axum::http::{HeaderMap, StatusCode};
+use axum::http::{StatusCode};
 use axum::{Extension, Json};
 use ejdb::bson::ordered::OrderedDocument;
 use ejdb::query::{Q, QH};

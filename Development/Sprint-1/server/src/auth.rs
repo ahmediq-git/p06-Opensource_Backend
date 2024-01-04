@@ -172,3 +172,27 @@ pub fn delete_session(
         Err(StatusCode::INTERNAL_SERVER_ERROR)
     }
 }
+
+pub fn create_admin(
+    db: &MutexGuard<'_, Database>,
+    email: String,
+    password: String,
+) -> Result<OrderedDocument, String> {
+    // let admin = Admin {
+    //     admin_id
+    //     email
+    //     password
+    // }
+    let coll = db.collection("ezbase_admin").unwrap();
+    let admin_id = rand_string(15);
+    let hashed_password = hasher(password);
+    let doc = bson! {
+        "admin_id" => admin_id,
+        "email" => email,
+        "password" => hashed_password
+    };
+    match coll.save(&doc) {
+        Ok(_) => Ok(doc),
+        Err(_) => Err("Error creating admin".to_string()),
+    }
+}
