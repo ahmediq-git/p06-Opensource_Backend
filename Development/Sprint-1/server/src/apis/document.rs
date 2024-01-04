@@ -113,25 +113,19 @@ pub async fn insert_docs(
             guard
         }
     };
-    match validate_session(&db_guard, headers) {
-        Ok(code) => {
-            let coll = db_guard
-                .collection(data["collection_name"].as_str().unwrap())
-                .unwrap();
-            let docs = data["docs"].as_object().unwrap();
-            let mut ret_ids: Vec<String> = Vec::new();
-            for (doc, data) in docs.iter() {
-                let data = bson! { data.clone() };
-                let doc_id = coll.save(data.as_document().unwrap()).unwrap();
-                ret_ids.push(doc_id.to_string());
-            }
-            (code, Json(ret_ids))
-        }
-        Err(code) => {
-            let empty_vec: Vec<String> = Vec::new();
-            (code, Json(empty_vec))
-        }
+
+    let coll = match db_guard.collection(data["collection_name"].as_str().unwrap()) {
+        Ok(coll) => coll,
+        Err(_) => return (StatusCode::INTERNAL_SERVER_ERROR, Json(vec![])),
+    };
+    let docs = data["docs"].as_object().unwrap();
+    let mut ret_ids: Vec<String> = Vec::new();
+    for (doc, data) in docs.iter() {
+        let data = bson! { data.clone() };
+        let doc_id = coll.save(data.as_document().unwrap()).unwrap();
+        ret_ids.push(doc_id.to_string());
     }
+    (StatusCode::OK, Json(ret_ids))
 }
 
 #[derive(Deserialize, Debug)]
@@ -193,21 +187,29 @@ pub async fn insert_field(
             guard
         }
     };
-    match validate_session(&db_guard, headers) {
-        Ok(code) => {
-            let coll = db_guard.collection(data.collection_name).unwrap();
-            let _result = coll
-                .query(
-                    Q.field("_id")
-                        .eq(data.doc_id)
-                        .set(data.field_name, data.field_value),
-                    QH.empty(),
-                )
-                .update()
-                .unwrap();
-            (code, Json("Field Added Successfully!".to_string()))
-        }
-        Err(code) => (code, Json("Session invalid".to_string())),
+
+    let coll = match db_guard.collection(data.collection_name) {
+        Ok(coll) => coll,
+        Err(_) => return (StatusCode::INTERNAL_SERVER_ERROR, Json("".to_string())),
+    };
+
+    let _result = coll
+        .query(
+            Q.field("_id")
+                .eq(data.doc_id)
+                .set(data.field_name, data.field_value),
+            QH.empty(),
+        )
+        .update();
+    match _result {
+        Ok(_) => (
+            StatusCode::OK,
+            Json("Field Added Successfully!".to_string()),
+        ),
+        Err(_) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json("Error Adding Field!".to_string()),
+        ),
     }
 }
 
@@ -229,15 +231,18 @@ pub async fn delete_doc(
             guard
         }
     };
-    match validate_session(&db_guard, headers) {
-        Ok(code) => {
-            let coll = db_guard.collection(data.collection_name).unwrap();
-            let q = Q.field("_id").eq(data.doc_id).drop_all();
-            coll.query(q, QH.empty()).update().unwrap();
 
-            (code, Json("Document Deleted!".to_string()))
-        }
-        Err(code) => (code, Json("Session invalid".to_string())),
+    let coll = match db_guard.collection(data.collection_name) {
+        Ok(coll) => coll,
+        Err(_) => return (StatusCode::INTERNAL_SERVER_ERROR, Json("".to_string())),
+    };
+    let q = Q.field("_id").eq(data.doc_id).drop_all();
+    match coll.query(q, QH.empty()).update() {
+        Ok(_) => (StatusCode::OK, Json("Document Deleted!".to_string())),
+        Err(_) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json("Error Deleting Document!".to_string()),
+        ),
     }
 }
 
@@ -263,25 +268,29 @@ pub async fn insert_many_fields(
             guard
         }
     };
-    match validate_session(&db_guard, headers) {
-        Ok(code) => {
-            let coll = db_guard
-                .collection(data["collection_name"].as_str().unwrap())
-                .unwrap();
-            let fields_to_insert = bson! {data["fields_to_insert"].clone()};
+    let coll = match db_guard.collection(data["collection_name"].as_str().unwrap()) {
+        Ok(coll) => coll,
+        Err(_) => return (StatusCode::INTERNAL_SERVER_ERROR, Json("".to_string())),
+    };
+    let fields_to_insert = bson! {data["fields_to_insert"].clone()};
 
-            let _result = coll
-                .query(
-                    Q.field("_id")
-                        .eq(data["doc_id"].clone())
-                        .set_many(fields_to_insert.as_document().unwrap().clone()),
-                    QH.empty(),
-                )
-                .update()
-                .unwrap();
-            (code, Json("Fields added".to_string()))
-        }
-        Err(code) => (code, Json("Session invalid".to_string())),
+    match coll
+        .query(
+            Q.field("_id")
+                .eq(data["doc_id"].clone())
+                .set_many(fields_to_insert.as_document().unwrap().clone()),
+            QH.empty(),
+        )
+        .update()
+    {
+        Ok(_) => (
+            StatusCode::OK,
+            Json("Fields Added Successfully!".to_string()),
+        ),
+        Err(_) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json("Error Adding Fields!".to_string()),
+        ),
     }
 }
 

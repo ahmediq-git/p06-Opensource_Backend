@@ -9,5 +9,6 @@ pub mod apis {
     pub mod logs;
 }
 pub mod middleware {
+    pub mod auth;
     pub mod tracer;
 }

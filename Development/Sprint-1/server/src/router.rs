@@ -10,7 +10,7 @@ use crate::apis::document::{
     insert_docs, insert_field, insert_many_fields, read_doc, search_doc_by_one_field,
 };
 use crate::apis::logs::get_logs;
-use crate::middleware::tracer::trace;
+use crate::middleware::{auth::auth_validate, tracer::trace};
 
 use axum::body::{Bytes, Full};
 use axum::extract::State;
@@ -52,6 +52,10 @@ pub fn get_router() -> Router {
         .route("/create_index", post(create_index))
         .route("/delete_index", delete(delete_index))
         .route("/delete_all_indices", delete(delete_all_indices))
+        .route_layer(middleware::from_fn_with_state(
+            Arc::clone(&db),
+            auth_validate,
+        ))
         .route("/signup_email", post(signup_email))
         .route("/login_email", post(login_email))
         .route("/logout", get(logout))
