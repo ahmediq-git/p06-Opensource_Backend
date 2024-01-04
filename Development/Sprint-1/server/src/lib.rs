@@ -1,6 +1,9 @@
 pub mod auth;
 pub mod router;
-pub mod utils;
+pub mod utils {
+    pub mod auth;
+    pub mod jwt;
+}
 
 pub mod apis {
     pub mod auth;

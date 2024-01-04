@@ -1,9 +1,6 @@
-use std::{
-    sync::{Arc, Mutex, MutexGuard},
-    time::{SystemTime, UNIX_EPOCH},
-};
+use std::sync::MutexGuard;
 
-use crate::utils::{hasher, rand_string, read_cookie_handler};
+use crate::utils::auth::{hasher, rand_string, read_cookie_handler};
 use axum::http::{HeaderMap, StatusCode};
 use chrono::Utc;
 use ejdb::{
@@ -14,7 +11,6 @@ use ejdb::{
 };
 
 const SESSION_TIME: i64 = 60;
-
 pub fn create_key(
     db: &MutexGuard<'_, Database>,
     user_id: String,

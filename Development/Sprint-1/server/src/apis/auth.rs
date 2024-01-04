@@ -4,18 +4,17 @@ use axum::{
     debug_handler,
     http::{header::SET_COOKIE, HeaderMap, HeaderName, StatusCode},
     response::AppendHeaders,
-    Error, Extension, Json,
+    Extension, Json,
 };
 use ejdb::{
-    bson::ordered::OrderedDocument,
     query::{Q, QH},
     Database,
 };
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    auth::{create_key, create_session, create_user, delete_session},
-    utils::{hash_verify, validate_credentials},
+    auth::{create_session, create_user, delete_session},
+    utils::auth::{hash_verify, validate_credentials},
 };
 
 #[derive(Deserialize, Debug)]
