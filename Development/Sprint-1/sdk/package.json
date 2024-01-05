@@ -1,6 +1,6 @@
 {
   "name": "ezbase",
-  "version": "0.1.49",
+  "version": "0.1.50",
   "description": "This is the official sdk of the EzBase Backend service",
   "main": "index.js",
   "scripts": {

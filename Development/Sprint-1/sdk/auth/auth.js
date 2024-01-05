@@ -29,7 +29,7 @@ class Auth {
 
             const sendObject = { "email": email, "password": password }
 
-            await this.client.sendToBackend(sendObject, "/login_email", "POST")
+            await this.client.sendToBackend(sendObject, "/signin_email", "POST")
         } catch (error) {
             console.log("Error signing in ", error)
         }
@@ -38,7 +38,7 @@ class Auth {
     // signs out the current user logged in
     async signOut() {
         try {
-            await this.client.sendToBackend({}, "/logout", "GET")
+            await this.client.sendToBackend({}, "/signout", "GET")
 
         } catch (error) {
             console.log("Error signing out: ", error)
