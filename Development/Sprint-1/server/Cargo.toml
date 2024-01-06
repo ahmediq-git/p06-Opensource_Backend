@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 argon2 = "0.5.2"
 axum = { version = "0.6.20", features = ["macros"] }
+axum-test = "13.4.1"
 chrono = "0.4.31"
 data-encoding = "2.5.0"
 ejdb = "0.4.1"

@@ -9,7 +9,9 @@ pub mod apis {
     pub mod auth;
     pub mod collection;
     pub mod document;
+    pub mod document_test;
     pub mod logs;
+    pub mod logs_test;
 }
 pub mod middleware {
     pub mod auth;
