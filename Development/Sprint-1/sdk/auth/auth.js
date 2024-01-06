@@ -1,8 +1,12 @@
 import ValidationUtils from "../validators/validators.js";
 
 class Auth {
-    constructor(ezBaseClient) {
-        this.client = ezBaseClient; //passing the client object to send to the user.
+    #client;
+    #authStore;
+
+    constructor(ezBaseClient, authStore) {
+        this.#client = ezBaseClient; //passing the client object to send to the user.
+        this.#authStore = authStore; //passing the authStore object to send to the user.
     }
 
     // signs in the user with the given email and password
@@ -14,7 +18,8 @@ class Auth {
 
             const sendObject = { "email": email, "password": password }
 
-            await this.client.sendToBackend(sendObject, "/signup_email", "POST")
+            const response=await this.#client.sendToBackend(sendObject, "/signup_email", "POST")
+            this.#authStore.saveTokenFromResponse(response)
         } catch (error) {
             console.log("Error signing in ", error)
         }
@@ -29,7 +34,8 @@ class Auth {
 
             const sendObject = { "email": email, "password": password }
 
-            await this.client.sendToBackend(sendObject, "/signin_email", "POST")
+            const response=await this.#client.sendToBackend(sendObject, "/signin_email", "POST")
+            this.#authStore.saveTokenFromResponse(response)
         } catch (error) {
             console.log("Error signing in ", error)
         }
@@ -38,8 +44,7 @@ class Auth {
     // signs out the current user logged in
     async signOut() {
         try {
-            await this.client.sendToBackend({}, "/signout", "GET")
-
+            await this.#client.sendToBackend({}, "/signout", "GET")
         } catch (error) {
             console.log("Error signing out: ", error)
         }

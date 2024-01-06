@@ -1,8 +1,12 @@
 import ValidationUtils from "../validators/validators.js";
 
 class Crud {
-    constructor(ezBaseClient) {
-        this.client = ezBaseClient; //passing the client object to send to the user.
+    #client;
+    #authStore;
+
+    constructor(ezBaseClient, authStore) {
+        this.#client = ezBaseClient; //passing the client object to send to the user.
+        this.#authStore = authStore; //passing the authStore object to send to the user.
     }
 
     // creates a collection with the given name
@@ -15,7 +19,7 @@ class Crud {
 
             const sendObject = { "collection_name": collectionName }
 
-            await this.client.sendToBackend(sendObject, "/create_collection", "POST")
+            await this.#client.sendToBackend(sendObject, "/create_collection", "POST")
         } catch (error) {
             console.log("Error creating collection: ", error)
         }
@@ -29,7 +33,7 @@ class Crud {
             }
 
             const sendObject = { "collection_name": collectionName, "delete_all_data": true }
-            await this.client.sendToBackend(sendObject, "/delete_collection", "DELETE")
+            await this.#client.sendToBackend(sendObject, "/delete_collection", "DELETE")
 
         } catch (error) {
             console.log("Error deleting collection: ", error)
@@ -52,8 +56,8 @@ class Crud {
             const value = doc[key];
 
             const sendObject = { "collection_name": collectionName, "field_name": key, "field_value": value };
-            const response = await this.client.sendToBackend(sendObject, "/insert_doc", "POST");
-            return response
+            const response = await this.#client.sendToBackend(sendObject, "/insert_doc", "POST");
+            return response.data
 
         } catch (error) {
             console.log("Error inserting document: ", error)
@@ -73,9 +77,9 @@ class Crud {
 
 
             const sendObject = { "collection_name": collectionName, "data": doc };
-            const response = await this.client.sendToBackend(sendObject, "/insert_doc_multifield", "POST");
+            const response = await this.#client.sendToBackend(sendObject, "/insert_doc_multifield", "POST");
             // returns the id of the doc
-            return response
+            return response.data
         } catch (error) {
             console.log("Error inserting document: ", error)
         }
@@ -96,9 +100,9 @@ class Crud {
             const convertedDocs = ValidationUtils.objectFromArrayOfObjects(docs);
 
             const sendObject = { "collection_name": collectionName, "docs": convertedDocs };
-            const response = await this.client.sendToBackend(sendObject, "/insert_docs", "POST");
+            const response = await this.#client.sendToBackend(sendObject, "/insert_docs", "POST");
             // returns the id of the doc
-            return response
+            return response.data
         } catch (error) {
             console.log("Error inserting documents: ", error)
         }
@@ -115,7 +119,7 @@ class Crud {
             }
 
             const sendObject = { "collection_name": collectionName, "doc_id": docId }
-            await this.client.sendToBackend(sendObject, "/delete_doc", "DELETE");
+            await this.#client.sendToBackend(sendObject, "/delete_doc", "DELETE");
         } catch (error) {
             console.log("Error deleting document: ", error)
         }
@@ -140,7 +144,7 @@ class Crud {
             const value = newField[key];
 
             const sendObject = { "collection_name": collectionName, "doc_id": docId, "field_name": key, "field_value": value }
-            await this.client.sendToBackend(sendObject, "/insert_field", "POST");
+            await this.#client.sendToBackend(sendObject, "/insert_field", "POST");
         } catch (error) {
             console.log("Error inserting field: ", error)
         }
@@ -161,7 +165,7 @@ class Crud {
             }
 
             const sendObject = { "collection_name": collectionName, "doc_id": docId, "fields_to_insert": newFields }
-            await this.client.sendToBackend(sendObject, "/insert_many_fields", "POST");
+            await this.#client.sendToBackend(sendObject, "/insert_many_fields", "POST");
         } catch (error) {
             console.log("Error inserting fields: ", error)
         }
@@ -182,7 +186,7 @@ class Crud {
             }
 
             const sendObject = { "collection_name": collectionName, "doc_id": docId, "fields_to_insert": newRecord }
-            await this.client.sendToBackend(sendObject, "/insert_many_fields", "POST");
+            await this.#client.sendToBackend(sendObject, "/insert_many_fields", "POST");
         } catch (error) {
             console.log("Error updating document: ", error)
         }
@@ -200,8 +204,8 @@ class Crud {
 
             const sendObject = { "collection_name": collectionName, "doc_id": docId }
            
-            const response = await this.client.sendToBackend(sendObject, "/get_doc", "GET")
-            return response;
+            const response = await this.#client.sendToBackend(sendObject, "/get_doc", "GET")
+            return response.data;
 
         }
         catch (error) {
@@ -218,8 +222,8 @@ class Crud {
 
             const sendObject = { "collection_name": collectionName }
 
-            const response = await this.client.sendToBackend(sendObject, "/get_all_docs", "GET");
-            return response;
+            const response = await this.#client.sendToBackend(sendObject, "/get_all_docs", "GET");
+            return response.data;
 
         } catch (error) {
             console.log("Error getting Collection: ", error)
@@ -245,8 +249,8 @@ class Crud {
             const value = query[key];
 
             const sendObject = { "collection_name": collectionName, "search_key": key, "search_value": value }
-            const response = await this.client.sendToBackend(sendObject, "/search_doc", "POST")
-            return response;
+            const response = await this.#client.sendToBackend(sendObject, "/search_doc", "POST")
+            return response.data;
 
         } catch (error) {
             console.log("Error finding document: ", error)
@@ -256,8 +260,8 @@ class Crud {
     // Gets name of all collections
     async getCollectionNames() {
         try {
-            const response = await this.client.sendToBackend({}, "/get_collection_names", "GET")
-            return response
+            const response = await this.#client.sendToBackend({}, "/get_collection_names", "GET")
+            return response.data
         }
         catch (error) {
             console.log("Error returning collection names: ", error)
