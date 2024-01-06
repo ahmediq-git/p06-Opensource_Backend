@@ -1,4 +1,3 @@
-
 use std::sync::{Arc, Mutex};
 
 use crate::apis::auth::{login_email, logout, signin_admin, signup_admin, signup_email};
@@ -11,17 +10,15 @@ use crate::apis::document::{
 };
 use crate::apis::logs::get_logs;
 use crate::middleware::{auth::auth_validate, tracer::trace};
-
-
-
-
-
+use crate::utils::jwt::generate_secret;
 use axum::{
     http::{header::CONTENT_TYPE, Method},
     routing::{delete, get, post},
     Router,
 };
 use axum::{middleware, Extension};
+use ejdb::bson;
+use ejdb::query::{Q, QH};
 use ejdb::Database;
 use tower_http::cors::{Any, CorsLayer};
 
@@ -33,6 +30,53 @@ pub fn get_router() -> Router {
 
     //Arc and Mutex allow for Sync and Clone
     let db: Arc<Mutex<Database>> = Arc::new(Mutex::new(Database::open("ezbase.db").unwrap()));
+    let db_guard = db.clone();
+    let db_guard = db_guard.lock().unwrap();
+    //settings collection = {{key: secret, value: secret_value}, {key:smtp_credntials, value: {username, password, host, port}}, {key: smtp_server, value: smtp_server_url}}
+    let config = match db_guard.get_collection("config").unwrap() {
+        Some(config_collection) => config_collection,
+        None => db_guard.collection("config").unwrap(),
+    };
+
+    let config_data = config
+        .query(Q.field("key").eq("secret"), QH.empty())
+        .find_one();
+    match config_data {
+        Ok(data) => {
+            match data {
+                Some(doc) => {
+                    let secret = doc
+                        .get("value")
+                        .unwrap()
+                        .to_string()
+                        .trim_matches('"')
+                        .to_string();
+                    if secret == "" {
+                        let secret = generate_secret();
+
+                        config
+                            .query(
+                                Q.field("key").eq("secret").set("value", secret.as_str()),
+                                QH.empty(),
+                            )
+                            .update()
+                            .unwrap();
+                    }
+                }
+                None => {
+                    let secret = generate_secret();
+                    let data = bson!({
+                        "key"=> "secret",
+                        "value"=> secret
+                    });
+                    config.save(data).unwrap();
+                }
+            };
+        }
+        Err(e) => {
+            println!("Error: {}", e);
+        }
+    }
 
     let log_db = Arc::new(Mutex::new(Database::open("logs.db").unwrap()));
 

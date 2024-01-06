@@ -25,7 +25,6 @@ pub struct InsertDoc {
 
 pub async fn insert_doc(
     Extension(db): Extension<Arc<Mutex<Database>>>,
-    headers: HeaderMap,
     Json(data): Json<InsertDoc>,
 ) -> (StatusCode, Json<String>) {
     let db_guard = match db.lock() {
@@ -35,18 +34,18 @@ pub async fn insert_doc(
             guard
         }
     };
-    match validate_session(&db_guard, headers) {
-        Ok(code) => {
-            let coll = db_guard.collection(data.collection_name).unwrap();
-            let field_name = data.field_name;
-            let field_value = data.field_value;
-            let doc = bson! {
-                field_name => field_value
-            };
-            let doc_id = coll.save(&doc).unwrap();
-            (code, Json(doc_id.to_string()))
-        }
-        Err(code) => (code, Json("Session invalid".to_string())),
+
+    let coll = db_guard.collection(data.collection_name).unwrap();
+    let field_name = data.field_name;
+    let field_value = data.field_value;
+    let doc = bson! {
+        field_name => field_value
+    };
+    let doc_id = coll.save(&doc);
+    if doc_id.is_err() {
+        return (StatusCode::INTERNAL_SERVER_ERROR, Json("".to_string()));
+    } else {
+        (StatusCode::OK, Json(doc_id.unwrap().to_string()))
     }
 }
 
@@ -61,7 +60,6 @@ pub async fn insert_doc(
 //   }
 pub async fn insert_doc_multifield(
     Extension(db): Extension<Arc<Mutex<Database>>>,
-    headers: HeaderMap,
     Json(data): Json<Value>,
 ) -> (StatusCode, Json<String>) {
     let db_guard = match db.lock() {
@@ -71,17 +69,17 @@ pub async fn insert_doc_multifield(
             guard
         }
     };
-    match validate_session(&db_guard, headers) {
-        Ok(code) => {
-            let coll = db_guard
-                .collection(data["collection_name"].as_str().unwrap())
-                .unwrap();
-            let data = bson! {data["data"].clone()};
 
-            let result = coll.save(data.as_document().unwrap()).unwrap();
-            (code, Json(result.to_string()))
-        }
-        Err(code) => (code, Json("Session invalid".to_string())),
+    let coll = db_guard
+        .collection(data["collection_name"].as_str().unwrap())
+        .unwrap();
+    let data = bson! {data["data"].clone()};
+
+    let result = coll.save(data.as_document().unwrap());
+    if result.is_err() {
+        return (StatusCode::INTERNAL_SERVER_ERROR, Json("".to_string()));
+    } else {
+        (StatusCode::OK, Json(result.unwrap().to_string()))
     }
 }
 
@@ -103,7 +101,6 @@ pub async fn insert_doc_multifield(
 //   }
 pub async fn insert_docs(
     Extension(db): Extension<Arc<Mutex<Database>>>,
-    _headers: HeaderMap,
     Json(data): Json<Value>,
 ) -> (StatusCode, Json<Vec<String>>) {
     let db_guard = match db.lock() {
@@ -177,7 +174,6 @@ pub struct InsertField {
 }
 pub async fn insert_field(
     Extension(db): Extension<Arc<Mutex<Database>>>,
-    _headers: HeaderMap,
     Json(data): Json<InsertField>,
 ) -> (StatusCode, Json<String>) {
     let db_guard = match db.lock() {
@@ -221,7 +217,6 @@ pub struct DeleteDoc {
 
 pub async fn delete_doc(
     Extension(db): Extension<Arc<Mutex<Database>>>,
-    _headers: HeaderMap,
     Json(data): Json<DeleteDoc>,
 ) -> (StatusCode, Json<String>) {
     let db_guard = match db.lock() {
@@ -258,7 +253,6 @@ pub async fn delete_doc(
 //   }
 pub async fn insert_many_fields(
     Extension(db): Extension<Arc<Mutex<Database>>>,
-    _headers: HeaderMap,
     Json(data): Json<Value>,
 ) -> (StatusCode, Json<String>) {
     let db_guard = match db.lock() {

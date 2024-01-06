@@ -1,6 +1,7 @@
 use std::sync::MutexGuard;
 
 use crate::utils::auth::{hasher, rand_string, read_cookie_handler};
+use crate::utils::jwt::{decrypt_jwt, get_secret, Claims};
 use axum::http::{HeaderMap, StatusCode};
 use chrono::Utc;
 use ejdb::{
@@ -159,9 +160,12 @@ pub fn delete_session(
     db: &MutexGuard<'_, Database>,
     headers: HeaderMap,
 ) -> Result<StatusCode, StatusCode> {
-    let session_id = read_cookie_handler(headers.clone(), "session".to_string());
-    let trimmed_session_id = session_id.trim_matches('"').to_string();
-    if session_id != "Error" {
+    let token = read_cookie_handler(headers.clone(), "session".to_string());
+    let trimmed_token = token.trim_matches('"').to_string();
+    if token != "Error" {
+        let secret = get_secret(db).unwrap();
+        let claims: Claims = decrypt_jwt(&secret, &trimmed_token).unwrap();
+        let trimmed_session_id = claims.session_id.trim_matches('"').to_string();
         let coll = db.collection("user_session").unwrap();
         let q = Q.field("session_id").eq(trimmed_session_id).drop_all();
         match coll.query(q, QH.empty()).update() {

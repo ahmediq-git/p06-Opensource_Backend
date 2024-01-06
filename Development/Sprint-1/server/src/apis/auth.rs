@@ -15,6 +15,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     auth::{create_admin, create_session, create_user, delete_session},
     utils::auth::{hash_verify, validate_credentials},
+    utils::jwt::{encrypt_jwt, get_secret, Claims},
 };
 
 #[derive(Deserialize, Debug)]
@@ -63,21 +64,65 @@ pub async fn signup_email(
                 .trim_matches('"')
                 .to_string();
             let session = create_session(&db_guard, user.get("user_id").unwrap().to_string());
-            AuthResponse {
-                user_id,
-                session_id: session
-                    .get("session_id")
+            let secret = get_secret(&db_guard);
+            let token = match secret {
+                Ok(secret) => {
+                    let token = encrypt_jwt(
+                        secret,
+                        Claims {
+                            session_id: session
+                                .get("session_id")
+                                .unwrap()
+                                .to_string()
+                                .trim_matches('"')
+                                .to_string(),
+                            is_admin: false,
+                            exp: session
+                                .get("active_period_expires_at")
+                                .unwrap()
+                                .as_i64()
+                                .unwrap(),
+                        },
+                    );
+                    token.unwrap()
+                }
+                Err(_error) => {
+                    return Err((StatusCode::BAD_REQUEST, Json("Secret not found".to_owned())))
+                }
+            };
+
+            serde_json::json!(
+                {
+                    "user_id": user_id,
+                    "session_id": session   .get("session_id")
                     .unwrap()
                     .to_string()
                     .trim_matches('"')
                     .to_string(),
-            }
+                    "token": token
+                }
+            )
         }
         Err(error) => return Err((StatusCode::BAD_REQUEST, Json(error))),
     };
-    let session_id = response.session_id.clone();
-    let headers = AppendHeaders([(SET_COOKIE, format!("session={}", session_id))]);
-    Ok((headers, Json(response)))
+    let session_id = response["session_id"]
+        .to_string()
+        .trim_matches('"')
+        .to_string();
+    let user_id = response["user_id"]
+        .to_string()
+        .trim_matches('"')
+        .to_string();
+    let token = response["token"].to_string().trim_matches('"').to_string();
+
+    let headers = AppendHeaders([(SET_COOKIE, format!("session={}", token))]);
+    Ok((
+        headers,
+        Json(AuthResponse {
+            user_id,
+            session_id,
+        }),
+    ))
 }
 
 #[debug_handler]
@@ -115,14 +160,45 @@ pub async fn login_email(
         if hash_verify(data.password, trimmed_pass) {
             let user_id = user_key.get("user_id").unwrap().to_string();
             let session = create_session(&db_guard, user_id.clone());
-            let session_id = session.get("session_id").unwrap().to_string();
-            let headers = AppendHeaders([(SET_COOKIE, format!("session={}", session_id))]);
+            let secret = get_secret(&db_guard);
+            let token = match secret {
+                Ok(secret) => {
+                    let token = encrypt_jwt(
+                        secret,
+                        Claims {
+                            session_id: session
+                                .get("session_id")
+                                .unwrap()
+                                .to_string()
+                                .trim_matches('"')
+                                .to_string(),
+                            is_admin: false,
+                            exp: session
+                                .get("active_period_expires_at")
+                                .unwrap()
+                                .as_i64()
+                                .unwrap(),
+                        },
+                    );
+                    token.unwrap()
+                }
+                Err(_error) => {
+                    return Err((StatusCode::BAD_REQUEST, Json("Secret not found".to_owned())))
+                }
+            };
+
+            let headers = AppendHeaders([(SET_COOKIE, format!("session={}", token))]);
 
             Ok((
                 headers,
                 Json(AuthResponse {
                     user_id: user_id.trim_matches('"').to_string(),
-                    session_id: session_id.trim_matches('"').to_string(),
+                    session_id: session
+                        .get("session_id")
+                        .unwrap()
+                        .to_string()
+                        .trim_matches('"')
+                        .to_string(),
                 }),
             ))
         } else {
@@ -183,21 +259,64 @@ pub async fn signup_admin(
                 .trim_matches('"')
                 .to_string();
             let session = create_session(&db_guard, admin_id.clone());
-            AuthResponse {
-                user_id: admin_id,
-                session_id: session
-                    .get("session_id")
+            let secret = get_secret(&db_guard);
+            let token = match secret {
+                Ok(secret) => {
+                    let token = encrypt_jwt(
+                        secret,
+                        Claims {
+                            session_id: session
+                                .get("session_id")
+                                .unwrap()
+                                .to_string()
+                                .trim_matches('"')
+                                .to_string(),
+                            is_admin: false,
+                            exp: session
+                                .get("active_period_expires_at")
+                                .unwrap()
+                                .as_i64()
+                                .unwrap(),
+                        },
+                    );
+                    token.unwrap()
+                }
+                Err(_error) => {
+                    return Err((StatusCode::BAD_REQUEST, Json("Secret not found".to_owned())))
+                }
+            };
+
+            serde_json::json!(
+                {
+                    "user_id": admin_id,
+                    "session_id": session   .get("session_id")
                     .unwrap()
                     .to_string()
                     .trim_matches('"')
                     .to_string(),
-            }
+                    "token": token
+                }
+            )
         }
         Err(error) => return Err((StatusCode::BAD_REQUEST, Json(error))),
     };
-    let session_id = response.session_id.clone();
-    let headers = AppendHeaders([(SET_COOKIE, format!("session={}", session_id))]);
-    Ok((headers, Json(response)))
+    let session_id = response["session_id"]
+        .to_string()
+        .trim_matches('"')
+        .to_string();
+    let user_id = response["user_id"]
+        .to_string()
+        .trim_matches('"')
+        .to_string();
+    let token = response["token"].to_string().trim_matches('"').to_string();
+    let headers = AppendHeaders([(SET_COOKIE, format!("session={}", token))]);
+    Ok((
+        headers,
+        Json(AuthResponse {
+            user_id,
+            session_id,
+        }),
+    ))
 }
 
 pub async fn signin_admin(
@@ -232,7 +351,28 @@ pub async fn signin_admin(
                 let admin_id = admin.get("admin_id").unwrap().to_string();
                 let session = create_session(&db_guard, admin_id.clone());
                 let session_id = session.get("session_id").unwrap().to_string();
-                let headers = AppendHeaders([(SET_COOKIE, format!("session={}", session_id))]);
+                let secret = get_secret(&db_guard);
+                let token = match secret {
+                    Ok(secret) => {
+                        let token = encrypt_jwt(
+                            secret,
+                            Claims {
+                                session_id: session_id.clone().trim_matches('"').to_string(),
+                                is_admin: false,
+                                exp: session
+                                    .get("active_period_expires_at")
+                                    .unwrap()
+                                    .as_i64()
+                                    .unwrap(),
+                            },
+                        );
+                        token.unwrap()
+                    }
+                    Err(_error) => {
+                        return Err((StatusCode::BAD_REQUEST, Json("Secret not found".to_owned())))
+                    }
+                };
+                let headers = AppendHeaders([(SET_COOKIE, format!("session={}", token))]);
 
                 Ok((
                     headers,
