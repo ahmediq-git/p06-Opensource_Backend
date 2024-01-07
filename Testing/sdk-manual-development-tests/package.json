@@ -10,6 +10,6 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "ezbase": "^0.1.49"
+    "ezbase": "file:../../Development/Sprint-1/sdk"
   }
 }

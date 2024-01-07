@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useAtom } from "jotai";
 import { useSWRConfig } from "swr";
-import { selectionAtom } from "../lib/state/selection";
+import { selectionAtom } from "../lib/state/selectionAtom";
 import JSONPretty from "react-json-pretty";
 import { Trash2 } from "lucide-react";
-// import "react-json-pretty/themes/monikai.css";
+import "/custom.css";
+import { isAuthCollection } from "../lib/utils/isAuthCollection";
+
 
 export default function Documents() {
 	const [selection, setSelection] = useAtom(selectionAtom);
@@ -58,7 +60,7 @@ export default function Documents() {
 					htmlFor="delete-collection-modal"
 				></label>
 				<div
-					className={`modal-content flex flex-col gap-5 max-w-6xl transition-all duration-500 "w-1/4  h-1/4"
+					className={`modal-content flex flex-col gap-5 max-w-6xl transition-all duration-500 w-2/5  
 					`}
 				>
 					<label
@@ -97,20 +99,29 @@ export default function Documents() {
 					</div>
 				</div>
 			</div>
-			<div className="basis-1/4 w-full p-4 rounded-sm gap-4 flex flex-col max-h-screen overflow-y-scroll">
-				<p>Document</p>
-				{selection.collection && (
-					<div className="justify-self-end self-end w-full transition-all duration-150 cursor-pointer">
-						<Trash2 color="#e01b24" onClick={() => setShowDeleteModal(true)} />
-					</div>
-				)}
+			<div className="basis-3/4 w-full p-4 rounded-sm gap-4 flex flex-col max-h-screen h-full overflow-y-scroll">
+				<div className="flex justify-between">
+					<p className="grow w-full">Document</p>
+					{selection.collection && (
+						<div className="justify-self-end self-end transition-all duration-150 cursor-pointer">
+							<Trash2
+								color="#e01b24"
+								onClick={() => setShowDeleteModal(true)}
+							/>
+						</div>
+					)}
+				</div>
+				<div className="flex justify-between items-center w-full bg-neutral-950">
+					{/* <pre className="w-full"> {JSON.stringify(selection.document, null, 2)}</pre> */}
 
-				<div className="flex justify-between items-center w-full">
 					<JSONPretty
 						id="doc"
 						data={selection.document}
 						style={{
 							width: "100%",
+							padding: "2rem",
+							backgroundColor: "#171717",
+							borderRadius: "0.5rem",
 						}}
 					></JSONPretty>
 				</div>

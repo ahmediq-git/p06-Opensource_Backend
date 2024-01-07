@@ -1,10 +1,39 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, PlusCircle, MinusCircle } from "lucide-react";
 import { useAtom } from "jotai";
-import { selectionAtom } from "../lib/state/selection";
+import { selectionAtom } from "../lib/state/selectionAtom";
 import useSwr, { useSWRConfig } from "swr";
+import { fetcher } from "../lib/utils/fetcher";
 
-const fetcher = (url) => fetch(url).then((res) => res.json());
+import { z } from "zod";
+
+// Define a function to validate data types associated with fields
+const dataSchema = z.union([
+	z.literal("boolean"),
+	z.literal("number"),
+	z.literal("string"),
+	z.literal("object"),
+	z.literal("array"),
+]);
+
+// // Define the main schema for an array of objects
+const fieldSchema = z.object({
+	field: z.string().refine((val) => {
+		/^[a-zA-Z\-_]+$/.test(val.trim());
+	}, {
+		message: "Field should not contain numbers, spaces, or special characters.",
+	}),
+	type: dataSchema,
+	data: z.lazy(() => {
+		return z.union([
+			z.boolean(),
+			z.number(),
+			z.string(),
+			z.lazy(() => fieldSchema), // For nested objects, refers back to the same schema
+			z.array(z.lazy(() => fieldSchema)), // For arrays of objects
+		]);
+	}),
+});
 
 export default function Documents() {
 	const [selection, setSelection] = useAtom(selectionAtom);
@@ -30,8 +59,21 @@ export default function Documents() {
 	useEffect(() => {
 		console.log("data", data);
 		console.log("error", error);
-		console.log("record", doc.length);
-	}, [data, error, doc]);
+	}, [data, error]);
+
+	useEffect(() => {
+		// delay by 1 second and reset on input
+		const timeout = setTimeout(() => {
+			for (let i = 0; i < doc.length; i++) {
+				console.log("doc[i].field", doc[i].field);
+				console.log("doc[i].type", doc[i].type);
+				console.log("doc[i].value", doc[i].value);
+			}
+		}, 1000);
+
+		return () => clearTimeout(timeout);
+
+	}, [doc]);
 
 	const setDocumentSelected = (doc) => {
 		setSelection((prev) => ({ ...prev, document: doc }));
@@ -39,6 +81,9 @@ export default function Documents() {
 
 	const createDocument = async () => {
 		try {
+
+			// const validatedData = fieldSchema.parse(Object.assign({}, ...doc));
+
 			const data = doc.map((record) => {
 				return {
 					[record.field]: record.value,
@@ -47,6 +92,10 @@ export default function Documents() {
 
 			// convert array to object
 			const obj = Object.assign({}, ...data);
+
+			console.log("obj", obj);
+
+			// validate data with zod
 
 			console.log({
 				collection_name: selection.collection,
@@ -69,13 +118,51 @@ export default function Documents() {
 
 			mutate(`http://127.0.0.1:3690/get_all_docs/${selection.collection}`);
 			setDocumentModal(false);
-
 		} catch (error) {
 			console.log(error);
 		}
 	};
 	return (
 		<>
+			{/* main div */}
+			<div className="basis-1/4 w-full p-4 rounded-sm gap-4 flex flex-col max-h-screen overflow-y-scroll ">
+				<p>Documents</p>
+				<button
+					onClick={() => {
+						setDocumentModal(true);
+					}}
+					className="btn btn-outline-primary hover:btn-secondary w-full menu-item duration-75 transition-all"
+				>
+					New Document
+				</button>
+				<nav className="menu  p-2 rounded-md">
+					<section className="menu-section">
+						<ul className="menu-items gap-2">
+							{data?.length !== 0 ? (
+								data?.map((doc) => (
+									<li
+										key={doc._id.$oid}
+										className={`menu-item ${
+											selection?.document?._id?.$oid === doc._id.$oid
+												? "menu-active"
+												: null
+										} bg-gray-2 flex justify-between`}
+										onClick={() => setDocumentSelected(doc)}
+									>
+										<p>{doc._id.$oid}</p>
+										<ArrowRight />
+									</li>
+								))
+							) : (
+								<li className="p-2 rounded-lg ">
+									<p>No documents</p>
+								</li>
+							)}
+						</ul>
+					</section>
+				</nav>
+			</div>
+
 			<label className="hidden btn btn-primary" htmlFor="add-collection-modal">
 				Open Modal
 			</label>
@@ -143,6 +230,7 @@ export default function Documents() {
 													setDoc((prev) => {
 														const newRecord = [...prev];
 														newRecord[index].type = e.target.value;
+														console.log("newRecord[index].type", newRecord[index].type);
 														return newRecord;
 													});
 												}}
@@ -164,19 +252,34 @@ export default function Documents() {
 										<div className="form-field w-full">
 											<label className="form-label">Value</label>
 
-											<input
-												placeholder="Type here"
-												type="text"
-												className="input max-w-full"
-												value={record.value}
-												onChange={(e) => {
-													setDoc((prev) => {
-														const newRecord = [...prev];
-														newRecord[index].value = e.target.value;
-														return newRecord;
-													});
-												}}
-											/>
+											{record.type === "boolean" ? (
+												<input
+													type="checkbox"
+													class="switch switch-primary switch-xl"
+													value={record.value}
+													onChange={(e) => {
+														setDoc((prev) => {
+															const newRecord = [...prev];
+															newRecord[index].value = e.target.value;
+															return newRecord;
+														});
+													}}
+												/>
+											) : (
+												<input
+													placeholder="Type here"
+													type={record.type}
+													className="input max-w-full"
+													value={record.value}
+													onChange={(e) => {
+														setDoc((prev) => {
+															const newRecord = [...prev];
+															newRecord[index].value = e.target.value;
+															return newRecord;
+														});
+													}}
+												/>
+											)}
 											{error?.value && (
 												<label className="form-label">
 													<span className="form-label-alt">
@@ -233,43 +336,31 @@ export default function Documents() {
 					</div>
 				</div>
 			</div>
-			<div className="basis-1/4 w-full p-4 rounded-sm  gap-4 flex flex-col max-h-screen overflow-y-scroll">
-				<p>Documents</p>
-				<button
-					onClick={() => {
-						setDocumentModal(true);
-					}}
-					className="btn btn-outline-primary hover:btn-secondary w-full menu-item shadow-2xl shadow-secondary duration-75 transition-all"
-				>
-					New Document
-				</button>
-				<nav className="menu  p-2 rounded-md">
-					<section className="menu-section">
-						<ul className="menu-items gap-2">
-							{data?.length !== 0 ? (
-								data?.map((doc) => (
-									<li
-										key={doc._id.$oid}
-										className={`menu-item ${
-											selection?.document?._id?.$oid === doc._id.$oid
-												? "menu-active"
-												: null
-										} bg-gray-2 flex justify-between`}
-										onClick={() => setDocumentSelected(doc)}
-									>
-										<p>{doc._id.$oid}</p>
-										<ArrowRight />
-									</li>
-								))
-							) : (
-								<li className="menu-item bg-gray-2 flex justify-between">
-									<p>No documents</p>
-								</li>
-							)}
-						</ul>
-					</section>
-				</nav>
-			</div>
 		</>
 	);
 }
+
+const Input = ({ label, type, value }) => {
+	if (type === "boolean") {
+		return <input type="checkbox" class="switch switch-primary switch-xl" />;
+	} else if (type === "number" || type === "string") {
+		return (
+			<div className="form-field w-full">
+				<label className="form-label">{label}</label>
+
+				<input
+					placeholder="Type here"
+					type={type}
+					className="input max-w-full"
+					value={value}
+					onChange={onChange}
+				/>
+				{error && (
+					<label className="form-label">
+						<span className="form-label-alt">{error}</span>
+					</label>
+				)}
+			</div>
+		);
+	}
+};

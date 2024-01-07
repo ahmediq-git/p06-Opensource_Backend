@@ -7,7 +7,9 @@ pub mod utils {
 
 pub mod apis {
     pub mod auth;
+    pub mod auth_test;
     pub mod collection;
+    pub mod collection_test;
     pub mod document;
     pub mod document_test;
     pub mod logs;

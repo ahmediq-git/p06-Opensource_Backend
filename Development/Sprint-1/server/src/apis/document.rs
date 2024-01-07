@@ -1,10 +1,6 @@
 use std::sync::{Arc, Mutex};
 
-use axum::{
-    extract::Path,
-    http::{StatusCode},
-    Extension, Json,
-};
+use axum::{extract::Path, http::StatusCode, Extension, Json};
 use ejdb::{
     bson,
     bson::ordered::OrderedDocument,
@@ -13,8 +9,6 @@ use ejdb::{
 };
 use serde::Deserialize;
 use serde_json::Value;
-
-
 
 #[derive(Deserialize, Debug)]
 pub struct InsertDoc {

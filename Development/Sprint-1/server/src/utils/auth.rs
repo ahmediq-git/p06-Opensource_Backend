@@ -66,3 +66,37 @@ pub fn validate_credentials(email: &str, password: &str) -> Result<(), String> {
 
     Ok(())
 }
+
+pub fn create_cookie_header(
+    session_id: String,
+    path: &str,
+    secure: bool,
+    samesite: &str,
+    maxage: i32,
+    http_only: bool,
+) -> String {
+    let mut header = String::from("session=");
+
+    header.push_str(&session_id);
+
+    if path != "" {
+        header.push_str("; Path=");
+        header.push_str(path);
+    }
+
+    if secure {
+        header.push_str("; Secure");
+    }
+
+    if http_only {
+        header.push_str("; HttpOnly");
+    }
+
+    header.push_str("; SameSite=");
+    header.push_str(samesite);
+
+    header.push_str("; Max-Age=");
+    header.push_str(&maxage.to_string());
+
+    header
+}
