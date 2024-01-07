@@ -1,35 +1,11 @@
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
-import { selectionAtom } from "../lib/state/selection";
+import { selectionAtom } from "../lib/state/selectionAtom";
 import useSWR, { useSWRConfig } from "swr";
 import { fetcher } from "../lib/utils/fetcher";
 import { z } from "zod";
-
-// Define a function to validate data types associated with fields
-// const dataSchema = z.union([
-// 	z.literal("boolean"),
-// 	z.literal("number"),
-// 	z.literal("string"),
-// 	z.literal("object"),
-// 	z.literal("array"),
-// ]);
-
-// // Define the main schema for an array of objects
-// const fieldSchema = z.object({
-// 	field: z.string().refine((val) => !/\d|\s|[^A-Za-z]/.test(val), {
-// 		message: "Field should not contain numbers, spaces, or special characters.",
-// 	}),
-// 	type: dataSchema,
-// 	data: z.lazy(() => {
-// 		return z.union([
-// 			z.boolean(),
-// 			z.number(),
-// 			z.string(),
-// 			z.lazy(() => fieldSchema), // For nested objects, refers back to the same schema
-// 			z.array(z.lazy(() => fieldSchema)), // For arrays of objects
-// 		]);
-// 	}),
-// });
+import { Lock } from "lucide-react";
+import {isAuthCollection} from "../lib/utils/isAuthCollection"
 
 const collectionNameSchema = z
 	.string({
@@ -44,13 +20,7 @@ export default function Collections() {
 	const [selection, setSelection] = useAtom(selectionAtom);
 	const [collectionName, setCollectionName] = useState(null);
 	const { mutate } = useSWRConfig();
-	// const [record, setRecord] = useState([
-	// 	{
-	// 		field: "fielder",
-	// 		type: "string",
-	// 		value: "values",
-	// 	},
-	// ]);
+
 	const [collectionNameError, setCollectionNameError] = useState(null);
 
 	const { data, error, isLoading } = useSWR(
@@ -60,7 +30,7 @@ export default function Collections() {
 
 	const setCollectionSelected = (e) => {
 		const name = e.target.textContent;
-		setSelection((prev) => ({ ...prev, collection: name }));
+		setSelection((prev) => ({ ...prev, collection: name, document: null }));
 	};
 
 	useEffect(() => {
@@ -79,30 +49,30 @@ export default function Collections() {
 		setCollectionNameError(null);
 	};
 
-	const selectCollectionName = (e) => {
-		e.preventDefault();
-		e.stopPropagation();
+	// const selectCollectionName = (e) => {
+	//   e.preventDefault();
+	//   e.stopPropagation();
 
-		// get value of collectionName from document
-		const name = document.querySelector("input[name='collectionName']").value;
-		console.log(name);
+	//   // get value of collectionName from document
+	//   const name = document.querySelector("input[name='collectionName']").value;
+	//   console.log(name);
 
-		// validate collectionName
-		try {
-			collectionNameSchema.parse(name);
-		} catch (err) {
-			console.log(err);
-			console.log(
-				"err.formErrors.fieldErrors.name[0]",
-				err.formErrors.fieldErrors.name[0]
-			);
-			setCollectionNameError(err.formErrors.fieldErrors.name[0]);
-			return;
-		}
+	//   // validate collectionName
+	//   try {
+	//     collectionNameSchema.parse(name);
+	//   } catch (err) {
+	//     console.log(err);
+	//     console.log(
+	//       "err.formErrors.fieldErrors.name[0]",
+	//       err.formErrors.fieldErrors.name[0]
+	//     );
+	//     setCollectionNameError(err.formErrors.fieldErrors.name[0]);
+	//     return;
+	//   }
 
-		// set collectionName
-		setCollectionName(name);
-	};
+	//   // set collectionName
+	//   setCollectionName(name);
+	// };
 
 	const createCollection = async () => {
 		// get value of collectionName from document
@@ -137,7 +107,7 @@ export default function Collections() {
 			console.log("data", data);
 
 			setModal(false);
-			mutate('http://127.0.0.1:3690/get_collection_names');
+			mutate("http://127.0.0.1:3690/get_collection_names");
 		} catch (error) {
 			console.log(error);
 		}
@@ -200,8 +170,6 @@ export default function Collections() {
 								</div>
 								{/* records */}
 								<div className="flex gap-6 justify-between w-full overflow-scroll">
-									{/* {records.map((record, index) => (
-										<> */}
 									<div className="form-field w-full">
 										<label className="form-label">Field</label>
 
@@ -254,75 +222,12 @@ export default function Collections() {
 											</label>
 										)}
 									</div>
-									{/* </>
-									))} */}
 								</div>
-								{/* 
-								<div>
-									<div className="form-field w-full">
-										<label className="form-label">Field</label>
-
-										<input
-											placeholder="Type here"
-											type="text"
-											className="input max-w-full"
-										/>
-										{error?.field && (
-											<label className="form-label">
-												<span className="form-label-alt">
-													error.field.message
-												</span>
-											</label>
-										)}
-									</div>
-									<div className="form-field w-full">
-										<label className="form-label">Type</label>
-
-										<select className="select w-full">
-											<option value="boolean">bool</option>
-											<option value="number">number</option>
-											<option value="string">string</option>
-											<option value="array">array</option>
-											<option value="object">object</option>
-										</select>
-										{error?.type && (
-											<label className="form-label">
-												<span className="form-label-alt">
-													error.type.message
-												</span>
-											</label>
-										)}
-									</div>
-									<div className="form-field w-full">
-										<label className="form-label">Value</label>
-
-										<input
-											placeholder="Type here"
-											type="email"
-											className="input max-w-full"
-										/>
-										{error?.value && (
-											<label className="form-label">
-												<span className="form-label-alt">
-													error.value,message
-												</span>
-											</label>
-										)}
-									</div>
-								</div> */}
 							</div>
 						)}
 					</div>
 
 					<div className="flex gap-3">
-						{/* {collectionName !== "" ? (
-							<button
-								className="btn btn-primary hover:btn-secondary btn-block"
-								onClick={selectCollectionName}
-							>
-								Create
-							</button>
-						) : ( */}
 						<button
 							className="btn btn-primary hover:btn-secondary btn-block"
 							onClick={createCollection}
@@ -338,20 +243,42 @@ export default function Collections() {
 				</div>
 			</div>
 			{/* Bar */}
-			<aside className="sidebar h-full justify-start">
+			<aside className="sidebar h-full justify-start bg-gray-1 border-r border-gray-100 border-opacity-10">
 				<section className="sidebar-content h-fit min-h-[20rem] overflow-visible mt-10">
 					<nav className="menu rounded-md">
 						<section className="menu-section px-4">
-							<span className="menu-title">Collections</span>
+							<span className="menu-title text-lg">Collections</span>
+
 							<ul className="menu-items gap-4">
 								<button
 									onClick={() => {
 										setModal((val) => !val);
 									}}
-									className="btn btn-outline-primary hover:btn-secondary w-full menu-item shadow-2xl shadow-secondary duration-75 transition-all mt-10"
+									className="btn btn-outline-primary hover:btn-secondary w-full menu-item duration-75 transition-all mt-10"
 								>
 									New Collection
 								</button>
+
+								<ul className="menu-items gap-4 border-2 border-red-500 p-2 rounded-lg">
+									<Lock size={18} className="self-end absolute z-10" />
+									{data?.length > 0 &&
+										data.map((collection, index) => (
+											<li
+												key={index}
+												className={`menu-item ${
+													selection.collection === collection
+														? "menu-active"
+														: null
+												}  ${
+													isAuthCollection(collection) ? null : "hidden"
+												}`}
+												onClick={setCollectionSelected}
+											>
+												<span>{collection}</span>
+											</li>
+										))}
+								</ul>
+
 								{data?.length > 0 &&
 									data.map((collection, index) => (
 										<li
@@ -360,6 +287,8 @@ export default function Collections() {
 												selection.collection === collection
 													? "menu-active"
 													: null
+											}  ${
+												isAuthCollection(collection) ? "hidden " : null
 											}`}
 											onClick={setCollectionSelected}
 										>

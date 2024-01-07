@@ -1,14 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import App from "./App";
 import "./index.css";
-
-
-const router = createBrowserRouter([{ path: "/", element: <App /> }]);
+import { SWRConfig } from "swr";
+import { localStorageProvider } from "./lib/utils/localStorageProvider";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
 	<React.StrictMode>
-		<RouterProvider router={router}></RouterProvider>
+<SWRConfig value={{ provider: localStorageProvider }}>
+		<App></App>
+		</SWRConfig>
 	</React.StrictMode>
 );
