@@ -82,7 +82,7 @@ export default function Documents() {
 	const createDocument = async () => {
 		try {
 
-			const validatedData = fieldSchema.parse(Object.assign({}, ...doc));
+			// const validatedData = fieldSchema.parse(Object.assign({}, ...doc));
 
 			const data = doc.map((record) => {
 				return {
