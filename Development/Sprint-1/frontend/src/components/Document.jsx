@@ -4,7 +4,7 @@ import { useSWRConfig } from "swr";
 import { selectionAtom } from "../lib/state/selectionAtom";
 import JSONPretty from "react-json-pretty";
 import { Trash2 } from "lucide-react";
-import "react-json-pretty/themes/custom.css";
+import "/custom.css";
 import { isAuthCollection } from "../lib/utils/isAuthCollection";
 
 
