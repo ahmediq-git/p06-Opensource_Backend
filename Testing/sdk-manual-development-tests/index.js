@@ -109,11 +109,11 @@ function deleteCollection(){
 signinTest();
 
 setTimeout(function() {
-  insertDocTest();
+  // insertDocTest();
   getCollectionNamesTest();
-  getAllDocsTest();
-  eb.db.getAllDocs("config").then(ans=>console.log(ans))
-}, 5000);
+  // getAllDocsTest();
+  // eb.db.getAllDocs("config").then(ans=>console.log(ans))
+}, 2000);
 
 // insertDocTest();
 // insertFieldTest("6557a315adeb935c00000000")
@@ -129,12 +129,13 @@ setTimeout(function() {
 // findDocTest()
 
 // getCollectionNamesTest()
+
 // deleteCollection()
 
 
 function signupTest(){
   console.log("Testing sign up")
-  eb.auth.signUp("email2@gmail.com", "hehehehe")
+  eb.auth.signUp("email1@gmail.com", "hehehehe")
 }
 
 function signinTest(){
@@ -148,11 +149,11 @@ function signoutTest(){
 }
 
 // signupTest()
-// // signinTest()
+// signinTest()
 // // getAllDocsTest()
 // setTimeout(function() {
-//   signoutTest();
+//   // signoutTest();
 //   getCollectionNamesTest()
+//   eb.db.getAllDocs()
 // }, 5000); // 5000 milliseconds = 5 seconds
 
-eb.db.getAllDocs()
