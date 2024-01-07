@@ -3,7 +3,7 @@ import ValidationUtils from "./validators/validators.js";
 class EzBaseClient {
     #backendUrl;//declare private variable for backendURL
 
-    constructor(backendUrl) {
+    constructor(backendUrl, authStore) {
     
         if (!ValidationUtils.isValidUrl(backendUrl)) {
             throw new Error('Invalid URL for backend. Please provide a valid URL.');
@@ -14,6 +14,7 @@ class EzBaseClient {
         }
 
         this.#backendUrl = backendUrl;
+        this.authStore=authStore;
     }
 
     // Sends to the backend using the given method and api endpoint
@@ -22,8 +23,9 @@ class EzBaseClient {
     
         const headers = {
             'Content-Type': 'application/json',
+            'Cookie': this.authStore.jwtToken,
         };
-        // console.log(jsonObject, apiEndpoint, method);
+
         try {
             let response;
     
@@ -31,18 +33,18 @@ class EzBaseClient {
                 case 'POST':
                     response = await axios.post(completeApiEndpoint, jsonObject, { headers });
                     console.log('Data sent successfully:', response.data);
-                    return response.data;
+                    return response;
                 case 'DELETE':
                     response = await axios.delete(completeApiEndpoint, { data: jsonObject, headers });
                     console.log('Data sent for deletion successfully:', response.data);
-                    return response.data;
+                    return response;
                 case 'GET':
                     const values = Object.values(jsonObject);
                     completeApiEndpoint += values.map(value => `/${value}`).join('');
-                    console.log(completeApiEndpoint)
+                    // console.log(completeApiEndpoint)
                     response = await axios.get(completeApiEndpoint, { headers });
                     console.log('Data received successfully:', response.data);
-                    return response.data;
+                    return response;
                 default:
                     console.error('Invalid method:', method);
                     return;

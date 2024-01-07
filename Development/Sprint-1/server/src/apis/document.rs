@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex};
 
 use axum::{
     extract::Path,
-    http::{HeaderMap, StatusCode},
+    http::{StatusCode},
     Extension, Json,
 };
 use ejdb::{
@@ -14,7 +14,7 @@ use ejdb::{
 use serde::Deserialize;
 use serde_json::Value;
 
-use crate::auth::validate_session;
+
 
 #[derive(Deserialize, Debug)]
 pub struct InsertDoc {
