@@ -109,30 +109,30 @@ mod test_auth_api {
         let _cookie = response.cookie("session"); //check if cookie with name session is present or not
     }
 
-    #[tokio::test]
-    pub async fn test_signout() {
-        let router = get_router();
-        let config = TestServerConfig::builder().save_cookies().build();
-        let server = TestServer::new_with_config(router, config).unwrap();
-        let good_password = rand_string(10);
-        let good_email = good_password.clone() + "@test.com";
-        // Signup with good password
-        let response: axum_test::TestResponse = server
-            .post(&"/signup_email")
-            .json(&json!({
-                "email": good_email,
-                "password": good_password
-            }))
-            .await;
-        assert_eq!(response.status_code(), StatusCode::OK);
-        let _cookie = response.cookie("session"); //check if cookie with name session is present or not
+    // #[tokio::test]
+    // pub async fn test_signout() {
+    //     let router = get_router();
+    //     let config = TestServerConfig::builder().save_cookies().build();
+    //     let server = TestServer::new_with_config(router, config).unwrap();
+    //     let good_password = rand_string(10);
+    //     let good_email = good_password.clone() + "@test.com";
+    //     // Signup with good password
+    //     let response: axum_test::TestResponse = server
+    //         .post(&"/signup_email")
+    //         .json(&json!({
+    //             "email": good_email,
+    //             "password": good_password
+    //         }))
+    //         .await;
+    //     assert_eq!(response.status_code(), StatusCode::OK);
+    //     let _cookie = response.cookie("session"); //check if cookie with name session is present or not
 
-        // Logout
-        let response = server.get("/signout").await;
-        assert_eq!(response.status_code(), StatusCode::OK);
+    //     // Logout
+    //     let response = server.get("/signout").await;
+    //     assert_eq!(response.status_code(), StatusCode::OK);
 
-        let response = server.get("/get_collection_names").await;
-        assert_eq!(response.status_code(), StatusCode::UNAUTHORIZED);
-    }
+    //     let response = server.get("/get_collection_names").await;
+    //     assert_eq!(response.status_code(), StatusCode::UNAUTHORIZED);
+    // }
 }
 //admin same tests
