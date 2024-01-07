@@ -28,7 +28,7 @@ dependencies = [
 
 [[package]]
 name = "android-tzdata"
-version = "0.1.1"
+version = "0.1.1"g433
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e999941b234f3131b00bc13c22d06e8c5ff726d1b6318ac7eb276997bbb4fef0"
 
@@ -430,15 +430,12 @@ dependencies = [
 ]
 
 [[package]]
-<<<<<<< HEAD
 name = "data-encoding"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7e962a19be5cfc3f3bf6dd8f61eb50107f356ad6270fbb3ed41476571db78be5"
 
 [[package]]
-=======
->>>>>>> 63cc3b3 (updated auth code)
 name = "deranged"
 version = "0.3.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -448,15 +445,12 @@ dependencies = [
 ]
 
 [[package]]
-<<<<<<< HEAD
 name = "diff"
 version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56254986775e3233ffa9c4d7d3faaf6d36a2c09d30b20687e9f88bc8bafc16c8"
 
 [[package]]
-=======
->>>>>>> 63cc3b3 (updated auth code)
 name = "digest"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -526,11 +520,8 @@ dependencies = [
  "axum",
  "axum-test",
  "chrono",
-<<<<<<< HEAD
  "data-encoding",
-=======
  "cookie",
->>>>>>> 63cc3b3 (updated auth code)
  "ejdb",
  "jsonwebtoken",
  "rand 0.8.5",
@@ -1457,8 +1448,6 @@ dependencies = [
 [[package]]
 name = "time"
 version = "0.3.31"
-<<<<<<< HEAD
-=======
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f657ba42c3f86e7680e53c8cd3af8abbe56b5491790b46e22e19c0d57463583e"
 dependencies = [
@@ -1488,7 +1477,6 @@ dependencies = [
 [[package]]
 name = "tokio"
 version = "1.33.0"
->>>>>>> 63cc3b3 (updated auth code)
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f657ba42c3f86e7680e53c8cd3af8abbe56b5491790b46e22e19c0d57463583e"
 dependencies = [
