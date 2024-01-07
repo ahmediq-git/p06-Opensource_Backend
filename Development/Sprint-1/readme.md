@@ -56,7 +56,7 @@ LIST OF REQUIREMENTS COMPLETED SO FAR
 
 HOW TO ACCESS THE SYSTEM
 
-1. The documentation site can be visited on https://p06-opensource-backend-in-rust.vercel.app/
+1. The documentation site can be visited on ezbase.vercel.app
 2. The SDK can be downloaded on npm repository on https://www.npmjs.com/package/ezbase
 3. The server will be downloadable from the documentation site in the upcoming sprints (we have had issues with making an executable for windows. Linux and mac executables are done), however for it can be run be following the steps below:
     - Go to the server repository in Sprint 1
