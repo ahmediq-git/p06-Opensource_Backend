@@ -59,7 +59,7 @@ HOW TO ACCESS THE SYSTEM
 
 1. The documentation site can be visited on https://p06-opensource-backend-in-rust.vercel.app/
 2. The SDK can be downloaded on npm repository on https://www.npmjs.com/package/ezbase
-3. The server will be downloadable from the documentation site in the upcoming sprints, however for it can be run be following the steps below:
+3. The server will be downloadable from the documentation site in the upcoming sprints (we have had issues with making an executable for windows. Linux and mac executables are done), however for it can be run be following the steps below:
     - Go to the server repository in Sprint 1
     - Execute `cargo run` on the terminal to start the server
 4. The UI can also be locally accessed and run by following the steps below:
@@ -78,4 +78,5 @@ HOW TO ACCESS THE SYSTEM
 ADDITIONAL INFORMATION
 
 1. The tests for the SDK are in the Testing folder. The automatic tests for sdk use Jest and are in sdk-automatic-tests. For development we use skd-manual-development tests
-2. Due to the nature of our project, and the backend language Rust, we are still working on making executables for the server and bundling the UI with it. It will be complete in the upcoming sprints.
+2. The tests for the server are in the apis folder. Use cargo -- --test-threads=1 to run.
+3. Due to the nature of our project, and the backend language Rust, we are still working on making executables for the server and bundling the UI with it. It will be complete in the upcoming sprints.
