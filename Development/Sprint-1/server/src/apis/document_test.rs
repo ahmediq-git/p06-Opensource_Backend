@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod test_doc_api {
-    use axum::{http::StatusCode, Json};
+    use axum::http::StatusCode;
     use axum_test::{TestServer, TestServerConfig};
     use ejdb::bson::ordered::OrderedDocument;
     use serde_json::json;
@@ -14,7 +14,7 @@ mod test_doc_api {
         let server = TestServer::new_with_config(router, config).unwrap();
         let rand = rand_string(8);
         let email = rand.clone() + "@test.com";
-        let signup_response = server
+        let __signup_response = server
             .post(&"/signup_email")
             .json(&json!({
                 "email": email,
@@ -43,7 +43,7 @@ mod test_doc_api {
         let server = TestServer::new_with_config(router, config).unwrap();
         let rand = rand_string(8);
         let email = rand.clone() + "@test.com";
-        let signup_response = server
+        let _signup_response = server
             .post(&"/signup_email")
             .json(&json!({
                 "email": email,
@@ -74,7 +74,7 @@ mod test_doc_api {
         let server = TestServer::new_with_config(router, config).unwrap();
         let rand = rand_string(8);
         let email = rand.clone() + "@test.com";
-        let signin_response = server
+        let _signin_response = server
             .post(&"/signup_email")
             .json(&json!({
                 "email": email,
@@ -107,7 +107,7 @@ mod test_doc_api {
         let server = TestServer::new_with_config(router, config).unwrap();
         let rand = rand_string(8);
         let email = rand.clone() + "@test.com";
-        let signin_response = server
+        let _signin_response = server
             .post(&"/signup_email")
             .json(&json!({
                 "email": email,
@@ -142,7 +142,7 @@ mod test_doc_api {
         let server = TestServer::new_with_config(router, config).unwrap();
         let rand = rand_string(8);
         let email = rand.clone() + "@test.com";
-        let signin_response = server
+        let _signin_response = server
             .post(&"/signup_email")
             .json(&json!({
                 "email": email,
@@ -158,7 +158,7 @@ mod test_doc_api {
             }))
             .await;
         let doc_id = insert_response.json::<String>();
-        let delete_doc_response = server
+        let _delete_doc_response = server
             .delete(&"/delete_doc")
             .json(&json!({
                 "collection_name": "Test",
@@ -180,7 +180,7 @@ mod test_doc_api {
         let server = TestServer::new_with_config(router, config).unwrap();
         let rand = rand_string(8);
         let email = rand.clone() + "@test.com";
-        let signin_response = server
+        let _signin_response = server
             .post(&"/signup_email")
             .json(&json!({
                 "email": email,
@@ -195,7 +195,7 @@ mod test_doc_api {
                 "field_value": "Test"
             }))
             .await;
-        let doc_id = insert_response.json::<String>();
+        let _doc_id = insert_response.json::<String>();
         let search_doc_response = server
             .post(&"/search_doc")
             .json(&json!({

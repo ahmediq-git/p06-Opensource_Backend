@@ -271,7 +271,7 @@ pub async fn signup_admin(
                                 .to_string()
                                 .trim_matches('"')
                                 .to_string(),
-                            is_admin: false,
+                            is_admin: true,
                             exp: session
                                 .get("active_period_expires_at")
                                 .unwrap()
@@ -358,7 +358,7 @@ pub async fn signin_admin(
                             secret,
                             Claims {
                                 session_id: session_id.clone().trim_matches('"').to_string(),
-                                is_admin: false,
+                                is_admin: true,
                                 exp: session
                                     .get("active_period_expires_at")
                                     .unwrap()
