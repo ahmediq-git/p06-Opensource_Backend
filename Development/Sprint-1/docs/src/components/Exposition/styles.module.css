@@ -1,0 +1,27 @@
+.features {
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+  width: 100%;
+}
+
+.featureSvg {
+  height: 200px;
+  width: 200px;
+} 
+
+.large-button {
+  background-color: #343434;
+}
+
+.large-button:hover{
+  background-color: #299D8F;
+}
+
+.small-button {
+  background-color: #343434;
+}
+
+.small-button:hover {
+  background-color: #299D8F;
+}

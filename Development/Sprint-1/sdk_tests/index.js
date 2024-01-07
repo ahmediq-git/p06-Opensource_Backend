@@ -1,5 +1,5 @@
 import ezbase from 'ezbase';
-const eb = new ezbase("http://0.0.0.0:3690");
+const eb = new ezbase("http://0.0.0.0:3690");  
 
 //1 createCollection
 function createCollectionTest(){
