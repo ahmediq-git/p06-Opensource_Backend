@@ -16,7 +16,6 @@ test("Sign in Test", async () => {
 
 
 test("Sign out Test", async () => {
-    // Use expect.assertions() to ensure that a certain number of assertions are called
     expect.assertions(1);
 
     await expect(eb.auth.signOut()).resolves.not.toThrow();

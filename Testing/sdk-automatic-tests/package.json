@@ -13,9 +13,17 @@
     "ezbase": "^0.1.52"
   },
   "jest": {
-    "transform": {}
+    "transform": {},
+    "reporters": [
+      "default",
+      ["./node_modules/jest-html-reporter", {
+        "pageTitle": "Test Report"
+      }]
+    ]
   },
   "devDependencies": {
-    "jest": "^29.7.0"
+    "jest": "^29.7.0",
+    "jest-html-reporter": "^3.10.2"
   }
+ 
 }
