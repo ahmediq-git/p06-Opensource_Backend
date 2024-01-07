@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 use std::sync::MutexGuard;
 
-use crate::apis::auth::{login_email, logout, signin_admin, signup_admin, signup_email};
+use crate::apis::auth::{login_email, logout, signin_admin, signup_admin, check_admin_exists, signup_email};
 use crate::apis::collection::{
     create_collection, delete_collection, get_all_docs, get_collection_names,
 };
@@ -107,6 +107,7 @@ pub fn get_router() -> Router {
         .route("/signup_email", post(signup_email))
         .route("/signin_email", post(login_email))
         .route("/signout", get(logout))
+        .route("/check_admin_exists", get(check_admin_exists))
         .route("/signup_admin", post(signup_admin))
         .route("/signin_admin", post(signin_admin))
         .layer(cors)
@@ -119,9 +120,8 @@ pub fn get_router() -> Router {
 }
 
 fn initialize_auth_collections(db: &MutexGuard<'_, Database>) {
-    let coll = db.collection("user_key").unwrap();
+    let _ = db.collection("user_key").unwrap();
+    let _ = db.collection("user").unwrap();
 
-    let coll = db.collection("user").unwrap();
-
-    let coll = db.collection("session").unwrap();
+    let _ = db.collection("user_session").unwrap();
 }

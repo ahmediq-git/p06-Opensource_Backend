@@ -6,6 +6,8 @@ use axum::{
     response::AppendHeaders,
     Extension, Json,
 };
+use cookie::Cookie;
+
 use ejdb::{
     query::{Q, QH},
     Database,
@@ -14,7 +16,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     auth::{create_admin, create_session, create_user, delete_session},
-    utils::auth::{hash_verify, validate_credentials},
+    utils::auth::{hash_verify, validate_credentials, create_cookie_header},
     utils::jwt::{encrypt_jwt, get_secret, Claims},
 };
 
@@ -393,4 +395,30 @@ pub async fn signin_admin(
             Json("User does not exist".to_string()),
         )),
     }
+}
+
+// this function checks if any admin exists in the database
+pub async fn check_admin_exists(Extension(db): Extension<Arc<Mutex<Database>>>) -> Json<String> {
+    let db_guard = match db.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => {
+            let guard = poisoned.into_inner();
+            guard
+        }
+    };
+
+    let coll = db_guard.collection("ezbase_admin").unwrap();
+
+    // fetch all the admins
+    let admins = match coll.query(Q.empty(), QH.empty()).find() {
+        Ok(admins) => admins,
+        Err(_) => return Json("false".to_string()),
+    };
+
+    // if there are no admins, return false
+    if admins.count() == 0 {
+        return Json("false".to_string());
+    }
+
+    Json("true".to_string())
 }
