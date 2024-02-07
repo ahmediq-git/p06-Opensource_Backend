@@ -8,6 +8,7 @@ import AuthStore from "./auth/AuthStore/store.js";
 export default class ezbase {
   #authStore;
   #ezBaseClient;
+  
 
   constructor(url) {
     this.#authStore = new AuthStore();
