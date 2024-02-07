@@ -24,9 +24,10 @@ export default function Collections() {
 	const [collectionNameError, setCollectionNameError] = useState(null);
 
 	const { data, error, isLoading } = useSWR(
-		"http://127.0.0.1:3690/get_collection_names",
+		"http://localhost:3690/api/collections",
 		fetcher
 	);
+
 
 	const setCollectionSelected = (e) => {
 		const name = e.target.textContent;
@@ -94,7 +95,7 @@ export default function Collections() {
 
 		// set collectionName
 		try {
-			const response = await fetch("http://127.0.0.1:3690/create_collection", {
+			const response = await fetch("http://localhost:3690/api/collections/create", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -107,7 +108,7 @@ export default function Collections() {
 			console.log("data", data);
 
 			setModal(false);
-			mutate("http://127.0.0.1:3690/get_collection_names");
+			mutate("http://localhost:3690/api/collections");
 		} catch (error) {
 			console.log(error);
 		}
@@ -261,8 +262,8 @@ export default function Collections() {
 
 								<ul className="menu-items gap-4 border-2 border-red-500 p-2 rounded-lg">
 									<Lock size={18} className="self-end absolute z-10" />
-									{data?.length > 0 &&
-										data.map((collection, index) => (
+									{data.data?.length > 0 &&
+										data.data.map((collection, index) => (
 											<li
 												key={index}
 												className={`menu-item ${
@@ -279,8 +280,8 @@ export default function Collections() {
 										))}
 								</ul>
 
-								{data?.length > 0 &&
-									data.map((collection, index) => (
+								{data.data?.length > 0 &&
+									data.data.map((collection, index) => (
 										<li
 											key={index}
 											className={`menu-item ${
