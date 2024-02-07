@@ -1,94 +1,104 @@
-import ezbase, { Collection } from 'ezbase-ts';
+import ezbase from 'ezbase-ts';
 
-const eb = new ezbase("http://0.0.0.0:3690");
+const eb = new ezbase("http://localhost:3690");
 
 //1 createCollection
-function createCollectionTest(): void {
+// function createCollectionTest(): void {
+//     console.log("");
+//     console.log("Testing creation of collections");
+//     const cct1 = eb.db.createCollection("newcol1");
+//     const cct12 = eb.db.createCollection("newcol2");
+//     console.log(cct1, cct12);
+// }
+
+// write createCollection function as an async function
+async function createCollectionTest(): Promise<any> {
     console.log("");
     console.log("Testing creation of collections");
-    eb.db.createCollection("newcol1");
-    eb.db.createCollection("newcol2");
-    console.log("");
+    const cct1 = await eb.db.createCollection("TestSDKCollection1");
+    const cct12 = await eb.db.createCollection("TestSDKCollection2");
+    console.log(cct1, cct12);
 }
 
-// There should be ezbase.db file in the server and a "newcol1" file in the server end
 
-//2 insertSingleFieldDoc
-function insertSingleFieldDocTest(): void {
-    console.log("Testing insertSingleFieldDoc");
-    let id: string;
-    eb.db.insertSingleFieldDoc("newcol1", { "name": "sample" })
-        .then((ans: string) => {
-            id = ans;
-            return id;
-        })
-        .catch((error: any) => {
-            console.error(error);
-        });
-}
+// // There should be ezbase.db file in the server and a "newcol1" file in the server end
 
-//3 getAllDocs
-function getAllDocsTest(): void {
-    console.log("Testing of getAllDocs on newcol1");
-    eb.db.getAllDocs("newcol1").then((ans: any) => console.log(ans));
-    console.log("");
-}
+// //2 insertSingleFieldDoc
+// function insertSingleFieldDocTest(): void {
+//     console.log("Testing insertSingleFieldDoc");
+//     let id: string;
+//     eb.db.insertSingleFieldDoc("newcol1", { "name": "sample" })
+//         .then((ans: string) => {
+//             id = ans;
+//             return id;
+//         })
+//         .catch((error: any) => {
+//             console.error(error);
+//         });
+// }
 
-// There should only be a collection with 1 doc of just one key and value
+// //3 getAllDocs
+// function getAllDocsTest(): void {
+//     console.log("Testing of getAllDocs on newcol1");
+//     eb.db.getAllDocs("newcol1").then((ans: any) => console.log(ans));
+//     console.log("");
+// }
 
-//4 insertDoc
-function insertDocTest(): void {
-    console.log("Testing of insertDoc (Doc should be of arbitrary fields), it returns doc id");
-    eb.db.insertDoc("newcol1", { "name": "A", "age": 25 }).then((id: string) => { console.log(id) });
-    console.log("");
-}
+// // There should only be a collection with 1 doc of just one key and value
 
-//5 insertField
-function insertFieldTest(id: string): void {
-    console.log("Testing of insertField on newcol1");
-    eb.db.insertField("newcol1", id, { "height": 123 });
-    eb.db.getAllDocs("newcol1").then((ans: any) => console.log(ans));
-    console.log("");
-}
+// //4 insertDoc
+// function insertDocTest(): void {
+//     console.log("Testing of insertDoc (Doc should be of arbitrary fields), it returns doc id");
+//     eb.db.insertDoc("newcol1", { "name": "A", "age": 25 }).then((id: string) => { console.log(id) });
+//     console.log("");
+// }
 
-//6 deleteDoc
-function deleteDocTest(id: string): void {
-    console.log("Testing delete doc");
-    eb.db.deleteDoc("newcol1", id);
-    eb.db.getAllDocs("newcol1").then((ans: any) => console.log("after deletion of a doc", ans));
-}
+// //5 insertField
+// function insertFieldTest(id: string): void {
+//     console.log("Testing of insertField on newcol1");
+//     eb.db.insertField("newcol1", id, { "height": 123 });
+//     eb.db.getAllDocs("newcol1").then((ans: any) => console.log(ans));
+//     console.log("");
+// }
 
-//7 insertManyFields
-function insertManyFieldsTest(id: string): void {
-    console.log("Testing insertManyFields");
-    eb.db.insertManyFields("newcol1", id, { "height": 175, "age": 28 });
-}
+// //6 deleteDoc
+// function deleteDocTest(id: string): void {
+//     console.log("Testing delete doc");
+//     eb.db.deleteDoc("newcol1", id);
+//     eb.db.getAllDocs("newcol1").then((ans: any) => console.log("after deletion of a doc", ans));
+// }
 
-//8 getDoc
-function getDocTest(id: string): void {
-    console.log("Testing getDoc");
-    eb.db.getDoc("newcol1", id).then((ans: any) => console.log(ans));
-}
+// //7 insertManyFields
+// function insertManyFieldsTest(id: string): void {
+//     console.log("Testing insertManyFields");
+//     eb.db.insertManyFields("newcol1", id, { "height": 175, "age": 28 });
+// }
 
-//9 updateDoc
-function updateDocTest(id: string): void {
-    console.log("Testing updateDoc");
-    eb.db.updateDoc("newcol1", id, { "name": "new name", "age": 20 });
-}
+// //8 getDoc
+// function getDocTest(id: string): void {
+//     console.log("Testing getDoc");
+//     eb.db.getDoc("newcol1", id).then((ans: any) => console.log(ans));
+// }
 
-//10 insertManyDocs
-function insertManyDocsTest(): void {
-    console.log("Testing insertManyDocs");
-    eb.db.insertManyDocs("newcol2", [{ "name": "A", "age": 20 }, { "name": "B" }, { "name": "C" }])
-        .then((resp: any) => console.log("We got response", resp));
-    eb.db.getAllDocs("newcol2").then((ans: any) => console.log("after inserting many docs", ans));
-}
+// //9 updateDoc
+// function updateDocTest(id: string): void {
+//     console.log("Testing updateDoc");
+//     eb.db.updateDoc("newcol1", id, { "name": "new name", "age": 20 });
+// }
 
-//11 findDoc
-function findDocTest(): void {
-    console.log("Testing findDoc");
-    eb.db.findDoc("newcol2", { "age": 20 }).then((ans: any) => console.log(ans));
-}
+// //10 insertManyDocs
+// function insertManyDocsTest(): void {
+//     console.log("Testing insertManyDocs");
+//     eb.db.insertManyDocs("newcol2", [{ "name": "A", "age": 20 }, { "name": "B" }, { "name": "C" }])
+//         .then((resp: any) => console.log("We got response", resp));
+//     eb.db.getAllDocs("newcol2").then((ans: any) => console.log("after inserting many docs", ans));
+// }
+
+// //11 findDoc
+// function findDocTest(): void {
+//     console.log("Testing findDoc");
+//     eb.db.findDoc("newcol2", { "age": 20 }).then((ans: any) => console.log(ans));
+// }
 
 //12 getCollectionNames()
 function getCollectionNamesTest(): void {
@@ -96,66 +106,66 @@ function getCollectionNamesTest(): void {
     eb.db.getCollectionNames().then((ans: any) => console.log(ans));
 }
 
-//13 deleteCollection()
-function deleteCollection(): void {
-    console.log("Testing deletion of a collection");
-    eb.db.deleteCollection("newcol2");
-}
+// //13 deleteCollection()
+// function deleteCollection(): void {
+//     console.log("Testing deletion of a collection");
+//     eb.db.deleteCollection("newcol2");
+// }
 
 
 // Calling the functions
 
 // where id is written change id according to what is received from server when testing
 
-// createCollectionTest()
-// insertSingleFieldDocTest()
-signinTest();
+createCollectionTest()
+// // insertSingleFieldDocTest()
+// signinTest();
 
-setTimeout(() => {
-    // insertDocTest();
-    getCollectionNamesTest();
-    // getAllDocsTest();
-    // eb.db.getAllDocs("config").then(ans=>console.log(ans))
-}, 2000);
-
-// insertDocTest();
-// insertFieldTest("6557a315adeb935c00000000")
-// deleteDocTest("6557a315adeb935c00000000")
-// getAllDocsTest()
-// 
-
-// insertManyFieldsTest("6557a47cdefcef5c00000000")
-// getDocTest("6559ab93e0730f6200000000")
-// updateDocTest("6557af222815ab5f00000000")
-
-// insertManyDocsTest()
-// findDocTest()
-
-// getCollectionNamesTest()
-
-// deleteCollection()
-
-
-function signupTest(): void {
-    console.log("Testing sign up");
-    eb.auth.signUp("email1@gmail.com", "hehehehe");
-}
-
-function signinTest(): void {
-    console.log("Testing sign in");
-    eb.auth.signIn("email1@gmail.com", "hehehehe");
-}
-
-function signoutTest(): void {
-    console.log("Sign out test");
-    eb.auth.signOut();
-}
-
-// signupTest()
-// signinTest()
-// // getAllDocsTest()
 // setTimeout(() => {
-//   // signoutTest();
-//   getCollectionNamesTest()
-//   eb.db.getAllDocs()
-// }, 5000); // 5000 milliseconds = 5 seconds
+//     // insertDocTest();
+//     getCollectionNamesTest();
+//     // getAllDocsTest();
+//     // eb.db.getAllDocs("config").then(ans=>console.log(ans))
+// }, 5000);
+
+// // insertDocTest();
+// // insertFieldTest("6557a315adeb935c00000000")
+// // deleteDocTest("6557a315adeb935c00000000")
+// // getAllDocsTest()
+// //
+
+// // insertManyFieldsTest("6557a47cdefcef5c00000000")
+// // getDocTest("6559ab93e0730f6200000000")
+// // updateDocTest("6557af222815ab5f00000000")
+
+// // insertManyDocsTest()
+// // findDocTest()
+
+// // getCollectionNamesTest()
+
+// // deleteCollection()
+
+
+// function signupTest(): void {
+//     console.log("Testing sign up");
+//     eb.auth.signUp("email1@gmail.com", "hehehehe");
+// }
+
+// function signinTest(): void {
+//     console.log("Testing sign in");
+//     eb.auth.signIn("email1@gmail.com", "hehehehe");
+// }
+
+// function signoutTest(): void {
+//     console.log("Sign out test");
+//     eb.auth.signOut();
+// }
+
+// // signupTest()
+// // signinTest()
+// // // getAllDocsTest()
+// // setTimeout(() => {
+// //   // signoutTest();
+// //   getCollectionNamesTest()
+// //   eb.db.getAllDocs()
+// // }, 5000); // 5000 milliseconds = 5 seconds
