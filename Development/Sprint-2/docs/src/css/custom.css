@@ -1,0 +1,160 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary: #2A9D8F;
+  --ifm-color-primary-dark: #29784c;
+  --ifm-color-primary-darker: #277148;
+  --ifm-color-primary-darkest: #205d3b;
+  --ifm-color-primary-light: #33925d;
+  --ifm-color-primary-lighter: #359962;
+  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+@font-face {
+  font-family: 'Big Shoulders Display';
+  src: url('fonts/BigShouldersDisplay-ExtraBold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Big Shoulders Display Light';
+  src: url('fonts/BigShouldersDisplay-Medium.ttf') format('truetype');
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme='dark'] {
+  background-color: #1C1C1C;
+  --ifm-color-primary: #2A9D8F;
+  --ifm-color-primary-dark: #21af90;
+  --ifm-color-primary-darker: #1fa588;
+  --ifm-color-primary-darkest: #1a8870;
+  --ifm-color-primary-light: #29d5b0;
+  --ifm-color-primary-lighter: #32d8b4;
+  --ifm-color-primary-lightest: #4fddbf;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+/* Hero styles */
+.hero__title {
+  color: white;
+  font-family: 'Big Shoulders Display';
+  font-size: 3.5rem;
+}
+
+.title_tagline {
+  color: #F4A261;
+}
+
+.demo-button {
+  background-color: #F4A261 !important;
+  color: white !important;
+  padding-top: 0.7rem;
+  padding-bottom: 0.7rem;
+}
+
+.doc-button {
+  background-color: #343434;
+  color: white !important;
+  padding-top: 0.7rem;
+  padding-bottom: 0.7rem;
+}
+
+.sub-title {
+  color: white;
+}
+
+.hero-button:hover{
+  border-color: #000; /* Default color */
+}
+
+.hero__subtitle {
+  color: white;
+  font-family: 'Big Shoulders Display Light';
+  font-size: 2.5rem;
+}
+
+.center-heading {
+  text-align: center;
+  font-family: 'Big Shoulders Display';
+  color: 'white';
+  font-size:3.0rem;
+  padding: 1rem;
+  padding-top: 1.5rem;
+}
+
+/* Exposition styles */
+
+.large-button {
+  color: white !important;
+  font-family: 'Big Shoulders Display';
+  background-color: #343434;
+}
+
+.large-button:hover{
+  background-color: #299D8F;
+}
+
+.large-button:active{
+  background:#299D8F;
+}
+
+.large-button:focus{
+  background:#299D8F;
+}
+
+.small-button {
+  color: white !important;
+  font-family: 'Big Shoulders Display';
+  background-color: #343434;
+  font-size: 16px;
+}
+
+.small-button:hover {
+  background-color: #299D8F;
+}
+
+.small-button:active{
+  background:#299D8F;
+}
+
+.small-button:focus{
+  background:#299D8F;
+}
+
+.subheading-exposition {
+  font-family: 'Big Shoulders Display';
+  font-size: 2.5rem;
+}
+
+.paragraph-exposition {
+  font-family: 'Big Shoulders Display Light';
+  font-size: 2.5rem;
+}
+
+/* Media Query for screens 600px and below */
+@media only screen and (max-width: 600px) {
+  .subheading-exposition {
+    font-size: 1.5rem;
+  }
+
+  .paragraph-exposition {
+    font-size: 1.5rem;
+  }
+}
+
+/* Media Query for screens 900px and below */
+@media only screen and (max-width: 1300px) {
+  .subheading-exposition {
+    font-size: 1.5rem;
+  }
+
+  .paragraph-exposition {
+    font-size: 1.5rem;
+  }
+}
