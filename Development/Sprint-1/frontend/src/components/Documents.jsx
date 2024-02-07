@@ -47,8 +47,8 @@ export default function Documents() {
 		},
 	]);
 
-	const { data, error } = useSwr(
-		`http://127.0.0.1:3690/get_all_docs/${selection.collection}`,
+	const { data, error, isLoading } = useSwr(
+		`http://localhost:3690/api/record/list?collection_name=${selection.collection}`,
 		fetcher
 	);
 
@@ -59,7 +59,7 @@ export default function Documents() {
 	useEffect(() => {
 		console.log("data", data);
 		console.log("error", error);
-	}, [data, error]);
+	}, [ data, error, isLoading ]);
 
 	useEffect(() => {
 		// delay by 1 second and reset on input
@@ -101,14 +101,14 @@ export default function Documents() {
 				collection_name: selection.collection,
 				data: obj,
 			});
-			const res = await fetch(`http://127.0.0.1:3690/insert_doc_multifield`, {
+			const res = await fetch(`http://localhost:3690/api/record/create`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
 					collection_name: selection.collection,
-					data: obj,
+					query: obj,
 				}),
 			});
 
@@ -116,7 +116,7 @@ export default function Documents() {
 
 			console.log(adsa);
 
-			mutate(`http://127.0.0.1:3690/get_all_docs/${selection.collection}`);
+			mutate(`http://localhost:3690/api/record/list?collection_name=${selection.collection}`);
 			setDocumentModal(false);
 		} catch (error) {
 			console.log(error);
@@ -139,17 +139,17 @@ export default function Documents() {
 					<section className="menu-section">
 						<ul className="menu-items gap-2">
 							{data?.length !== 0 ? (
-								data?.map((doc) => (
+								data?.data.map((doc) => (
 									<li
-										key={doc._id.$oid}
+										key={doc._id}
 										className={`menu-item ${
-											selection?.document?._id?.$oid === doc._id.$oid
+											selection?.document?._id === doc._id
 												? "menu-active"
 												: null
 										} bg-gray-2 flex justify-between`}
 										onClick={() => setDocumentSelected(doc)}
 									>
-										<p>{doc._id.$oid}</p>
+										<p>{doc._id}</p>
 										<ArrowRight />
 									</li>
 								))
