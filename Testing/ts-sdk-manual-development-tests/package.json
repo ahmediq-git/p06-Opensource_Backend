@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ezbase-ts": "^1.0.1"
+    "ezbase-ts": "^1.0.28"
   }
 }

@@ -105,8 +105,7 @@ async function LoadLogs() {
     autoload: true,
   }); //logs are not auto loaded, they are loaded on demand
 
-  // load the database before indexing
-  // db.ensureIndex({ fieldName: "_id", unique: true }, function (err) {
+  // db.ensureIndex({ fieldName: "request_id", unique: true }, function (err) {
   // 	if (err) {
   // 		console.log(err);
   // 	}
@@ -133,7 +132,9 @@ async function LoadConfig() {
     });
   });
 
-  if (configObject && configObject?.length !== 0) return config; // just return the datastore if a config already exists
+  if (configObject) return config; // just return the datastore if a config already exists
+
+  console.log("Creating new config");
 
   const defaultConfig: AppConfig = {
     name: "Ezbase",

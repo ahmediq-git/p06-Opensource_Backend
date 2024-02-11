@@ -7,6 +7,7 @@ import {
 	listRecords,
 	countRecords,
 } from "@src/controllers/record-crud";
+import getAllCollections from "@src/utils/collection-crud/getAllCollections";
 
 const records = new Hono();
 
@@ -14,9 +15,17 @@ records.post("/create", async (c) => {
 	try {
 		const { collection_name, query } = await c.req.json();
 
+		console.log(query);
+		
+
 		if (!collection_name) throw new Error("No collection name provided");
 		if (!query) throw new Error("No query provided");
 		if (typeof query !== "object") throw new Error("Query must be an object");
+
+		// check if collection exists, if not, deny the request
+		const collections = await getAllCollections();
+		if (!collections.includes(collection_name))
+			throw new Error("Collection does not exist");
 
 		const record = await createRecord(query, collection_name);
 
