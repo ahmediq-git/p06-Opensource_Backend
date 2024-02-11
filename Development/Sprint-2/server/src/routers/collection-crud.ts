@@ -11,8 +11,13 @@ collections.get("/", async (c: Context) => {
 		const collections = await getAllCollections();
 
 		// remove system collections
+		// config, logs
+		const systemCollections = ["config", "logs"];
 
-		return c.json({ data: collections, error: null });
+		console.log(collections);		
+
+
+		return c.json({ data: collections.filter(collection => !systemCollections.includes(collection)), error: null });
 	} catch (error) {
 		console.log(error);
 
