@@ -33,18 +33,20 @@ class EzBaseClient {
             switch (method) {
                 case 'POST':
                     response = await axios.post(completeApiEndpoint, jsonObject, { headers });
-                    console.log('Data sent successfully:', response.data);
+                    // console.log('Data sent successfully:', response.data);
                     return response;
                 case 'DELETE':
                     response = await axios.delete(completeApiEndpoint, { data: jsonObject, headers });
-                    console.log('Data sent for deletion successfully:', response.data);
+                    // console.log('Data sent for deletion successfully:', response.data);
                     return response;
                 case 'GET':
                     const values = Object.values(jsonObject);
-                    completeApiEndpoint += values.map(value => `/${value}`).join('');
-                    console.log(completeApiEndpoint)
+                    if (values.length > 0) {
+                        completeApiEndpoint += values.map(value => `/${value}`).join('');
+                        console.log(completeApiEndpoint)
+                    }
                     response = await axios.get(completeApiEndpoint, { headers });
-                    console.log('Data received successfully:', response.data);
+                    // console.log('Data received successfully:', response.data);
                     return response;
                 default:
                     console.error('Invalid method:', method);
@@ -55,6 +57,7 @@ class EzBaseClient {
                 console.error('Error sending data to server:', error);
             } else if (error.request) {
                 console.error('No response received from server:', error);
+                return error;
             } else {
                 console.error('Request failed with error:', error);
             }

@@ -28,6 +28,10 @@ class ValidationUtils {
         return typeof userInput === 'string';
     }
 
+    static isBoolean(userInput: any): boolean {
+        return typeof userInput === 'boolean';
+    }
+
     static isArrayOfObjects(userInput: any): boolean {
         return Array.isArray(userInput) && userInput.every(item => typeof item === 'object' && item !== null);
     }
