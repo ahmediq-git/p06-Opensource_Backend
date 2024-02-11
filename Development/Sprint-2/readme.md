@@ -1,4 +1,4 @@
-Project: Opensource Backend in Rust
+Project: Opensource Backend
 Team: 06
 
 - 24100305 Abdul Wahab
@@ -7,15 +7,15 @@ Team: 06
 - 24100296 Moiz Raza Amir
 - 24100085 Ahmed Mozammil Iqbal
 
-SPRINT-1 SUBMISSION GUIDELINES
+SPRINT-2 SUBMISSION GUIDELINES
 
 1. Properly tested working system deployed on an online hosting platform.
-2. Code with readable comments uploaded in “Development/Sprint-1” folder of your project’s Github repository.
-3. 3-4 minutes video that explains the functionality of your system developed so far. This must be uploaded in “Sprint-1” folder of your project’s Github repository.
+2. Code with readable comments uploaded in “Development/Sprint-2” folder of your project’s Github repository.
+3. 3-4 minutes video that explains the functionality of your system developed so far. This must be uploaded in “Sprint-2” folder of your project’s Github repository.
 4. Updated architecture and data model must be uploaded in the respective folders on Github.
 5. Test case execution report. 
 6. Update project schedule.  
-7. This "Readme" file should be uploaded in Sprint-1 folder. 
+7. This "Readme" file should be uploaded in Sprint-2 folder. 
 
 
 
@@ -23,11 +23,9 @@ SPRINT-1 SUBMISSION GUIDELINES
 
 LIST OF REQUIREMENTS COMPLETED IN THE SPRINT
 
-1. Create a user with username and password through API and UI
-2. Log in/out user
-3. User Logs (Partially)
-4. Information website with Documentation (for the usecases completed so far)
-5. Create an Admin, Delete an Admin through the UI (Partially)
+1. Migration of SDK to Typescript due to speed and typechecking
+2. Migration of Server to Typescript due to Rust's complexity.
+3. With the
 
 ------------------------------------------------------------------------------------------------
 
@@ -57,7 +55,7 @@ LIST OF REQUIREMENTS COMPLETED SO FAR
 HOW TO ACCESS THE SYSTEM
 
 1. The documentation site can be visited on http://ezbase.vercel.app
-2. The SDK can be downloaded on npm repository on https://www.npmjs.com/package/ezbase
+2. The SDK can be downloaded on npm repository on https://www.npmjs.com/package/ezbase-ts
 3. The server will be downloadable from the documentation site in the upcoming sprints (we have had issues with making an executable for windows. Linux and mac executables are done), however for it can be run be following the steps below:
     - Go to the server repository in Sprint 1
     - Execute cargo run on the terminal to start the server
@@ -76,8 +74,5 @@ HOW TO ACCESS THE SYSTEM
 
 ADDITIONAL INFORMATION
 
-1. The tests for the SDK are in the Testing folder. The automatic tests for sdk use Jest and are in sdk-automatic-tests. For development we use skd-manual-development tests
-2. The test reports can be viewed at a glance on p06_TestingReport in this same folder.
-3. The SDK Test Case Report can be viewed on sdk-test-report.html clearly 
-4. The tests for the server are in the apis folder. Use cargo -- --test-threads=1 to run. The test report is also in the server folder.
-5. Due to the nature of our project, and the backend language Rust, we are still working on making executables for the server and bundling the UI with it. It will be complete in the upcoming sprints.
+1. As this sprint was spent converting the entire codebase to Typescript due to complexities faced in debugging and expanding the rust backend system, this sprint was spent in migrating the server and sdk to typescript.
+2. As the functionality remains constant therefore the demo videos in sprint 1 should suffice for this sprint.
