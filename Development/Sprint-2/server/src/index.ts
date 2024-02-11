@@ -13,7 +13,7 @@ import { Initialize } from "./core/init";
 const app = new Hono().basePath("/api");
 
 app.use("*", logConsole);
-app.use("/api/*", cors());
+app.use("*", cors());
 
 app.get("/", async (c: Context) => {
 	return c.text("Hello world");

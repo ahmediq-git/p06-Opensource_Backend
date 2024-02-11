@@ -128,7 +128,7 @@ async function LoadConfig() {
 		});
 	});
 
-	if (configObject?.length !== 0) return config; // just return the datastore if a config already exists
+	if (configObject && configObject?.length !== 0) return config; // just return the datastore if a config already exists
 
 	const defaultConfig: AppConfig = {
 		name: "Ezbase",

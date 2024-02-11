@@ -262,8 +262,8 @@ export default function Collections() {
 
 								<ul className="menu-items gap-4 border-2 border-red-500 p-2 rounded-lg">
 									<Lock size={18} className="self-end absolute z-10" />
-									{data.data?.length > 0 &&
-										data.data.map((collection, index) => (
+									{data?.data?.length > 0 &&
+										data?.data?.map((collection, index) => (
 											<li
 												key={index}
 												className={`menu-item ${
@@ -280,8 +280,8 @@ export default function Collections() {
 										))}
 								</ul>
 
-								{data.data?.length > 0 &&
-									data.data.map((collection, index) => (
+								{data?.data?.length > 0 &&
+									data?.data?.map((collection, index) => (
 										<li
 											key={index}
 											className={`menu-item ${
