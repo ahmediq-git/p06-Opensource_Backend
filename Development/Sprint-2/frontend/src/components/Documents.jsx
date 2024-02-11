@@ -35,6 +35,16 @@ const fieldSchema = z.object({
 	}),
 });
 
+const parseValue = (value, type) => {
+	if (type === "boolean") {
+		return value === "true";
+	} else if (type === "number") {
+		return parseFloat(value);
+	} else {
+		return value;
+	}
+};
+
 export default function Documents() {
 	const [selection, setSelection] = useAtom(selectionAtom);
 	const [documentModal, setDocumentModal] = useState(false);
@@ -43,7 +53,7 @@ export default function Documents() {
 		{
 			field: "",
 			type: "number",
-			value: "",
+			value: null,
 		},
 	]);
 
@@ -89,6 +99,8 @@ export default function Documents() {
 					[record.field]: record.value,
 				};
 			});
+
+			console.log("data in createdocument", data);
 
 			// convert array to object
 			const obj = Object.assign({}, ...data);
@@ -274,7 +286,8 @@ export default function Documents() {
 													onChange={(e) => {
 														setDoc((prev) => {
 															const newRecord = [...prev];
-															newRecord[index].value = e.target.value;
+															newRecord[index].value = parseValue(e.target.value, record.type);
+															console.log("newRecord[index].value", typeof(newRecord[index].value));
 															return newRecord;
 														});
 													}}
