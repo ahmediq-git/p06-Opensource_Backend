@@ -17,22 +17,18 @@ export default function HomePage() {
 
 	const deleteCollection = async () => {
 		try {
-			const res = await fetch(`http://127.0.0.1:3690/delete_collection`, {
+			const res = await fetch(`http://localhost:3690/api/collections/${selection.collection}`, {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({
-					collection_name: selection.collection,
-					delete_all_data: true,
-				}),
 			});
 
 			const data = await res.json();
 
 			// remove the deleted collection from the list of collections
 			setSelection({ collection: "", document: "" });
-			mutate("http://127.0.0.1:3690/get_collection_names");
+			mutate("http://localhost:3690/api/collections");
 			setShowDeleteModal(false);
 		} catch (error) {
 			console.log(error);
