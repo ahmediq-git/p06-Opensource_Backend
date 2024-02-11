@@ -1,5 +1,8 @@
 {
   "dependencies": {
-    "ezbase-ts": "^1.0.13"
+    "ezbase-ts": "^1.0.20"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   }
 }
