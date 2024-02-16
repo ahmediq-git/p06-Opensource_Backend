@@ -9,16 +9,19 @@ Team: 06
 
 SPRINT-1 SUBMISSION GUIDELINES [90/100]
 
-1. Properly tested working system deployed on an online hosting platform. [30/30]
+1. Properly tested working system deployed on an online hosting platform. [25/30] Server executable need to be created.
 2. Code with readable comments uploaded in “Development/Sprint-1” folder of your project’s Github repository. [5/10]
 3. 3-4 minutes video that explains the functionality of your system developed so far. This must be uploaded in “Sprint-1” folder of your project’s Github repository. [10/10]
 4. Updated architecture and data model must be uploaded in the respective folders on Github.
 5. Test case execution report. [10/10]
 6. Update project schedule. 
 7. This "Readme" file should be uploaded in Sprint-1 folder. [10/10]
-8. Size of the work completed [25/30]
+8. Size of the work completed [30/30] Not much work after the prototype.
 
-
+General Comments:
+ 
+ 
+Individual grading:
 
 ------------------------------------------------------------------------------------------------
 
