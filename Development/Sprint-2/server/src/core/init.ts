@@ -132,7 +132,6 @@ async function LoadConfig() {
 
 	console.log("Creating new config");
 	
->>>>>>> 350908e (Bug fixes, auths scaffold)
 	const defaultConfig: AppConfig = {
 		name: "Ezbase",
 		url: "http://localhost:3690",
