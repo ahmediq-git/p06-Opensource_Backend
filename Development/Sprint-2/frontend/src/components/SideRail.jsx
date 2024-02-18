@@ -1,13 +1,29 @@
 import { useAtom } from "jotai";
 import { Database, BarChart3, Settings, Code2 } from "lucide-react";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { adminAtom } from "../lib/state/adminAtom";
 import { useNavigate } from "react-router-dom";
 
 export default function SideRail() {
-	const [active, setActive] = useState("database");
+	const [active, setActive] = useState("");
 	const [admin, setAdmin] = useAtom(adminAtom)
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		switch (location.pathname) {
+			case "/":
+				setActive("database");
+				break;
+			case "/logs":
+				setActive("logs");
+				break;
+			case "/settings":
+				setActive("settings");
+				break;
+			default:
+				setActive("");
+		}
+	}, [location.pathname]); 
 
 	const signOut = async () => {
 		setAdmin({ loggedIn: false, email: "" });
@@ -27,7 +43,7 @@ export default function SideRail() {
 					<section className="menu-section px-4">
 						<ul className="menu-items gap-4">
 							<li
-								onClick={() => setActive("database")}
+								onClick={() => {setActive("database"); navigate("/")}}
 								className={`menu-item ${
 									active === "database" && "menu-active"
 								}`}
@@ -36,7 +52,7 @@ export default function SideRail() {
 							</li>
 
 							<li
-								onClick={() => setActive("logs")}
+								onClick={() => {setActive("logs"); navigate("/logs")}}
 								className={`menu-item ${active === "logs" && "menu-active"}`}
 							>
 								<BarChart3 />
