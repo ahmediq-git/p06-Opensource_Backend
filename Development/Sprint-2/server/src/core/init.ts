@@ -128,12 +128,8 @@ async function LoadConfig() {
 		});
 	});
 
-<<<<<<< HEAD
 	if (configObject && configObject?.length !== 0) return config; // just return the datastore if a config already exists
 
-=======
-	if (configObject) return config; // just return the datastore if a config already exists
-	
 	console.log("Creating new config");
 	
 >>>>>>> 350908e (Bug fixes, auths scaffold)
