@@ -4,7 +4,7 @@ import { useState } from "react";
 import { adminAtom } from "../lib/state/adminAtom";
 import { useNavigate } from "react-router-dom";
 
-export default function SideRail() {
+export default function SideRail({setActiveState}) {
 	const [active, setActive] = useState("database");
 	const [admin, setAdmin] = useAtom(adminAtom)
 	const navigate = useNavigate();
@@ -27,7 +27,10 @@ export default function SideRail() {
 					<section className="menu-section px-4">
 						<ul className="menu-items gap-4">
 							<li
-								onClick={() => setActive("database")}
+								onClick={() => {
+									setActive("database")
+									setActiveState("database")
+								}}
 								className={`menu-item ${
 									active === "database" && "menu-active"
 								}`}
@@ -36,7 +39,9 @@ export default function SideRail() {
 							</li>
 
 							<li
-								onClick={() => setActive("logs")}
+								onClick={() => {setActive("logs")
+								setActiveState("logs")
+							}}
 								className={`menu-item ${active === "logs" && "menu-active"}`}
 							>
 								<BarChart3 />

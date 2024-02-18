@@ -23,7 +23,7 @@ records.post("/create", async (c) => {
 		if (typeof query !== "object") throw new Error("Query must be an object");
 
 		// check if collection exists, if not, deny the request
-		const collections = await getAllCollections();
+		const collections: string[] = await getAllCollections();
 		if (!collections.includes(collection_name))
 			throw new Error("Collection does not exist");
 
@@ -102,7 +102,6 @@ records.delete("/delete", async (c) => {
 records.get("/list", async (c) => {
 	try {
 		const params = c.req.query();
-
 		const { collection_name, query, queryOptions } = params as {
 			collection_name: string;
 			query: string;

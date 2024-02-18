@@ -3,6 +3,7 @@ import HomePage from "./pages/Homepage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ProtectedRoutes from "./pages/ProtectedRoutes";
+import Logs from "./components/Logs";
 
 function App() {
 	return (
@@ -10,7 +11,7 @@ function App() {
 			<Routes>
 				{/* <Route path="/" element={<ProtectedRoutes />}> */}
 				<Route path="/" element={<HomePage />}></Route>
-					{/* <Route path="/login" element={<Login />}></Route>
+				{/* <Route path="/login" element={<Login />}></Route>
 					<Route path="/init" element={<Signup />}></Route> */}
 				{/* </Route> */}
 			</Routes>
