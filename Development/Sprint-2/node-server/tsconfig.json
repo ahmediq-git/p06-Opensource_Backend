@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": false,
+    "types": [
+      "node"
+    ],
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
+    "paths": {
+      "@src/*": ["./src/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@routers/*": ["./src/routers/*"],
+      "@controllers/*": ["./src/controllers/*"],
+    }
+  }
+}
