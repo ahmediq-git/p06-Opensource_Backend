@@ -40,7 +40,7 @@ class Crud {
             }
             else {
                 // Server returned an error status code
-                console.error("An error occurred while creating collection: ", response.statusText);
+                console.error("An error occurred while creating collection: ", response.error);
             }
         } catch (error) {
             console.error("An error occurred while creating collection: ", error)
@@ -48,7 +48,7 @@ class Crud {
     }
 
     // Gets name of all existing collections
-    async getAllCollections(): Promise<string[] | []> {
+    async getAllCollections(): Promise<string[] | void> {
         try {
             const apiEndpoint = "/api/collections";
             const response = await this.client.sendToBackend({}, apiEndpoint, "GET");
@@ -60,7 +60,6 @@ class Crud {
                 // Check if there's an error
                 if (error != null) {
                     console.error("An error occurred while getting collection names: ", error);
-                    return [];
                 } else {
                     // check if the returned response includes an error
                     if (data.error != null) {
@@ -71,13 +70,11 @@ class Crud {
                 }
             } else {
                 // Server returned an error status code
-                console.error("An error occurred while getting collections: ", response.statusText);
-                return [];
+                console.error("An error occurred while getting collections: ", response.error);
             }
         }
         catch (error) {
             console.error("An error occurred while getting collections: ", error);
-            return [];
         }
     }
 
@@ -108,7 +105,7 @@ class Crud {
             }
             else {
                 // Server returned an error status code
-                console.error("An error occurred while deleting collection:", response.statusText);
+                console.error("An error occurred while deleting collection:", response.error);
             }
 
         } catch (error) {
@@ -116,6 +113,7 @@ class Crud {
         }
     }
 
+    // creates a new record in a collection
     async createRecord(collection_name: string, query: object): Promise<any> {
         try {
             if (!ValidationUtils.isString(collection_name)) {
@@ -149,7 +147,7 @@ class Crud {
             }
             else {
                 // Server returned an error status code
-                console.error("An error occurred while creating record: ", response.statusText);
+                console.error("An error occurred while creating record: ", response.error);
             }
         } catch (error) {
             console.error("An error occurred while creating record: ", error)
@@ -192,7 +190,7 @@ class Crud {
             }
             else {
                 // Server returned an error status code
-                console.error("An error occurred while reading record: ", response.statusText);
+                console.error("An error occurred while reading record: ", response.error);
             }
         } catch (error) {
             console.error("An error occurred while reading record: ", error)
@@ -238,7 +236,7 @@ class Crud {
             }
             else {
                 // Server returned an error status code
-                console.error("An error occurred while deleting record: ", response.statusText);
+                console.error("An error occurred while deleting record: ", response.error);
             }
         } catch (error) {
             console.error("An error occurred while deleting record: ", error)
@@ -287,10 +285,10 @@ class Crud {
             }
             else {
                 // Server returned an error status code
-                console.error("Server returned an error while listing records: ", response.statusText);
+                console.error("An error occurred while listing collection: ", response.error);
             }
         } catch (error) {
-            console.error("Server returned an error while listing records: ", error)
+            console.error("An error occurred while listing collection: ", error)
         }
     }
 
@@ -329,7 +327,7 @@ class Crud {
             }
             else {
                 // Server returned an error status code
-                console.error("Server returned an error while counting records: ", response.statusText);
+                console.error("An error occurred while counting records: ", response.error);
             }
         } catch (error) {
             console.error("An error occurred while counting records: ", error)
