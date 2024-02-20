@@ -101,11 +101,11 @@ async function LoadUsers() {
 async function LoadLogs() {
 	const db = new DataStore({ filename: `./data/logs.json`, timestampData: true }); //logs are not auto loaded, they are loaded on demand
 
-	db.ensureIndex({ fieldName: "request_id", unique: true }, function (err) {
-		if (err) {
-			console.log(err);
-		}
-	});
+	// db.ensureIndex({ fieldName: "request_id", unique: true }, function (err) {
+	// 	if (err) {
+	// 		console.log(err);
+	// 	}
+	// });
 
 	return db;
 }
@@ -130,6 +130,8 @@ async function LoadConfig() {
 
 	if (configObject && configObject?.length !== 0) return config; // just return the datastore if a config already exists
 
+	console.log("Creating new config");
+	
 	const defaultConfig: AppConfig = {
 		name: "Ezbase",
 		url: "http://localhost:3690",
