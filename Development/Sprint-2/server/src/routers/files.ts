@@ -1,41 +1,48 @@
-
 import { Context, Hono } from "hono";
-import { resolve } from 'path'
+import { resolve } from "path";
+import { v4 } from "uuid";
 
 const files = new Hono();
 
-files.post("", async (c) => {
+//post with file field in form data http://localhost:3690/api/files
+files.post("/", async (c) => {
+  try {
     const data = await c.req.formData();
-    const file_x = data.get("file");
-    if(!file_x) return c.json({error: true, data: null})
-    let bytes_written = await Bun.write(`./files/${file_x.name}`, file_x)
-    if(bytes_written > 0){
-        let path = resolve(`./files/${file_x.name}`)
-        return c.json({
-            error: false,
-            data: path
-        })
+    const file = data.get("file");
+    const id = v4();
+    if (!file) throw new Error("No file provided in the `file` field");
+
+    let bytes_written = await Bun.write(`./files/${id}_${file.name}`, file);
+    if (bytes_written > 0) {
+      let name = `${id}_${file.name}`;
+      return c.json({
+        error: false,
+        data: name,
+      });
+    } else {
+      throw new Error("Failed to write file to disk");
     }
-    return c.json({
-        error: true,
-        data: null
-    })
-   
+  } catch (err) {
+    console.log(err);
+    return c.json({ error: err, data: null });
+  }
 });
 
-files.get("/get_file", async (c: Context) => {
-    const params = c.req.query();
-	const { file_name } = params as {
-        file_name: string;
-	};
-    if(file_name){
-    let path = resolve(`./files/${file_name}`)
-    return new Response(Bun.file(path))
-    }
-    return c.json({
-        error: true,
-        data: null
-    })
-})
+//http://localhost:3690/api/files?file_name=
 
-export default files
+files.get("/", async (c: Context) => {
+  const params = c.req.query();
+  const { file_name } = params as {
+    file_name: string;
+  };
+  if (file_name) {
+    let path = resolve(`./files/${file_name}`);
+    return new Response(Bun.file(path));
+  }
+  return c.json({
+    error: true,
+    data: null,
+  });
+});
+
+export default files;
