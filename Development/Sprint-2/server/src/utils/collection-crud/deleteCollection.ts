@@ -50,8 +50,6 @@ export default async function deleteCollection(
 			if (collectionCount > 0) throw new Error("Collection is not empty");
 		}
 
-		await unlink(`./data/${name}.json`);
-
 		config.update(
 			{ _id: appConfig._id },
 			{
@@ -70,7 +68,8 @@ export default async function deleteCollection(
 				console.log(numReplaced);
 			}
 		);
-
+		await unlink(`./data/${name}.json`);
+		await config.persistence.compactDatafile();
 		return true;
 	} catch (error) {
 		console.log(error);
