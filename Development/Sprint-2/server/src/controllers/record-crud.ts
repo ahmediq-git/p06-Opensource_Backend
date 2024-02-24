@@ -76,6 +76,7 @@ export async function deleteRecord(
 			queryOptions,
 			function (err: Error | null, num_removed: number) {
 				if (err) {
+					console.log("Error: ", err)
 					reject(err);
 				}
 

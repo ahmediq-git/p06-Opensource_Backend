@@ -9,105 +9,109 @@ import { DataStoreObject } from "@src/utils/getCollection";
 import DataStore from "nedb";
 
 export enum CollectionType {
-	user = "user",
-	system = "system",
+  user = "user",
+  system = "system",
 }
 
 type Collection = {
-	name: string;
-	type: CollectionType;
-	createdAt: string;
-	updatedAt: string;
+  name: string;
+  type: CollectionType;
+  createdAt: string;
+  updatedAt: string;
 };
 
 type Admin = {
-	id: string;
-	email: string;
-	password: string;
-	createdAt: string;
-	updatedAt: string;
+  id: string;
+  email: string;
+  password: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type AppConfig = {
-	name: string; //app name
-	url: string;
-	admins: Admin[];
-	s3: {
-		endpoint: string;
-		bucket: string;
-		region: string;
-		access_key: string;
-		secret: string;
-		createdAt: string;
-		updatedAt: string;
-	} | null;
-	smtp: {
-		host: string;
-		port: number;
-		username: string;
-		password: string;
-		createdAt: string;
-		updatedAt: string;
-	} | null;
-	backup: {
-		auto: boolean;
-		to_s3: boolean;
-		backups: any[];
-	};
-	logs: {
-		retention: number; //days
-		ip_enabled: boolean;
-	};
-	collections: Collection[];
+  name: string; //app name
+  url: string;
+  admins: Admin[];
+  s3: {
+    endpoint: string;
+    bucket: string;
+    region: string;
+    access_key: string;
+    secret: string;
+    createdAt: string;
+    updatedAt: string;
+  } | null;
+  smtp: {
+    host: string;
+    port: number;
+    username: string;
+    password: string;
+    createdAt: string;
+    updatedAt: string;
+  } | null;
+  backup: {
+    auto: boolean;
+    to_s3: boolean;
+    backups: any[];
+  };
+  logs: {
+    retention: number; //days
+    ip_enabled: boolean;
+  };
+  collections: Collection[];
 };
 
 export async function Initialize() {
-	console.log("Initializing app");
+  console.log("Initializing app");
 
-	const users_db = await LoadUsers();
-	const logs_db = await LoadLogs();
-	const config_db = await LoadConfig();
+  const users_db = await LoadUsers();
+  const logs_db = await LoadLogs();
+  const config_db = await LoadConfig();
 
-	return {
-		users_db,
-		logs_db,
-		config_db,
-	};
+  return {
+    users_db,
+    logs_db,
+    config_db,
+  };
 }
 
 async function LoadUsers() {
-	const db = new DataStore({
-		filename: `./data/users.json`,
-		autoload: true,
-		timestampData: true,
-	});
+  const db = new DataStore({
+    filename: `./data/users.json`,
+    autoload: true,
+    timestampData: true,
+  });
 
-	// ensure that the username field is unique
-	db.ensureIndex({ fieldName: "username", unique: true }, function (err) {
-		if (err) {
-			console.log(err);
-		}
-	});
+  // ensure that the username field is unique
+  db.ensureIndex({ fieldName: "username", unique: true }, function (err) {
+    if (err) {
+      console.log(err);
+    }
+  });
 
-	db.ensureIndex({ fieldName: "email", unique: true }, function (err) {
-		if (err) {
-			console.log(err);
-		}
-	});
+  db.ensureIndex({ fieldName: "email", unique: true }, function (err) {
+    if (err) {
+      console.log(err);
+    }
+  });
 
-	return db;
+  return db;
 }
 
 async function LoadLogs() {
-	const db = new DataStore({ filename: `./data/logs.json`, timestampData: true }); //logs are not auto loaded, they are loaded on demand
+  const db = new DataStore({
+    filename: `./data/logs.json`,
+    timestampData: true,
+    autoload: true,
+  }); //logs are not auto loaded, they are loaded on demand
 
-	// db.ensureIndex({ fieldName: "request_id", unique: true }, function (err) {
-	// 	if (err) {
-	// 		console.log(err);
-	// 	}
-	// });
+  // db.ensureIndex({ fieldName: "request_id", unique: true }, function (err) {
+  // 	if (err) {
+  // 		console.log(err);
+  // 	}
+  // });
 
-	return db;
+  return db;
 }
 
 async function LoadConfig() {

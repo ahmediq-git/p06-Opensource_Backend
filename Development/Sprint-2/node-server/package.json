@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "dev": "tsx watch src/index.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.8.0",
+    "hono": "^4.0.4",
+    "nedb": "^1.8.0",
+    "nodemailer": "^6.9.9"
+  },
+  "devDependencies": {
+    "@types/nedb": "^1.8.16",
+    "@types/node": "^20.11.17",
+    "@types/nodemailer": "^6.4.14",
+    "tsx": "^3.12.2"
+  }
+}

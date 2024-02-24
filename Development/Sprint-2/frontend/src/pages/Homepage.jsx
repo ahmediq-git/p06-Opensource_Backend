@@ -8,11 +8,13 @@ import { selectionAtom } from "../lib/state/selectionAtom";
 import { useAtom } from "jotai";
 import { useSWRConfig } from "swr";
 import { isAuthCollection } from "../lib/utils/isAuthCollection";
+import Logs from "../components/Logs";
 
 
 export default function HomePage() {
 	const [selection, setSelection] = useAtom(selectionAtom);
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const [activeState, setActiveState] = useState('database');
 	const { mutate } = useSWRConfig();
 
 	const deleteCollection = async () => {
@@ -94,9 +96,11 @@ export default function HomePage() {
 					</div>
 				</div>
 			</div>
-			<SideRail />
+			<SideRail setActiveState={setActiveState}/>
 			<div className="w-[2px] h-screen bg-gray-100 opacity-10"></div>
-			<Collections />
+			{activeState=="database" &&<Collections />}
+			{activeState=="logs" &&<Logs />}
+
 
 			<div className="basis-full h-screen flex flex-col relative ">
 				{selection.collection ? (
