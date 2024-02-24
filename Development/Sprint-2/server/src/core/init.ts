@@ -130,6 +130,8 @@ async function LoadConfig() {
 
 	if (configObject && configObject?.length !== 0) return config; // just return the datastore if a config already exists
 
+	console.log("Creating new config");
+	
 	const defaultConfig: AppConfig = {
 		name: "Ezbase",
 		url: "http://localhost:3690",

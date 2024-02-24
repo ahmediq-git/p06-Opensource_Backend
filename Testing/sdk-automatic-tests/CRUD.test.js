@@ -112,7 +112,7 @@ test("insertManyDocs() and getAllDocs() Test: Inserting many documents in a coll
     // Compare arrayOfIds with docs
     const matchingIds = arrayOfIds.filter(id => docs.some(doc => doc._id.$oid === id));
 
- 
+
     expect(matchingIds.length).toBe(arrayOfIds.length);
 
 
@@ -124,7 +124,7 @@ test("updateDoc() Test: updating multiple fields of a document", async () => {
     // Get collection names
     const id = await eb.db.insertSingleFieldDoc("test_collection", { "name": "sample update doc" });
 
-    await eb.db.updateDoc("test_collection", id, { "name": "new_overwritten_name","new_field": "new_value", "new_field2": "new_value2" });
+    await eb.db.updateDoc("test_collection", id, { "name": "new_overwritten_name", "new_field": "new_value", "new_field2": "new_value2" });
 
     const doc = await eb.db.getDoc("test_collection", id);
 
@@ -150,16 +150,16 @@ test("findDoc() Test: Finds all documents fulfilling the query, query is a singl
 
     await eb.db.insertManyDocs("test_collection_3", sampleArray);
 
-    const docs = await eb.db.findDoc("test_collection_3", {color:"red"});
+    const docs = await eb.db.findDoc("test_collection_3", { color: "red" });
     const areAllRed = docs.every(doc => doc.color === 'red');
-    
+
     expect(docs.length).toBe(4);
     expect(areAllRed).toBe(true);
 });
 
 test("deleteCollection() Test: Delete all collections one by one from the Database", async () => {
     expect.assertions(3);
-  
+
     // Delete a collection
     await eb.db.deleteCollection("test_collection");
     const collectionNames = await eb.db.getCollectionNames();
@@ -169,11 +169,10 @@ test("deleteCollection() Test: Delete all collections one by one from the Databa
     await eb.db.deleteCollection("test_collection_2");
     const collectionNames2 = await eb.db.getCollectionNames();
     expect(collectionNames2).not.toContain("test_collection_2");
-  
+
     // Delete final collection
     await eb.db.deleteCollection("test_collection_3");
     const collectionNames3 = await eb.db.getCollectionNames();
 
     expect(collectionNames3).not.toContain("test_collection_3");
-  });
-  
+});
