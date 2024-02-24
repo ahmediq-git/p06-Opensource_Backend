@@ -26,9 +26,9 @@ export default function Logs() {
 		return new Date(dateTimeString).toLocaleString();
 	};
   return (
-    <div className="flex bg-neutral-950 text-gray-50 h-screen max-h-screen overflow-y-scroll">
+    <div className="flex bg-neutral-950 text-gray-50 h-screen max-h-screen">
         	<SideRail />
-            <div className="flex flex-col w-full"> 
+            <div className="flex flex-col w-full overflow-y-scroll"> 
 			
 				<p className="text-lg font-bold mb-2 p-4">LOGS</p>
                 {data && data?.length !== 0 ? (
