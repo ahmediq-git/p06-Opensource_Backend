@@ -1,12 +1,6 @@
 
-import { FileStore } from "@tus/file-store";
-import { Server } from "@tus/server";
 import { Context, Hono } from "hono";
 import { resolve } from 'path'
-const tusServer = new Server({
-    path: '/files',
-    datastore: new FileStore({ directory: './files'})
-  });
 
 const files = new Hono();
 
