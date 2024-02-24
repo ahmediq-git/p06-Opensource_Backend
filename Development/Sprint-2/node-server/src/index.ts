@@ -9,7 +9,6 @@ import { logConsole } from "./middleware/log-console";
 import { Initialize } from "./core/init";
 import { serve } from "@hono/node-server";
 
-
 (async () => {
 	await Initialize(); //initialize all the system defined parameters and collections
   console.log(`Server started on port 3690`)

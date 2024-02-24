@@ -1,5 +1,5 @@
 import DataStore from "nedb";
-import { unlink } from "node:fs/promises";
+import { unlink } from "fs/promises";
 
 export default async function deleteCollection(
 	name: string,

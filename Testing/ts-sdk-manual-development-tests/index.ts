@@ -1,4 +1,4 @@
-import ezbase from 'ezbase-ts';
+import ezbase from "../../Development/Sprint-2/sdk/dist/index";
 import axios, { AxiosResponse } from 'axios';
 
 const eb = new ezbase("http://localhost:3690");
@@ -59,8 +59,14 @@ function countRecords(): void {
     eb.db.countRecords("TestSDKCollection1", { "name": "John Doe" }).then((ans: any) => console.log(ans));
 }
 
-// Calling the functions
+async function sendTextMail(): Promise<any>{
+    console.log("Testing sending mail");
+    const res =  await eb.mail.sendTextMail("moizwwww@gmail.com", "Test Subject", "Test Body").then((ans: any) => console.log(ans));
+    console.log(res);
+}
 
+// Calling the functions
+sendTextMail();
 // createCollectionTest();
 // getCollectionsTest();
 // deleteCollection();

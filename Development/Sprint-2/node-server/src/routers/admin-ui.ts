@@ -1,6 +1,7 @@
 import { Context, Hono } from "hono";
 import { getCollection } from "@utils/getCollection";
 
+//these urls must be only accessed through admin ui
 const admin_ui = new Hono();
 
 admin_ui.get("/settings", async (c: Context) => {
