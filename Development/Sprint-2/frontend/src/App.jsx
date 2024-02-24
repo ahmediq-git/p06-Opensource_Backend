@@ -4,7 +4,6 @@ import Logs from "./pages/Logs";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ProtectedRoutes from "./pages/ProtectedRoutes";
-import Logs from "./components/Logs";
 
 function App() {
 	return (
