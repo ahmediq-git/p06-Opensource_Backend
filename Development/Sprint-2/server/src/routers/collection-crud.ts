@@ -9,7 +9,6 @@ const collections = new Hono();
 collections.get("/", async (c: Context) => {
 	try {
 		const collections = await getAllCollections();
-
 		// remove system collections
 		// config, logs
 		const systemCollections = ["config", "logs"];
@@ -50,7 +49,7 @@ collections.delete("/:collection_name", async (c: Context) => {
 		if (!collection_name) throw new Error("No collection name provided");
 
 		// delete the collection
-		const deleted = await deleteCollection(collection_name, false);
+		const deleted = await deleteCollection(collection_name, true);
 
 		if (!deleted) throw new Error("Failed to delete collection");
 

@@ -1,5 +1,5 @@
+import { createRecord } from "@src/controllers/record-crud";
 import { Context } from "hono";
-import{createRecord} from "@src/controllers/record-crud";
 import DataStore from "nedb";
 
 // // this middleware logs the request to the console

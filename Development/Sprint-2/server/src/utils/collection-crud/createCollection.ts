@@ -58,7 +58,7 @@ export default async function createCollection(
 				console.log(numReplaced);
 			}
 		);
-
+		await config_db.persistence.compactDatafile()
 		return "Collection created successfully";
 	} catch (error) {
 		return error;

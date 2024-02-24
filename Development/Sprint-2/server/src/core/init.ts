@@ -115,75 +115,74 @@ async function LoadLogs() {
 }
 
 async function LoadConfig() {
-  const config = new DataStore({
-    filename: `./data/config.json`,
-    autoload: true,
-    timestampData: true,
-  });
+	const config = new DataStore({
+		filename: `./data/config.json`,
+		autoload: true,
+		timestampData: true,
+	});
 
-  // get the current config object
-  const configObject: any[] = await new Promise((resolve, reject) => {
-    config.findOne({}, function (err, docs) {
-      if (err) {
-        reject(err);
-      }
+	// get the current config object
+	const configObject: any[] = await new Promise((resolve, reject) => {
+		config.findOne({}, function (err, docs) {
+			if (err) {
+				reject(err);
+			}
 
-      resolve(docs);
-    });
-  });
+			resolve(docs);
+		});
+	});
 
-  if (configObject) return config; // just return the datastore if a config already exists
+	if (configObject && configObject?.length !== 0) return config; // just return the datastore if a config already exists
 
-  console.log("Creating new config");
+	console.log("Creating new config");
+	
+	const defaultConfig: AppConfig = {
+		name: "Ezbase",
+		url: "http://localhost:3690",
+		admins: [],
+		s3: null,
+		smtp: null,
+		backup: {
+			auto: false,
+			to_s3: false,
+			backups: [],
+		},
+		logs: {
+			retention: 30,
+			ip_enabled: false,
+		},
+		collections: [
+			{
+				name: "users",
+				type: CollectionType.system,
+				createdAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+			},
+			{
+				name: "logs",
+				type: CollectionType.system,
+				createdAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+			},
+			{
+				name: "config",
+				type: CollectionType.system,
+				createdAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+			},
+		],
+	};
 
-  const defaultConfig: AppConfig = {
-    name: "Ezbase",
-    url: "http://localhost:3690",
-    admins: [],
-    s3: null,
-    smtp: null,
-    backup: {
-      auto: false,
-      to_s3: false,
-      backups: [],
-    },
-    logs: {
-      retention: 30,
-      ip_enabled: false,
-    },
-    collections: [
-      {
-        name: "users",
-        type: CollectionType.system,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      {
-        name: "logs",
-        type: CollectionType.system,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-      {
-        name: "config",
-        type: CollectionType.system,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-    ],
-  };
+	// create a config object if it does not exist
+	const newConfig: any[] = await new Promise((resolve, reject) => {
+		config.insert(defaultConfig, (err, doc: any) => {
+			if (err) {
+				reject(err);
+			}
 
-  // create a config object if it does not exist
-  const newConfig: any[] = await new Promise((resolve, reject) => {
-    console.log("Creating default config");
-    config.insert(defaultConfig, (err, doc: any) => {
-      if (err) {
-        reject(err);
-      }
+			resolve(doc);
+		});
+	});
 
-      resolve(doc);
-    });
-  });
-
-  return newConfig;
+	return newConfig;
 }
