@@ -61,6 +61,7 @@ class EzBaseClient {
             } else {
                 console.error('Request failed with error:', error);
             }
+            return error
         }
     }
 }
