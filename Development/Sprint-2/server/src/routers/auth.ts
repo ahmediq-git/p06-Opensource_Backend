@@ -1,5 +1,6 @@
 import { Context, Hono } from "hono";
 import { setCookie} from 'hono/cookie'
+import createAdmin from "@src/utils/auth/admin/createAdmin";
 
 const auth = new Hono();
 
@@ -11,7 +12,7 @@ auth.post("/admin/create", async (c: Context) => {
 
 		if (!admin) throw new Error("Failed to create admin");
 
-		return setCookie
+		return setCookie(c, "admin", JSON.stringify(username), { httpOnly: true });
 	} catch (error) {
 		console.log(error);
 
