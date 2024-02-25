@@ -43,7 +43,8 @@ export default function Logs() {
     };
 
     const getTimeTakenData = () => {
-        const last12Logs = data.data.slice(0, 12); // Consider only the last 12 logs
+        const last12Logs = data.data.slice(0, 12);
+        last12Logs.reverse()
         const timeTakenData = {
             labels: [],
             datasets: [{
@@ -56,7 +57,7 @@ export default function Logs() {
         };
 
         last12Logs.forEach(log => {
-            timeTakenData.labels.push(formatTime(log.createdAt)); // Extract only time
+            timeTakenData.labels.push(formatTime(log.createdAt)); 
             timeTakenData.datasets[0].data.push(log.time_taken);
         });
 
