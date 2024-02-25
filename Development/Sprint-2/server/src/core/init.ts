@@ -5,8 +5,10 @@
 // 2. Logs - Contains per-request logs
 // 3. Config - Includes smtp creds, logging behavior, S3 creds, Token secrets, Admins
 
+import { deleteRecord, readRecord } from "@src/controllers/record-crud";
 import { DataStoreObject } from "@src/utils/getCollection";
 import DataStore from "nedb";
+import { SimpleIntervalJob, Task, ToadScheduler } from "toad-scheduler";
 
 export enum CollectionType {
   user = "user",
@@ -68,11 +70,51 @@ export async function Initialize() {
   const logs_db = await LoadLogs();
   const config_db = await LoadConfig();
 
+  await LogCullerSchedule() // cull logs based on retention
+
   return {
     users_db,
     logs_db,
     config_db,
   };
+}
+
+async function LogCullerSchedule(){
+  const scheduler = new ToadScheduler();
+  const task = new Task('cull logs', async () => {
+  try {
+      const config:any = new DataStore({
+      filename: "./data/config.json",
+      autoload: true,
+      timestampData: true,
+      });
+      if (!config) throw new Error("Failed to get config");
+      const appConfig: any = await new Promise((resolve, reject) => {
+      config.findOne({}, function (err:any, docs:any) {
+        if (err) {
+          reject(err);
+        }
+        resolve(docs);
+      });
+      });
+      if (!appConfig) throw new Error("Failed to get appConfig");
+      const retentionInDays = appConfig.logs.retention;
+      const currentTime = new Date();
+      const retentionInMilliseconds = retentionInDays * 24 * 60 * 60 * 1000;
+      const currentTimeMinusRetention = new Date(currentTime.getTime() - retentionInMilliseconds);
+      await deleteRecord({createdAt: {$lte: currentTimeMinusRetention}}, {multi: true}, 'logs')
+  }catch(err){
+      console.log("In log culler",err);
+      return err;
+  }
+  });
+  const job = new SimpleIntervalJob(
+    { seconds: 600, runImmediately: true },
+    task, {
+      id: 'id_1',
+      preventOverrun: true
+    });
+  scheduler.addSimpleIntervalJob(job);
 }
 
 async function LoadUsers() {
