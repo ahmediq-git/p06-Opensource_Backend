@@ -28,6 +28,36 @@ admin_ui.get("/settings", async (c: Context) => {
     }
 });
 
+admin_ui.get("/settings/:setting_name", async (c: Context) => {
+    try {
+        const { setting_name } = c.req.param();
+        const config = getCollection("config");
+        const settings: { [key: string]: any } = await new Promise((resolve, reject) => {
+            config.findOne({}, function (err, docs) {
+                if (err) {
+                    reject(err);
+                }
+                resolve(docs);
+            });
+        });
+
+        if (!settings) throw new Error("Failed to get settings");
+        const setting = settings.hasOwnProperty(setting_name) ? settings[setting_name] : false;
+
+        if (!setting) throw new Error("Failed to get setting");
+
+        return c.json({
+            data: setting,
+            error: null,
+        });
+    } catch (err) {
+        return c.json({
+            data: null,
+            error: err,
+        })
+    }
+});
+
 admin_ui.put("/settings", async (c: Context) => {
     try{
         const {setting_name, value}  = await c.req.json();
@@ -42,9 +72,14 @@ admin_ui.put("/settings", async (c: Context) => {
         });
 
         if (!settings) throw new Error("Failed to get settings");
+
+        const setting = settings.hasOwnProperty(setting_name) ? true : false;
+        if (!setting) throw new Error("Failed to get setting");
+
         console.log("name",setting_name, settings[setting_name]);
+        console.log("value in request",value)
         settings[setting_name] = value;
-        console.log(settings);
+        // console.log(settings);
         config.update({
             _id: settings._id
         }, settings, {}, function (err, numReplaced) {

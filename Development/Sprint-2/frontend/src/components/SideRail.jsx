@@ -58,7 +58,7 @@ export default function SideRail() {
 								<BarChart3 />
 							</li>
 							<li
-								onClick={() => setActive("settings")}
+								onClick={() => {setActive("settings"); navigate("/settings")}}
 								className={`menu-item ${
 									active === "settings" && "menu-active"
 								}`}

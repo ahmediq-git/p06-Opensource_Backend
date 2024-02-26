@@ -31,8 +31,10 @@ type Admin = {
 };
 
 export type AppConfig = {
-  name: string; //app name
-  url: string;
+  application: {
+    name: string;
+    url: string;
+  };
   admins: Admin[];
   s3: {
     endpoint: string;
@@ -179,8 +181,10 @@ async function LoadConfig() {
 	console.log("Creating new config");
 	
 	const defaultConfig: AppConfig = {
-		name: "Ezbase",
-		url: "http://localhost:3690",
+		application: {
+      name: "Ezbase",
+		  url: "http://localhost:3690",
+    },
 		admins: [],
 		s3: null,
 		smtp: null,
