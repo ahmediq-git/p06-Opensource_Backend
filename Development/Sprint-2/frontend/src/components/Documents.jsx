@@ -58,7 +58,7 @@ export default function Documents() {
 	]);
 
 	const { data, error, isLoading } = useSwr(
-		`http://localhost:3690/api/record/list?collection_name=${selection.collection}`,
+		`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}`,
 		fetcher
 	);
 
@@ -113,7 +113,7 @@ export default function Documents() {
 				collection_name: selection.collection,
 				data: obj,
 			});
-			const res = await fetch(`http://localhost:3690/api/record/create`, {
+			const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/record/create`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -128,7 +128,7 @@ export default function Documents() {
 
 			console.log(adsa);
 
-			mutate(`http://localhost:3690/api/record/list?collection_name=${selection.collection}`);
+			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}`);
 			setDocumentModal(false);
 		} catch (error) {
 			console.log(error);

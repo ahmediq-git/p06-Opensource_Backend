@@ -8,7 +8,7 @@ import Chart from 'chart.js/auto';
 export default function Logs() {
     const { mutate } = useSWRConfig();
     const { data: initialData, error, isLoading } = useSWR(
-        'http://localhost:3690/api/record/list?collection_name=logs&queryOptions=' + encodeURIComponent(JSON.stringify({ sort: { createdAt: -1 } })),
+        `${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=logs&queryOptions=` + encodeURIComponent(JSON.stringify({ sort: { createdAt: -1 } })),
         fetcher
     );
     const [data, setData] = useState(initialData);

@@ -24,7 +24,7 @@ export default function Collections() {
 	const [collectionNameError, setCollectionNameError] = useState(null);
 
 	const { data, error, isLoading } = useSWR(
-		"http://localhost:3690/api/collections",
+		`${import.meta.env.VITE_BACKEND_URL}/collections`,
 		fetcher
 	);
 
@@ -94,7 +94,7 @@ export default function Collections() {
 
 		// set collectionName
 		try {
-			const response = await fetch("http://localhost:3690/api/collections/create", {
+			const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/collections/create`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -107,7 +107,7 @@ export default function Collections() {
 			console.log("data", data);
 
 			setModal(false);
-			mutate("http://localhost:3690/api/collections");
+			mutate(`${import.meta.env.VITE_BACKEND_URL}/collections`);
 		} catch (error) {
 			console.log(error);
 		}
