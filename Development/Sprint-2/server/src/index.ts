@@ -15,8 +15,11 @@ import { Initialize } from "./core/init";
 
 export const app = new Hono().basePath("/api");
 
+app.use("*", cors({
+  origin: process.env.ORIGIN != undefined ? process.env.ORIGIN : "*",
+}));
+
 app.use("*", logConsole);
-app.use("*", cors());
 app.get("/", async (c: Context) => {
   return c.text("Hello world");
 });
@@ -27,8 +30,6 @@ app.route("/admin_ui", admin_ui);
 app.route("/mail", mail);
 app.route("/auth", auth);
 app.route("/files", files)
-
-
 
 export default {
   port: 3690,
