@@ -31,6 +31,7 @@ files.post("/", async (c) => {
 //http://localhost:3690/api/files?file_name=
 
 files.get("/", async (c: Context) => {
+  try {
   const params = c.req.query();
   const { file_name } = params as {
     file_name: string;
@@ -43,6 +44,16 @@ files.get("/", async (c: Context) => {
     error: true,
     data: null,
   });
+} catch (error) {
+
+  console.log(error);
+  return c.json({
+    error: "Error retriving the file",
+    data: null,
+  });
+
+}
+
 });
 
 export default files;

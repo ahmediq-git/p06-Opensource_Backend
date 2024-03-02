@@ -139,6 +139,7 @@ export default function Logs() {
                     )}
                 </div>
                 {data && data.data && data.data.length !== 0 ? (
+                    <>
                     <div className="px-4">
                         {chartType === 'dataSentReceived' && (
                             <div className="flex justify-center mb-4">
@@ -198,9 +199,7 @@ export default function Logs() {
                             </tbody>
                         </table>
                     </div>
-                ) : null}
-
-                <div className="flex justify-center mt-4">
+                    <div className="flex justify-center mt-4">
                     <button
                         onClick={handlePreviousPage}
                         disabled={currentPage === 1}
@@ -216,6 +215,10 @@ export default function Logs() {
                         {'>'}
                     </button>
                 </div>
+                    </>
+                    
+                ) : null}
+
             </div>
         </div>
     );
