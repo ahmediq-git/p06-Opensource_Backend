@@ -13,7 +13,7 @@ export default function ApplicationSettings() {
     fetcher
   );
 
-  const [data, setData] = useState({}); // this will have data from config for a specific setting
+  const [data, setData] = useState(null); // this will have data from config for a specific setting
   const [msg, setMsg] = useState(null);
   const { mutate } = useSWRConfig();
 
