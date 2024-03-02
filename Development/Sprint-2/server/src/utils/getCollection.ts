@@ -10,7 +10,6 @@ export function getCollection(
 	options: CrudOptions = { autoload: true, timestampData: true }
 ) {
 	const db = new DataStore({ filename: `./data/${name}.json`, ...options });
-	console.log(`Loaded collection ${name}`);
 	return db;
 }
 

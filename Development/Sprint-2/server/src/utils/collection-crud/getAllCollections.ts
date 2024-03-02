@@ -18,23 +18,9 @@ export default async function getAllCollections(): Promise<string[] | []> {
         coll_data.forEach((coll) => {
             collections.push(coll.name);
         });
-		console.log(collections)
         return collections;
     } catch (err) {
         console.error('Error occurred while fetching collections:', err);
         return []; 
     }
-	// try {
-	// 	const collections: string[] = [];
-	// 	const files = await readdir("./data");
-
-	// 	files.forEach((file) => {
-	// 		const name = file.split(".")[0];
-	// 		collections.push(name);
-	// 	});
-	// 	return collections;
-	// } catch (error) {
-	// 	console.log(error);
-	// 	return [];
-	// }
 }

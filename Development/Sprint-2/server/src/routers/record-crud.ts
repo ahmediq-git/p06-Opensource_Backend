@@ -13,10 +13,7 @@ const records = new Hono();
 
 records.post("/create", async (c) => {
 	try {
-		const { collection_name, query } = await c.req.json();
-
-		console.log(query);
-		
+		const { collection_name, query } = await c.req.json();		
 
 		if (!collection_name) throw new Error("No collection name provided");
 		if (!query) throw new Error("No query provided");

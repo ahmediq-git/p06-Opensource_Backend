@@ -5,8 +5,6 @@ export default async function createCollection(
 	collection_name: string
 ): Promise<any> {
 	try {
-		console.log("Creating collection");
-
 		const collection = new DataStore({
 			filename: `./data/${collection_name}.json`,
 			autoload: true,
@@ -55,7 +53,6 @@ export default async function createCollection(
 					console.log(err);
 					throw new Error("Failed to update config");
 				}
-				console.log(numReplaced);
 			}
 		);
 		await config_db.persistence.compactDatafile()

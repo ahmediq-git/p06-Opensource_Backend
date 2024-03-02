@@ -8,8 +8,6 @@ import { selectionAtom } from "../lib/state/selectionAtom";
 import { useAtom } from "jotai";
 import { useSWRConfig } from "swr";
 import { isAuthCollection } from "../lib/utils/isAuthCollection";
-import Logs from "../components/Logs";
-
 
 export default function HomePage() {
 	const [selection, setSelection] = useAtom(selectionAtom);
