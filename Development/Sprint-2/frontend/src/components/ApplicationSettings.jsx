@@ -18,7 +18,7 @@ export default function ApplicationSettings() {
   const { mutate } = useSWRConfig();
 
   useEffect(() => {
-    setData(initialData.data);
+    setData(initialData?.data);
   }, [initialData]);
 
   const updateSettings = async (event) => {
@@ -111,7 +111,7 @@ export default function ApplicationSettings() {
             </div>
           </form>
         ) : (
-          <div>Loading...</div>
+          <div className=" text-black">Loading...</div>
         )}
       </div>
     </>

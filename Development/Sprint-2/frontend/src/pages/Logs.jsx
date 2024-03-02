@@ -94,6 +94,7 @@ export default function Logs() {
                     )}
                 </div>
                 {data && data.data && data.data.length !== 0 ? (
+                    <>
                     <div className="px-4">
                         <table className="table-auto w-full rounded-lg shadow-lg bg-gray-800 overflow-hidden mb-4">
                             <thead>
@@ -122,9 +123,7 @@ export default function Logs() {
                             </tbody>
                         </table>
                     </div>
-                ) : null}
-
-                <div className="flex justify-center mt-4">
+                    <div className="flex justify-center mt-4">
                     <button
                         onClick={handlePreviousPage}
                         disabled={currentPage === 1}
@@ -140,6 +139,10 @@ export default function Logs() {
                         {'>'}
                     </button>
                 </div>
+                    </>
+                    
+                ) : null}
+
             </div>
         </div>
     );
