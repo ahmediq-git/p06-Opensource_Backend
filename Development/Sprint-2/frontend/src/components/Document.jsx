@@ -15,7 +15,7 @@ export default function Documents() {
 
 	const deleteDoc = async () => {
 		try {
-			const res = await fetch(`http://localhost:3690/api/record/delete`, {
+			const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/record/delete`, {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
@@ -31,7 +31,7 @@ export default function Documents() {
 			console.log(data);
 
 			// remove the deleted collection from the list of collections
-			mutate(`http://localhost:3690/api/record/list?collection_name=${selection.collection}`);
+			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}`);
 			setSelection({ collection: "", document: "" });
 
 			setShowDeleteModal(false);

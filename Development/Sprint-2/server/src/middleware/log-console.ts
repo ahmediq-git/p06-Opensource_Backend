@@ -4,14 +4,19 @@ import DataStore from "nedb";
 
 // // this middleware logs the request to the console
 export const logConsole = async (c: Context, next: () => Promise<void>) => {
+	console.log(`[${new Date().toLocaleString()}] ${c.req.method} ${c.req.url}`);
+	const start = performance.now()
+	await next();
+	const end = performance.now()
+	const time_taken = (end - start).toFixed(2)
 	const db = new DataStore({ filename: "./data/logs.json", timestampData: true,autoload: true});
 	const log = {
 		method: c.req.method,
 		url: c.req.url,
+		status: c.res.status,
+		time_taken,
+		origin: c.req.raw.headers.get("origin")
 	};
-
-	// // const record = await createRecord(log, "logs");
-
 	const insert = await new Promise<string>((resolve, reject) => {   //dont await for promise
 		db.insert(log, function (err: any, newDoc: any) {
 			if (err) {
@@ -23,7 +28,4 @@ export const logConsole = async (c: Context, next: () => Promise<void>) => {
 	}).catch((err:any) => {
 		console.log("Error inserting log: ",err);
 	});
-
-	console.log(`[${new Date().toLocaleString()}] ${c.req.method} ${c.req.url}`);
-	await next();
 };

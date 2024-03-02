@@ -20,7 +20,6 @@ export async function generateQuery(
 	db: DataStoreObject
 ) {
 	const { sort, limit, offset } = options;
-
 	const queryObject = db.find(query);
 
 	if (sort) queryObject.sort(sort);

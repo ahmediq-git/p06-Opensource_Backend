@@ -19,7 +19,7 @@ export default function HomePage() {
 
 	const deleteCollection = async () => {
 		try {
-			const res = await fetch(`http://localhost:3690/api/collections/${selection.collection}`, {
+			const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/collections/${selection.collection}`, {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
@@ -30,7 +30,7 @@ export default function HomePage() {
 
 			// remove the deleted collection from the list of collections
 			setSelection({ collection: "", document: "" });
-			mutate("http://localhost:3690/api/collections");
+			mutate(`${import.meta.env.VITE_BACKEND_URL}/collections`);
 			setShowDeleteModal(false);
 		} catch (error) {
 			console.log(error);

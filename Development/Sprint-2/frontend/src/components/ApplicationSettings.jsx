@@ -9,7 +9,7 @@ export default function ApplicationSettings() {
     error,
     isLoading,
   } = useSWR(
-    "http://localhost:3690/api/admin_ui/settings/application",
+    `${import.meta.env.VITE_BACKEND_URL}/admin_ui/settings/application`,
     fetcher
   );
 
@@ -24,7 +24,7 @@ export default function ApplicationSettings() {
   const updateSettings = async (event) => {
     event.preventDefault();
     try {
-      const req = await fetch("http://localhost:3690/api/admin_ui/settings", {
+      const req = await fetch(`${import.meta.env.VITE_BACKEND_URL}/admin_ui/settings`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -44,7 +44,7 @@ export default function ApplicationSettings() {
         setMsg("Settings updated successfully");
       }
 
-      mutate("http://localhost:3690/api/admin_ui/settings/application");
+      mutate(`${import.meta.env.VITE_BACKEND_URL}/admin_ui/settings/application`);
     } catch (error) {
       console.log(error);
       setMsg("Failed to update settings");
