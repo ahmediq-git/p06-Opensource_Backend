@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import SideRail from '../components/SideRail';
 
-const socket = io('http://localhost:3691');
+const socket = io(`${import.meta.env.VITE_BACKEND_SOCKET_URL}`);
 
 const RealtimeTest = () => {
   const [collections, setCollections] = useState([]);
