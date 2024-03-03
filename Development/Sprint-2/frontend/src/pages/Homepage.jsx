@@ -10,7 +10,6 @@ import { useSWRConfig } from "swr";
 import { isAuthCollection } from "../lib/utils/isAuthCollection";
 import RealtimeTest from "./RealtimeTest";
 import Bot from '../components/Bot';
-import '../bot/style.css';
 
 export default function HomePage() {
 	
