@@ -39,7 +39,7 @@ app.route("/files", files)
 
 const io = new Server({cors: {
   origin: "*",
-  methods: ["GET", "POST", "PATCH", "DELETE", "PUT"]
+  methods: ["GET", "POST", "PATCH", "DELETE", "PUT", "OPTIONS"]
 }});
 
 let subscriptions: any = {};
