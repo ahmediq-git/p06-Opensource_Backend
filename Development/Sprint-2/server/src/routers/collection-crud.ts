@@ -13,13 +13,9 @@ collections.get("/", async (c: Context) => {
 		// config, logs
 		const systemCollections = ["config", "logs"];
 
-		console.log(collections);		
-
-
 		return c.json({ data: collections.filter(collection => !systemCollections.includes(collection)), error: null });
 	} catch (error) {
 		console.log(error);
-
 		return c.json({ error, data: null });
 	}
 });
@@ -44,8 +40,6 @@ collections.delete("/:collection_name", async (c: Context) => {
 	try {
 		const { collection_name } = c.req.param();
 
-		console.log(collection_name);
-
 		if (!collection_name) throw new Error("No collection name provided");
 
 		// delete the collection
@@ -64,8 +58,6 @@ collections.delete("/:collection_name", async (c: Context) => {
 collections.delete("/force/:name", async (c: Context) => {
 	try {
 		const { name } = c.req.param();
-
-		console.log(name);
 
 		if (!name) throw new Error("No collection name provided");
 

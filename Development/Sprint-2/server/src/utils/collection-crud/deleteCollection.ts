@@ -65,7 +65,6 @@ export default async function deleteCollection(
 					console.log(err);
 					throw new Error("Failed to update config");
 				}
-				console.log(numReplaced);
 			}
 		);
 		await unlink(`./data/${name}.json`);

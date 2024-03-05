@@ -8,15 +8,14 @@ import {
 	countRecords,
 } from "@src/controllers/record-crud";
 import getAllCollections from "@src/utils/collection-crud/getAllCollections";
+import app from "@src/index";
+import { Socket } from "socket.io";
 
 const records = new Hono();
 
 records.post("/create", async (c) => {
 	try {
-		const { collection_name, query } = await c.req.json();
-
-		console.log(query);
-		
+		const { collection_name, query } = await c.req.json();		
 
 		if (!collection_name) throw new Error("No collection name provided");
 		if (!query) throw new Error("No query provided");
@@ -28,7 +27,16 @@ records.post("/create", async (c) => {
 			throw new Error("Collection does not exist");
 
 		const record = await createRecord(query, collection_name);
-
+		try{
+		app.subscriptions[collection_name].forEach((socket: Socket) => {
+			socket.emit('recordAdded', {
+				collection_name,
+				record
+			});
+		})
+		}catch(err){
+			console.log(err);
+		}
 		return c.json({
 			data: record,
 			error: null,
@@ -84,7 +92,15 @@ records.delete("/delete", async (c) => {
 		if (typeof query !== "object") throw new Error("Query must be an object");
 
 		const record = await deleteRecord(query, queryOptions, collection_name);
-
+		try{
+			app.subscriptions[collection_name].forEach((socket: Socket) => {
+				socket.emit('recordRemoved', {
+					collection_name,
+				});
+			})
+			}catch(err){
+				console.log(err);
+			}
 		return c.json({
 			data: record,
 			error: null,
