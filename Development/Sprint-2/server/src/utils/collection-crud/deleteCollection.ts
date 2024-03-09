@@ -1,16 +1,18 @@
 import DataStore from "nedb";
 import { unlink } from "node:fs/promises";
+import Database from "@src/database/database_handler";
 
 export default async function deleteCollection(
 	name: string,
 	force: boolean
 ): Promise<any> {
 	try {
-		const config = new DataStore({
-			filename: `./data/config.json`,
-			autoload: true,
-			timestampData: true,
-		});
+		const config:any = Database.getInstance().getDataStore()?.config
+		// const config = new DataStore({
+		// 	filename: `./data/config.json`,
+		// 	autoload: true,
+		// 	timestampData: true,
+		// });
 
 		if (!config) throw new Error("Failed to get config");
 
@@ -32,11 +34,12 @@ export default async function deleteCollection(
 		if (!collectionExists) throw new Error("Collection does not exist");
 
 		// check if collection is empty
-		const collection = new DataStore({
-			filename: `./data/${name}.json`,
-			autoload: true,
-			timestampData: true,
-		});
+		// const collection = new DataStore({
+		// 	filename: `./data/${name}.json`,
+		// 	autoload: true,
+		// 	timestampData: true,
+		// });
+		const collection=Database.getInstance().getDataStore()?.[name]
 
 		if (!force) { //force delete
 			const collectionCount: number = await new Promise((resolve, reject) => {
@@ -67,7 +70,8 @@ export default async function deleteCollection(
 				}
 			}
 		);
-		await unlink(`./data/${name}.json`);
+		// await unlink(`./data/${name}.json`);
+		Database.getInstance().unloadCollection(name)
 		await config.persistence.compactDatafile();
 		return true;
 	} catch (error) {

@@ -1,23 +1,28 @@
 import { CollectionType } from "@src/core/init";
 import DataStore from "nedb";
+import Database from "@src/database/database_handler";
 
 export default async function createCollection(
 	collection_name: string
 ): Promise<any> {
 	try {
-		const collection = new DataStore({
-			filename: `./data/${collection_name}.json`,
-			autoload: true,
-			timestampData: true,
-		});
+		const collection = Database.getInstance().loadCollection(collection_name, {autoload: true, timestampData: true})
+		
+		// new DataStore({
+		// 	filename: `./data/${collection_name}.json`,
+		// 	autoload: true,
+		// 	timestampData: true,
+		// });
 
 		if (!collection) throw new Error("Failed to create collection");
 
 		// update the config db to reflect the new collection
-		const config_db = new DataStore({
-			filename: `./data/config.json`,
-			autoload: true,
-		});
+		const config_db = Database.getInstance().getDataStore()?.config
+		
+		// new DataStore({
+		// 	filename: `./data/config.json`,
+		// 	autoload: true,
+		// });
 
 		const config: any = await new Promise((resolve, reject) => {
 			config_db.findOne({}, function (err, docs) {
