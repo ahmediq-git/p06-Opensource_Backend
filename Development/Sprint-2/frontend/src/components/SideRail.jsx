@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { Database, BarChart3, Settings, Code2, Zap } from "lucide-react";
+import { Database, BarChart3, Settings, Code2, Zap, Play } from "lucide-react";
 import { useState,useEffect } from "react";
 import { adminAtom } from "../lib/state/adminAtom";
 import { useNavigate } from "react-router-dom";
@@ -22,6 +22,9 @@ export default function SideRail() {
 				break;
 			case "realtimedemo":
 				setActive("realtimedemo");
+				break;
+			case "functions":
+				setActive("functions");
 				break;
 			default:
 				setActive("");
@@ -75,6 +78,14 @@ export default function SideRail() {
 								}`}
 							>
 								<Zap />
+							</li>
+							<li
+								onClick={() => {setActive("functions"); navigate("/functions")}}
+								className={`menu-item ${
+									active === "functions" && "menu-active"
+								}`}
+							>
+								<Play />
 							</li>
 						</ul>
 					</section>
