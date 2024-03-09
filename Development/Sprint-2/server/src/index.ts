@@ -9,6 +9,7 @@ import { cors } from "hono/cors";
 import { logConsoleDev, logConsoleProd } from "./middleware/log-console";
 import { Initialize } from "./core/init";
 import { Server, Socket } from "socket.io";
+import functions from "./routers/functions";
 
 (async () => {
   await Initialize(); //initialize all the system defined parameters and collections
@@ -35,7 +36,8 @@ app.route("/collections", collection_crud);
 app.route("/admin_ui", admin_ui);
 app.route("/mail", mail);
 app.route("/auth", auth);
-app.route("/files", files)
+app.route("/files", files);
+app.route("/functions", functions);
 
 const io = new Server({cors: {
   origin: "*",

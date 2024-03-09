@@ -10,6 +10,7 @@ import { useSWRConfig } from "swr";
 import { isAuthCollection } from "../lib/utils/isAuthCollection";
 import RealtimeTest from "./RealtimeTest";
 import Bot from '../components/Bot';
+import FunctionsPage from './Functions';
 
 export default function HomePage() {
 	
@@ -129,6 +130,8 @@ export default function HomePage() {
             {activeState=="database" &&<Collections />}
             {activeState=="logs" &&<Logs />}
             {activeState=="realtimedemo" &&<RealtimeTest />}
+            {activeState=="functions" &&<FunctionsPage />}
+
 
             <div className="flex-1 relative">
                 <div className="w-full h-screen flex flex-col">
