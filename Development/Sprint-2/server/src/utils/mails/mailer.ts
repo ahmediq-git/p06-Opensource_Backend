@@ -1,5 +1,6 @@
 import {createTransport} from 'nodemailer';
 import DataStore from "nedb";
+import Database from "../../database/database_handler"
 
 type smtp = {
     host: string;
@@ -10,11 +11,13 @@ type smtp = {
 
 export default async function sendEmail(to: string, subject: string, text: string, html:string) :Promise<any> {
     try{
-        const config:any = new DataStore({
-			filename: "./data/config.json",
-			autoload: true,
-			timestampData: true,
-		});
+        const config:any = Database.getInstance().getDataStore()?.config
+        
+        // new DataStore({
+		// 	filename: "./data/config.json",
+		// 	autoload: true,
+		// 	timestampData: true,
+		// });
 
         if (!config) throw new Error("Failed to get config");
         const appConfig: any = await new Promise((resolve, reject) => {

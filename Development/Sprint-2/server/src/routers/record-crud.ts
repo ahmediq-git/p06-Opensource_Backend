@@ -28,7 +28,7 @@ records.post("/create", async (c) => {
 
 		const record = await createRecord(query, collection_name);
 		try{
-		app.subscriptions[collection_name].forEach((socket: Socket) => {
+		app.subscriptions[collection_name]?.forEach((socket: Socket) => {
 			socket.emit('recordAdded', {
 				collection_name,
 				record
