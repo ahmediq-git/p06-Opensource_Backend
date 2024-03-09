@@ -93,7 +93,7 @@ records.delete("/delete", async (c) => {
 
 		const record = await deleteRecord(query, queryOptions, collection_name);
 		try{
-			app.subscriptions[collection_name].forEach((socket: Socket) => {
+			app.subscriptions[collection_name]?.forEach((socket: Socket) => {
 				socket.emit('recordRemoved', {
 					collection_name,
 				});
