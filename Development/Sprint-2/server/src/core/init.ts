@@ -140,11 +140,15 @@ async function FunctionRunner() {
         });
       });
       for (let x = 0; x < allFunctions.length; x++) {
-        let functLastRun = allFunctions[x].lastRun;
+        let lastRun = allFunctions[x].lastRun;
+        // Check if lastRun is not null
+        let functLastRun = lastRun !== null ? lastRun.getTime() / 1000 : 0; // convert to seconds
         let functRunAfter = allFunctions[x].runAfter;
-        let currentTime = (new Date()).getTime();
+        let currentTime = ((new Date()).getTime()) / 1000;
+        // run function if more time elapsed than alloted
         if (currentTime - functLastRun > functRunAfter) {
           let op = allFunctions[x].op;
+          // what to do if op is export 
           if (op == "export") {
             let to_export = allFunctions[x].toExport;
             let out_name = allFunctions[x].outName;
@@ -161,23 +165,27 @@ async function FunctionRunner() {
               });
             });
             var dir = './exports';
+            // make sure directory exists before writing to file
             if (!fs.existsSync(dir)) {
               fs.mkdirSync(dir);
             }
             fs.writeFileSync(`./exports/${out_name}.txt`, JSON.stringify(data_to_export));
-            to_export_datastore.update(allFunctions[x], { $set: { lastRun: new Date() } }, {}, function (err, numReplaced) {
+            functions.update(allFunctions[x], { $set: { lastRun: new Date() } }, {}, function (err, numReplaced) {
             });
             console.log(`${to_export} exported`);
-
           }
+          // what to do if op is backup
           else if (op == "backup") {
             let to_backup = allFunctions[x].toBackup;
             for (let i = 0; i < to_backup.length; i++) {
               var dir = './backups';
+              // make sure directory exists before copying file
               if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir);
               }
               fs.copyFileSync(`./data/${to_backup[i]}.json`, `./backups/${to_backup[i]}.json`);
+              functions.update(allFunctions[x], { $set: { lastRun: new Date() } }, {}, function (err, numReplaced) {
+              });
               console.log(`${to_backup[i]} backed up`);
             }
           }
@@ -262,7 +270,7 @@ async function LoadConfig() {
       resolve(docs);
     });
   });
-  
+
   if (configObject && configObject?.length !== 0) return config; // just return the datastore if a config already exists
 
   console.log("Creating new config");
