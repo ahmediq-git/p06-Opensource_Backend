@@ -5,7 +5,7 @@ import { selectionAtom } from "../lib/state/selectionAtom";
 import useSwr, { useSWRConfig } from "swr";
 import { fetcher } from "../lib/utils/fetcher";
 
-import { z } from "zod";
+import { record, z } from "zod";
 
 // Define a function to validate data types associated with fields
 const dataSchema = z.union([
@@ -93,8 +93,11 @@ export default function Documents() {
 		try {
 
 			// const validatedData = fieldSchema.parse(Object.assign({}, ...doc));
-
+			console.log("DOC", doc)
 			const data = doc.map((record) => {
+				if (record.type === "boolean" && record.value === null) {
+					record.value = false;
+				}
 				return {
 					[record.field]: record.value,
 				};
@@ -126,7 +129,7 @@ export default function Documents() {
 
 			const adsa = await res.json();
 
-			console.log(adsa);
+			console.log("ADSA",adsa);
 
 			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}`);
 			setDocumentModal(false);
@@ -272,7 +275,7 @@ export default function Documents() {
 													onChange={(e) => {
 														setDoc((prev) => {
 															const newRecord = [...prev];
-															newRecord[index].value = e.target.value;
+															newRecord[index].value = e.target.checked ? true: false;
 															return newRecord;
 														});
 													}}
