@@ -139,7 +139,6 @@ async function FunctionRunner() {
           resolve(docs);
         });
       });
-      console.log(allFunctions);
       for (let x = 0; x < allFunctions.length; x++) {
         let functLastRun = allFunctions[x].lastRun;
         let functRunAfter = allFunctions[x].runAfter;
@@ -161,21 +160,27 @@ async function FunctionRunner() {
                 resolve(docs);
               });
             });
+            var dir = './exports';
+            if (!fs.existsSync(dir)) {
+              fs.mkdirSync(dir);
+            }
             fs.writeFileSync(`./exports/${out_name}.txt`, JSON.stringify(data_to_export));
             to_export_datastore.update(allFunctions[x], { $set: { lastRun: new Date() } }, {}, function (err, numReplaced) {
             });
+            console.log(`${to_export} exported`);
 
           }
           else if (op == "backup") {
             let to_backup = allFunctions[x].toBackup;
-            console.log("To backup", to_backup);
             for (let i = 0; i < to_backup.length; i++) {
-              console.log("File", to_backup[i]);
+              var dir = './backups';
+              if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir);
+              }
               fs.copyFileSync(`./data/${to_backup[i]}.json`, `./backups/${to_backup[i]}.json`);
               console.log(`${to_backup[i]} backed up`);
             }
           }
-          console.log("Run function", allFunctions[x])
         }
       }
     } catch (err) {
