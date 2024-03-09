@@ -189,7 +189,7 @@ async function FunctionRunner() {
     }
   });
   const job = new SimpleIntervalJob(
-    { seconds: 10, runImmediately: true },
+    { seconds: 10, runImmediately: false },
     task, {
     id: 'id_2',
     preventOverrun: true
@@ -252,7 +252,6 @@ async function LoadConfig() {
     autoload: true,
     timestampData: true,
   });
-
   // get the current config object
   const configObject: any[] = await new Promise((resolve, reject) => {
     config.findOne({}, function (err, docs) {
@@ -263,7 +262,7 @@ async function LoadConfig() {
       resolve(docs);
     });
   });
-
+  
   if (configObject && configObject?.length !== 0) return config; // just return the datastore if a config already exists
 
   console.log("Creating new config");
@@ -312,7 +311,6 @@ async function LoadConfig() {
       },
     ],
   };
-
   // create a config object if it does not exist
   const newConfig: any[] = await new Promise((resolve, reject) => {
     config.insert(defaultConfig, (err, doc: any) => {
