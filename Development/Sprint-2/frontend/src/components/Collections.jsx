@@ -54,6 +54,11 @@ export default function Collections() {
   const createCollection = async () => {
     // get value of collectionName from document
     const name = document.querySelector("input[name='collectionName']").value;
+    if(collectionData.data.includes(name)) {
+      setModal(false);
+      alert("Collection already exists");
+      return
+    }
     // validate collectionName
     try {
       collectionNameSchema.parse(name);
