@@ -7,10 +7,8 @@
 
 import { deleteRecord, readRecord } from "@src/controllers/record-crud";
 import Database from "@src/database/database_handler";
-import { DataStoreObject } from "@src/utils/getCollection";
-import DataStore from "nedb";
 import { SimpleIntervalJob, Task, ToadScheduler } from "toad-scheduler";
-const fs = require('fs')
+import fs from 'fs';
 
 export enum CollectionType {
   user = "user",
@@ -89,12 +87,8 @@ async function LogCullerSchedule() {
   const scheduler = new ToadScheduler();
   const task = new Task('cull logs', async () => {
     try {
-      const config = Database.getInstance().getDataStore()['config'];;
-      // const config: any = new DataStore({
-      //   filename: "./data/config.json",
-      //   autoload: true,
-      //   timestampData: true,
-      // });
+      const config = Database.getInstance().getDataStore()?.['config'];;
+  
       if (!config) throw new Error("Failed to get config");
       const appConfig: any = await new Promise((resolve, reject) => {
         config.findOne({}, function (err: any, docs: any) {
@@ -128,12 +122,8 @@ async function FunctionRunner() {
   const scheduler = new ToadScheduler();
   const task = new Task('run functions', async () => {
     try {
-      const functions = Database.getInstance().getDataStore()['functions'];;
-      // const functions = new DataStore({
-      //   filename: "./data/functions.json",
-      //   autoload: true,
-      //   timestampData: true,
-      // });
+      const functions = Database.getInstance().getDataStore()?.['functions'];
+ 
       const allFunctions: any[] = await new Promise((resolve, reject) => {
         functions.find({}, function (err: any, docs: any) {
           if (err) {
@@ -155,10 +145,8 @@ async function FunctionRunner() {
           if (op == "export") {
             let to_export = allFunctions[x].toExport;
             let out_name = allFunctions[x].outName;
-            const to_export_datastore = new DataStore({
-              filename: `./data/${to_export}.json`,
-              autoload: true
-            });
+            const to_export_datastore = Database.getInstance().getDataStore()?.[to_export]
+            
             const data_to_export: any[] = await new Promise((resolve, reject) => {
               to_export_datastore.find({}, function (err: any, docs: any) {
                 if (err) {
@@ -209,11 +197,8 @@ async function FunctionRunner() {
 }
 
 async function LoadUsers() {
-  const db = new DataStore({
-    filename: `./data/users.json`,
-    autoload: true,
-    timestampData: true,
-  });
+  const db = Database.getInstance().getDataStore()?.['users'];
+
 
   // ensure that the username field is unique
   db.ensureIndex({ fieldName: "username", unique: true }, function (err) {
@@ -232,12 +217,8 @@ async function LoadUsers() {
 }
 
 async function LoadLogs() {
-  const db = new DataStore({
-    filename: `./data/logs.json`,
-    timestampData: true,
-    autoload: true,
-  }); //logs are not auto loaded, they are loaded on demand
-
+  // }); //logs are not auto loaded, they are loaded on demand
+  const db = Database.getInstance().getDataStore()?.['logs'];
   // db.ensureIndex({ fieldName: "request_id", unique: true }, function (err) {
   // 	if (err) {
   // 		console.log(err);
@@ -248,21 +229,15 @@ async function LoadLogs() {
 }
 
 async function LoadFunctions() {
-  const db = new DataStore({
-    filename: `./data/functions.json`,
-    timestampData: true,
-    autoload: true,
-  });
-
+ 
+  const db=Database.getInstance().loadCollection('functions',{autoload:true, timestampData: true})
+ 
   return db;
 }
 
 async function LoadConfig() {
-  const config = new DataStore({
-    filename: `./data/config.json`,
-    autoload: true,
-    timestampData: true,
-  });
+
+  const config=Database.getInstance().getDataStore()?.config
   // get the current config object
   const configObject: any[] = await new Promise((resolve, reject) => {
     config.findOne({}, function (err, docs) {
