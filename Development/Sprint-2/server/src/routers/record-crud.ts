@@ -83,6 +83,29 @@ records.get("/read", async (c) => {
 	}
 });
 
+records.patch("/update", async (c)=>{
+	try {
+		const { collection_name, id, new_record } = await c.req.json();
+
+		if (!collection_name) throw new Error("No collection name provided");
+		if (!id) throw new Error("No id provided");
+		if (typeof new_record !== "object") throw new Error("New record must be an object");
+
+		const record = await updateRecord(collection_name, id._id, new_record);
+
+		return c.json({
+            data: new_record,
+            error: null
+        });
+
+	} catch (error) {
+		return c.json({
+			data:null,
+			error: "Failed to update record"
+		});
+	}
+})
+
 records.delete("/delete", async (c) => {
 	try {
 		const { collection_name, query, queryOptions } = await c.req.json();
