@@ -73,7 +73,7 @@ const ActionProvider = ({ createChatBotMessage, setState, children }) => {
         }));
     }
 
-    const handleDocEdits = () => {
+    const handleDocEdit = () => {
       const botMessage = createChatBotMessage('Existing documents can be edited by clicking the pencil icon when viewing a document.');
         setState((prev) => ({
           ...prev,
@@ -111,7 +111,7 @@ const ActionProvider = ({ createChatBotMessage, setState, children }) => {
               handleLogs,
               handleRecordFieldTypes,
               handleFunctions,
-              handleDocEdits,
+              handleDocEdit,
               handleIdentityInquiry,
               handleElse
             },
