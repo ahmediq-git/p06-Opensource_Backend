@@ -6,6 +6,7 @@
 // 3. Config - Includes smtp creds, logging behavior, S3 creds, Token secrets, Admins
 
 import { deleteRecord, readRecord } from "@src/controllers/record-crud";
+import Database from "@src/database/database_handler";
 import { DataStoreObject } from "@src/utils/getCollection";
 import DataStore from "nedb";
 import { SimpleIntervalJob, Task, ToadScheduler } from "toad-scheduler";
@@ -75,7 +76,7 @@ export async function Initialize() {
   const functions = await LoadFunctions();
 
   await LogCullerSchedule(); // cull logs based on retention
-  await FunctionRunner();
+  await FunctionRunner(); // to run periodic functions
 
   return {
     users_db,
@@ -88,11 +89,12 @@ async function LogCullerSchedule() {
   const scheduler = new ToadScheduler();
   const task = new Task('cull logs', async () => {
     try {
-      const config: any = new DataStore({
-        filename: "./data/config.json",
-        autoload: true,
-        timestampData: true,
-      });
+      const config = Database.getInstance().getDataStore()['config'];;
+      // const config: any = new DataStore({
+      //   filename: "./data/config.json",
+      //   autoload: true,
+      //   timestampData: true,
+      // });
       if (!config) throw new Error("Failed to get config");
       const appConfig: any = await new Promise((resolve, reject) => {
         config.findOne({}, function (err: any, docs: any) {
@@ -114,7 +116,7 @@ async function LogCullerSchedule() {
     }
   });
   const job = new SimpleIntervalJob(
-    { seconds: 600, runImmediately: true },
+    { seconds: 600, runImmediately: false },
     task, {
     id: 'id_1',
     preventOverrun: true
@@ -126,11 +128,12 @@ async function FunctionRunner() {
   const scheduler = new ToadScheduler();
   const task = new Task('run functions', async () => {
     try {
-      const functions = new DataStore({
-        filename: "./data/functions.json",
-        autoload: true,
-        timestampData: true,
-      });
+      const functions = Database.getInstance().getDataStore()['functions'];;
+      // const functions = new DataStore({
+      //   filename: "./data/functions.json",
+      //   autoload: true,
+      //   timestampData: true,
+      // });
       const allFunctions: any[] = await new Promise((resolve, reject) => {
         functions.find({}, function (err: any, docs: any) {
           if (err) {
@@ -142,7 +145,7 @@ async function FunctionRunner() {
       for (let x = 0; x < allFunctions.length; x++) {
         let lastRun = allFunctions[x].lastRun;
         // Check if lastRun is not null
-        let functLastRun = lastRun !== null ? lastRun.getTime() / 1000 : 0; // convert to seconds
+        let functLastRun = (lastRun !== null && lastRun != undefined ) ? lastRun.getTime() / 1000 : 0; // convert to seconds
         let functRunAfter = allFunctions[x].runAfter;
         let currentTime = ((new Date()).getTime()) / 1000;
         // run function if more time elapsed than alloted
