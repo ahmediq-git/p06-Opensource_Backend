@@ -67,6 +67,9 @@ export type AppConfig = {
 
 export async function Initialize() {
   console.log("Initializing app");
+  
+  // instantiating the Database if its the first time
+  Database.getInstance()
 
   const users_db = await LoadUsers();
   const logs_db = await LoadLogs();
@@ -146,9 +149,9 @@ async function FunctionRunner() {
             let to_export = allFunctions[x].toExport;
             let out_name = allFunctions[x].outName;
             const to_export_datastore = Database.getInstance().getDataStore()?.[to_export]
-            
+            // console.log(Object.keys(Database.getInstance().getDataStore()), to_export)
             const data_to_export: any[] = await new Promise((resolve, reject) => {
-              to_export_datastore.find({}, function (err: any, docs: any) {
+              to_export_datastore?.find({}, function (err: any, docs: any) {
                 if (err) {
                   reject(err);
                 }
@@ -197,8 +200,14 @@ async function FunctionRunner() {
 }
 
 async function LoadUsers() {
-  const db = Database.getInstance().getDataStore()?.['users'];
+  
+  if (!Database.getInstance().getDataStore().hasOwnProperty('users')){
+    // create the users file if it doesn't exist
+    Database.getInstance().loadCollection('users',{autoload:true, timestampData: true})
+  } 
 
+  // retrieve the file
+  const db = Database.getInstance().getDataStore()?.['users'];
 
   // ensure that the username field is unique
   db.ensureIndex({ fieldName: "username", unique: true }, function (err) {
@@ -218,14 +227,19 @@ async function LoadUsers() {
 
 async function LoadLogs() {
   // }); //logs are not auto loaded, they are loaded on demand
-  const db = Database.getInstance().getDataStore()?.['logs'];
+  // const db = Database.getInstance().getDataStore()?.['logs'];
   // db.ensureIndex({ fieldName: "request_id", unique: true }, function (err) {
   // 	if (err) {
   // 		console.log(err);
   // 	}
   // });
-
-  return db;
+  if (!Database.getInstance().getDataStore().hasOwnProperty('logs')){
+    const db=Database.getInstance().loadCollection('logs',{autoload:true, timestampData: true})
+    return db;
+  } else {
+    const db = Database.getInstance().getDataStore()?.['logs']
+    return db;
+  }
 }
 
 async function LoadFunctions() {
@@ -240,7 +254,12 @@ async function LoadFunctions() {
 
 async function LoadConfig() {
 
-  const config=Database.getInstance().getDataStore()?.config
+  if (!Database.getInstance().getDataStore().hasOwnProperty('config')){
+    // create the config file if it doesn't exist
+    Database.getInstance().loadCollection('config',{autoload:true, timestampData: true})
+  } 
+  const config = Database.getInstance().getDataStore()?.['config']
+
   // get the current config object
   const configObject: any[] = await new Promise((resolve, reject) => {
     config.findOne({}, function (err, docs) {
