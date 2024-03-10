@@ -17,7 +17,7 @@ export default function Documents() {
 	const convertToDoc = (originalObject) => {
 		const convertedArray = [];
 		for (const key in originalObject) {
-			if (Object.prototype.hasOwnProperty.call(originalObject, key) && key !== '_id' && key != 'updatedAt' && key!='createdAt') {
+			if (Object.prototype.hasOwnProperty.call(originalObject, key) && key !== '_id' && key != 'updatedAt' && key != 'createdAt') {
 				convertedArray.push({
 					field: key,
 					type: typeof originalObject[key],
@@ -25,12 +25,12 @@ export default function Documents() {
 				});
 			}
 		}
-	
+
 		return convertedArray;
 	};
 
 	const [doc, setDoc] = useState(convertToDoc(selection.document));
-	
+
 	const { mutate } = useSWRConfig();
 
 
@@ -127,7 +127,7 @@ export default function Documents() {
 			});
 
 			const obj = Object.assign({}, ...data);
-		
+
 			const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/record/update`, {
 				method: "PATCH",
 				headers: {
@@ -415,7 +415,7 @@ export default function Documents() {
 						{selection.collection &&
 							(<Pencil
 								onClick={() => setShowEditModal(true)}
-								className="ml-2"
+								className="ml-2 hover:scale-105" cursor="pointer"
 							/>)
 						}
 					</div>

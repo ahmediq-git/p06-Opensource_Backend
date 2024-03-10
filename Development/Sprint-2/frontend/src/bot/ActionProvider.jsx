@@ -64,6 +64,38 @@ const ActionProvider = ({ createChatBotMessage, setState, children }) => {
           messages: [...prev.messages, botMessage],
         }));
     };
+
+    const handleFunctions = () => {
+      const botMessage = createChatBotMessage('The play icon is the functions page, it is where you can add functions to run periodically on your database. Functions include creating exports files, making backups and so on.');
+        setState((prev) => ({
+          ...prev,
+          messages: [...prev.messages, botMessage],
+        }));
+    }
+
+    const handleDocEdits = () => {
+      const botMessage = createChatBotMessage('Existing documents can be edited by clicking the pencil icon when viewing a document.');
+        setState((prev) => ({
+          ...prev,
+          messages: [...prev.messages, botMessage],
+        }));
+    }
+
+    const handleIdentityInquiry = () => {
+      const botMessage = createChatBotMessage('I am Moiz Raza Amir, a student of LUMS, trapped in this bot. HELP ME.');
+        setState((prev) => ({
+          ...prev,
+          messages: [...prev.messages, botMessage],
+        }));
+    }
+    
+    const handleElse = (message) => {
+      const botMessage = createChatBotMessage(`https://google.com/search?q=${message}`);
+        setState((prev) => ({
+          ...prev,
+          messages: [...prev.messages, botMessage],
+        }));
+    }
   
     return (
       <div>
@@ -78,6 +110,10 @@ const ActionProvider = ({ createChatBotMessage, setState, children }) => {
               handleDeleteCollection,
               handleLogs,
               handleRecordFieldTypes,
+              handleFunctions,
+              handleDocEdits,
+              handleIdentityInquiry,
+              handleElse
             },
           });
         })}
