@@ -78,7 +78,7 @@ export default function FunctionsPage() {
 
             if (response.ok) {
                 await fetchRegisteredFunctions();
-                <Alert type="Success" />;
+                alert("Function registered!");
                 console.log('Registration successful');
             } else {
                 alert("There was an error registering your function!")
@@ -87,6 +87,7 @@ export default function FunctionsPage() {
         } catch (error) {
             console.error('Error registering:', error);
         }
+        setSelectedCollections([])
     };
 
     const handleDeleteFunction = async (id) => {
@@ -109,6 +110,7 @@ export default function FunctionsPage() {
         } catch (error) {
             console.error('Error fetching collections:', error);
         }
+        setSelectedCollections([])
     }
 
     return (
