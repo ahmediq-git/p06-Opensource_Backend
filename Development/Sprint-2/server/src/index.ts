@@ -10,6 +10,7 @@ import { logConsoleDev, logConsoleProd } from "./middleware/log-console";
 import { Initialize } from "./core/init";
 import { Server, Socket } from "socket.io";
 import functions from "./routers/functions";
+import stress from "./routers/stress_test";
 
 (async () => {
   await Initialize(); //initialize all the system defined parameters and collections
@@ -38,6 +39,7 @@ app.route("/mail", mail);
 app.route("/auth", auth);
 app.route("/files", files);
 app.route("/functions", functions);
+app.route("/stress", stress);
 
 const io = new Server({cors: {
   origin: "*",

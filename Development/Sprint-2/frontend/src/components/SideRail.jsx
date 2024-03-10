@@ -3,6 +3,7 @@ import { Database, BarChart3, Settings, Code2, Zap, Play } from "lucide-react";
 import { useState,useEffect } from "react";
 import { adminAtom } from "../lib/state/adminAtom";
 import { useNavigate } from "react-router-dom";
+import { Flame } from "lucide-react";
 
 export default function SideRail() {
 	const [active, setActive] = useState("");
@@ -25,6 +26,9 @@ export default function SideRail() {
 				break;
 			case "functions":
 				setActive("functions");
+				break;
+			case "stress":
+				setActive("stress");
 				break;
 			default:
 				setActive("");
@@ -87,12 +91,20 @@ export default function SideRail() {
 							>
 								<Play />
 							</li>
+							<li
+								onClick={() => {setActive("stress"); navigate("/stress")}}
+								className={`menu-item ${
+									active === "stress" && "menu-active"
+								}`}
+							>
+								<Flame />
+							</li>
 						</ul>
 					</section>
 				</nav>
 			</section>
 
-			<section className="sidebar-footer h-full justify-end bg-gray-1 pt-2 z-20">
+			<section className="sidebar-footer h-80 justify-end bg-gray-1 pt-2 z-20">
 				<div className="divider my-0"></div>
 				<div className="dropdown w-full cursor-pointer  p-4">
 					<label className="flex items-center justify-center w-full" tabindex="0">
