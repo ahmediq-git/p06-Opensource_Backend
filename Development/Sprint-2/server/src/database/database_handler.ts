@@ -1,4 +1,4 @@
-// This follows the singleton design pattern
+// This follows the singleton design pattern as each collection DataStore object should only be created exactly once
 // This is to ensure that a collection is instantiated just once as NeDB does not allow multiple instances of a DataStore object
 import DataStore from "nedb";
 import fs from "fs";
@@ -17,7 +17,10 @@ class Database {
   // Used to load any existing collections to the datastore
   private loadExistingCollections() {
     const dir = "./data";
-    const fileList = fs.readdirSync("./data");
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
+    const fileList = fs.readdirSync(dir);
 
     // Loading every single existing collection to the Database singleton
     fileList?.forEach((file) => {
@@ -44,21 +47,25 @@ class Database {
   }
 
   // To add a new collection to the data store
-  public loadCollection(collectionName: string, options: any ) {
-    const filePath = `./data/${collectionName}.json`; // assuming the file extension is .db
-    this.dataStore[collectionName] = new DataStore({
-      filename: filePath,
-      ...options
-    });
-    return this.getDataStore()[collectionName]
+  public loadCollection(collectionName: string, options: any) {
+    if (!this.getDataStore()?.[collectionName]) {
+      const filePath = `./data/${collectionName}.json`; // assuming the file extension is .db
+      this.dataStore[collectionName] = new DataStore({
+        filename: filePath,
+        ...options,
+      });
+    }
+    return this.getDataStore()[collectionName];
   }
 
   // to remove a collection from the data store
   public unloadCollection(collectionName: string) {
-    delete this.dataStore[collectionName];
-    // deleting file from the filesystem aswell
-    const filePath = `./data/${collectionName}.json`;
-    fs.unlinkSync(filePath);
+    if (this.getDataStore()?.[collectionName]) {
+      delete this.dataStore[collectionName];
+      // deleting file from the filesystem aswell
+      const filePath = `./data/${collectionName}.json`;
+      fs.unlinkSync(filePath);
+    }
   }
 }
 

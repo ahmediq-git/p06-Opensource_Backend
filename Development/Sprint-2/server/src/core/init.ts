@@ -229,10 +229,13 @@ async function LoadLogs() {
 }
 
 async function LoadFunctions() {
- 
-  const db=Database.getInstance().loadCollection('functions',{autoload:true, timestampData: true})
- 
-  return db;
+  if (!Database.getInstance().getDataStore().hasOwnProperty('functions')){
+    const db=Database.getInstance().loadCollection('functions',{autoload:true, timestampData: true})
+    return db;
+  } else {
+    const db = Database.getInstance().getDataStore()?.['functions']
+    return db;
+  }
 }
 
 async function LoadConfig() {
