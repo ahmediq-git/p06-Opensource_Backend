@@ -93,7 +93,7 @@ export default function Documents() {
 		try {
 
 			// const validatedData = fieldSchema.parse(Object.assign({}, ...doc));
-			console.log("DOC", doc)
+			console.log("DOC is", doc)
 			const data = doc.map((record) => {
 				if (record.type === "boolean" && record.value === null) {
 					record.value = false;
