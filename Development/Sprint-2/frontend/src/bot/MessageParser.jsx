@@ -41,6 +41,15 @@ const MessageParser = ({ children, actions }) => {
     else if (/who\s+are\s+you|what\s+are\s+you|what\s+is\s+your\s+name|your\s+name/i.test(message)) {
       actions.handleIdentityInquiry();
     }
+    else if (/help/i.test(message)) {
+      actions.handleHelp();
+    }
+    else if (/security/i.test(message)) {
+      actions.handleSecurity();
+    }
+    else if (/performance/i.test(message)) {
+      actions.handlePerformance();
+    }
     else {
       actions.handleElse(message);
     }

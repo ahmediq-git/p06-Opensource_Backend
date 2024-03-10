@@ -88,6 +88,30 @@ const ActionProvider = ({ createChatBotMessage, setState, children }) => {
           messages: [...prev.messages, botMessage],
         }));
     }
+
+    const handleHelp = () => {
+      const botMessage = createChatBotMessage('Ask me anything\n. How to create a collection\n. How to create a record\n. What do the icons do on the left\n I will answer any such questions to the best of my ability');
+        setState((prev) => ({
+          ...prev,
+          messages: [...prev.messages, botMessage],
+        }));
+    }
+
+    const handleSecurity = () => {
+      const botMessage = createChatBotMessage('Ezbase guarantees state of the art security. We utilize industry best practices to make sure your data is safe.');
+        setState((prev) => ({
+          ...prev,
+          messages: [...prev.messages, botMessage],
+        }));
+    }
+
+    const handlePerformance = () => {
+      const botMessage = createChatBotMessage('Ezbase utilizes NEDB, NeDB is not intended to be a replacement of large-scale databases such as MongoDB, and as such was not designed for speed. That said, it is still pretty fast on the expected datasets, especially if you use indexing. On a typical, not-so-fast dev machine, for a collection containing 10,000 documents, with indexing:\n Insert: 10,680 ops/s\n Find: 43,290 ops/s\nUpdate: 8,000 ops/s\nRemove: 11,750 ops/s');
+        setState((prev) => ({
+          ...prev,
+          messages: [...prev.messages, botMessage],
+        }));
+    }
     
     const handleElse = (message) => {
       const botMessage = createChatBotMessage(`https://google.com/search?q=${message}`);
@@ -113,7 +137,10 @@ const ActionProvider = ({ createChatBotMessage, setState, children }) => {
               handleFunctions,
               handleDocEdit,
               handleIdentityInquiry,
-              handleElse
+              handleElse,
+              handleHelp,
+              handleSecurity,
+              handlePerformance
             },
           });
         })}
