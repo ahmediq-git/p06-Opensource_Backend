@@ -62,7 +62,7 @@ export default function Documents() {
 	const [foreignCollSelected, setForeignCollSelected] = useState("");
 
 	const { data, error, isLoading } = useSwr(
-		`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}`,
+		`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}&embed=false`,
 		fetcher
 	);
 
@@ -135,7 +135,7 @@ export default function Documents() {
 				}else if(record.type === "foreign") {
 					let obj = {
 						"type": "foreign_key",
-						"ref": record.value,
+						"ref": (record.value != '' && record.value != null) ? record.value : foreignDocOptions[0]._id,
 						"collection": foreignCollSelected
 					}
 					return {
