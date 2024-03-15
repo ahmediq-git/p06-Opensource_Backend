@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, PlusCircle, MinusCircle } from "lucide-react";
+import { ArrowRight, PlusCircle, MinusCircle, RefreshCcwDotIcon } from "lucide-react";
 import { useAtom } from "jotai";
 import { selectionAtom } from "../lib/state/selectionAtom";
 import useSwr, { useSWRConfig } from "swr";
@@ -14,6 +14,7 @@ const dataSchema = z.union([
 	z.literal("string"),
 	z.literal("object"),
 	z.literal("array"),
+	z.literal("foreign"),
 ]);
 
 // // Define the main schema for an array of objects
@@ -56,6 +57,9 @@ export default function Documents() {
 			value: null,
 		},
 	]);
+	const [foreignDocOptions, setForeignDocOptions] = useState([]);
+	const [foreignCollOptions, setForeignCollOptions] = useState([]);
+	const [foreignCollSelected, setForeignCollSelected] = useState("");
 
 	const { data, error, isLoading } = useSwr(
 		`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}`,
@@ -69,7 +73,7 @@ export default function Documents() {
 	useEffect(() => {
 		console.log("data", data);
 		console.log("error", error);
-	}, [ data, error, isLoading ]);
+	}, [data, error, isLoading]);
 
 	useEffect(() => {
 		// delay by 1 second and reset on input
@@ -85,6 +89,37 @@ export default function Documents() {
 
 	}, [doc]);
 
+	const fetchForeignOptions = async (coll) => {
+		try {
+			const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${coll}`);
+			const data = await response.json();
+			if (data?.data) {
+				setForeignDocOptions(data.data.map(option => ({ _id: option._id })));
+			}
+		} catch (error) {
+			console.error("Error fetching foreign options:", error);
+		}
+	};
+
+
+	useEffect(() => {
+
+		const fetchForeignCollOptions = async () => {
+			try {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/collections`,);
+				const data = await response.json();
+				if (data?.data) {
+					setForeignCollOptions(data.data);
+				}
+			} catch (error) {
+				console.error("Error fetching foreign options:", error);
+			}
+		};
+		if (doc.some(record => record.type === "foreign")) {
+			fetchForeignCollOptions();
+		}
+	}, [doc]);
+
 	const setDocumentSelected = (doc) => {
 		setSelection((prev) => ({ ...prev, document: doc }));
 	};
@@ -97,6 +132,15 @@ export default function Documents() {
 			const data = doc.map((record) => {
 				if (record.type === "boolean" && record.value === null) {
 					record.value = false;
+				}else if(record.type === "foreign") {
+					let obj = {
+						"type": "foreign_key",
+						"ref": record.value,
+						"collection": foreignCollSelected
+					}
+					return {
+						[record.field] : obj
+					}
 				}
 				return {
 					[record.field]: record.value,
@@ -129,7 +173,7 @@ export default function Documents() {
 
 			const adsa = await res.json();
 
-			console.log("ADSA",adsa);
+			console.log("ADSA", adsa);
 
 			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}`);
 			setDocumentModal(false);
@@ -157,11 +201,10 @@ export default function Documents() {
 								data?.data.map((doc) => (
 									<li
 										key={doc._id}
-										className={`menu-item ${
-											selection?.document?._id === doc._id
-												? "menu-active"
-												: null
-										} bg-gray-2 flex justify-between`}
+										className={`menu-item ${selection?.document?._id === doc._id
+											? "menu-active"
+											: null
+											} bg-gray-2 flex justify-between`}
 										onClick={() => setDocumentSelected(doc)}
 									>
 										<p>{doc._id}</p>
@@ -255,6 +298,7 @@ export default function Documents() {
 												<option value="string">string</option>
 												<option value="array">array</option>
 												<option value="object">object</option>
+												<option value="foreign">foreign</option>
 											</select>
 											{error?.type && (
 												<label className="form-label">
@@ -275,11 +319,44 @@ export default function Documents() {
 													onChange={(e) => {
 														setDoc((prev) => {
 															const newRecord = [...prev];
-															newRecord[index].value = e.target.checked ? true: false;
+															newRecord[index].value = e.target.checked ? true : false;
 															return newRecord;
 														});
 													}}
 												/>
+											) : record.type === "foreign" ? (
+												<div>
+													<select
+														className="select w-full"
+														type="dropdown"
+														onSelect={(e) => {
+															setForeignCollSelected(e.target.value)
+															fetchForeignOptions(e.target.value)
+														}}
+														onChange={(e) => {
+															setForeignCollSelected(e.target.value)
+															fetchForeignOptions(e.target.value)
+														}}>
+														{foreignCollOptions.map(option => (
+															<option key={option} value={option}>{option}</option>
+														))}
+													</select>
+													<select
+														className="select w-full"
+														value={record.value}
+														onChange={(e) => {
+															setDoc((prev) => {
+																const newRecord = [...prev];
+																newRecord[index].value = e.target.value;
+																return newRecord;
+															});
+														}}
+													>
+														{foreignDocOptions.map(option => (
+															<option key={option._id} value={option._id}>{option._id}</option>
+														))}
+													</select>
+												</div>
 											) : (
 												<input
 													placeholder="Type here"
@@ -290,7 +367,7 @@ export default function Documents() {
 														setDoc((prev) => {
 															const newRecord = [...prev];
 															newRecord[index].value = parseValue(e.target.value, record.type);
-															console.log("newRecord[index].value", typeof(newRecord[index].value));
+															console.log("newRecord[index].value", typeof (newRecord[index].value));
 															return newRecord;
 														});
 													}}
