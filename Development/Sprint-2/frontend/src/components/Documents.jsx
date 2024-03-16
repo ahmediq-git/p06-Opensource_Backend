@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, PlusCircle, MinusCircle } from "lucide-react";
+import { ArrowRight, PlusCircle, MinusCircle, RefreshCcwDotIcon } from "lucide-react";
 import { useAtom } from "jotai";
 import { selectionAtom } from "../lib/state/selectionAtom";
 import useSwr, { useSWRConfig } from "swr";
@@ -16,6 +16,7 @@ const dataSchema = z.union([
 	z.literal("string"),
 	z.literal("object"),
 	z.literal("array"),
+	z.literal("foreign"),
 ]);
 
 // // Define the main schema for an array of objects
@@ -64,11 +65,13 @@ export default function Documents() {
 			value: null,
 		},
 	]);
+	const [foreignDocOptions, setForeignDocOptions] = useState([]);
+	const [foreignCollOptions, setForeignCollOptions] = useState([]);
+	const [foreignCollSelected, setForeignCollSelected] = useState("");
 
 
 	const { data, error, isLoading } = useSwr(
-		`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection
-		}`,
+		`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}&embed=false`,
 		fetcher
 	);
 
@@ -102,6 +105,37 @@ export default function Documents() {
 		return () => clearTimeout(timeout);
 	}, [doc]);
 
+	const fetchForeignOptions = async (coll) => {
+		try {
+			const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${coll}`);
+			const data = await response.json();
+			if (data?.data) {
+				setForeignDocOptions(data.data.map(option => ({ _id: option._id })));
+			}
+		} catch (error) {
+			console.error("Error fetching foreign options:", error);
+		}
+	};
+
+
+	useEffect(() => {
+
+		const fetchForeignCollOptions = async () => {
+			try {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/collections`,);
+				const data = await response.json();
+				if (data?.data) {
+					setForeignCollOptions(data.data);
+				}
+			} catch (error) {
+				console.error("Error fetching foreign options:", error);
+			}
+		};
+		if (doc.some(record => record.type === "foreign")) {
+			fetchForeignCollOptions();
+		}
+	}, [doc]);
+
 	const setDocumentSelected = (doc) => {
 		setSelection((prev) => ({ ...prev, document: doc }));
 	};
@@ -113,6 +147,15 @@ export default function Documents() {
 			const data = doc.map((record) => {
 				if (record.type === "boolean" && record.value === null) {
 					record.value = false;
+				}else if(record.type === "foreign") {
+					let obj = {
+						"type": "foreign_key",
+						"ref": (record.value != '' && record.value != null) ? record.value : foreignDocOptions[0]._id,
+						"collection": foreignCollSelected
+					}
+					return {
+						[record.field] : obj
+					}
 				}
 				return {
 					[record.field]: record.value,
@@ -237,13 +280,66 @@ export default function Documents() {
 							<div className="flex flex-col gap-6 justify-between w-full overflow-scroll">
 								{doc.map((record, index) => (
 									<div key={index}>
-										<div
-											key={index}
-											className="flex gap-6 justify-between items-end"
-										>
-											<div className="form-field w-full">
-												<label className="form-label">Field</label>
+									<div
+										key={index}
+										className="flex gap-6 justify-between items-end"
+									>
+										<div className="form-field w-full">
+											<label className="form-label">Field</label>
 
+											<input
+												placeholder="Type here"
+												type="text"
+												value={record.field}
+												onChange={(e) => {
+													setDoc((prev) => {
+														const newRecord = [...prev];
+														newRecord[index].field = e.target.value;
+														return newRecord;
+													});
+												}}
+												className="input max-w-full"
+											/>
+											{error?.field && (
+												<label className="form-label">
+													<span className="form-label-alt">
+														error.field.message
+													</span>
+												</label>
+											)}
+										</div>
+										<div className="form-field w-full">
+											<label className="form-label">Type</label>
+
+											<select
+												className="select w-full"
+												value={record.type}
+												onChange={(e) => {
+													setDoc((prev) => {
+														const newRecord = [...prev];
+														newRecord[index].type = e.target.value;
+														console.log("newRecord[index].type", newRecord[index].type);
+														return newRecord;
+													});
+												}}
+											>
+												<option value="boolean">bool</option>
+												<option value="number">number</option>
+												<option value="string">string</option>
+												<option value="array">array</option>
+												<option value="object">object</option>
+												<option value="foreign">foreign</option>
+											</select>
+											{error?.type && (
+												<label className="form-label">
+													<span className="form-label-alt">
+														error.type.message
+													</span>
+												</label>
+											)}
+										</div>
+										<div className="form-field w-full">
+											<label className="form-label">Value</label>
 												<input
 													placeholder="Type here"
 													type="text"
@@ -251,10 +347,48 @@ export default function Documents() {
 													onChange={(e) => {
 														setDoc((prev) => {
 															const newRecord = [...prev];
-															newRecord[index].field = e.target.value;
+															newRecord[index].value = e.target.checked ? true : false;
 															return newRecord;
 														});
 													}}
+												/>
+											) : record.type === "foreign" ? (
+												<div>
+													<select
+														className="select w-full"
+														type="dropdown"
+														onSelect={(e) => {
+															setForeignCollSelected(e.target.value)
+															fetchForeignOptions(e.target.value)
+														}}
+														onChange={(e) => {
+															setForeignCollSelected(e.target.value)
+															fetchForeignOptions(e.target.value)
+														}}>
+														{foreignCollOptions.map(option => (
+															<option key={option} value={option}>{option}</option>
+														))}
+													</select>
+													<select
+														className="select w-full"
+														value={record.value}
+														onChange={(e) => {
+															setDoc((prev) => {
+																const newRecord = [...prev];
+																newRecord[index].value = e.target.value;
+																return newRecord;
+															});
+														}}
+													>
+														{foreignDocOptions.map(option => (
+															<option key={option._id} value={option._id}>{option._id}</option>
+														))}
+													</select>
+												</div>
+											) : (
+												<input
+													placeholder="Type here"
+													type={record.type}
 													className="input max-w-full"
 												/>
 												{error?.field && (
@@ -274,11 +408,8 @@ export default function Documents() {
 													onChange={(e) => {
 														setDoc((prev) => {
 															const newRecord = [...prev];
-															newRecord[index].type = e.target.value;
-															console.log(
-																"newRecord[index].type",
-																newRecord[index].type
-															);
+															newRecord[index].value = parseValue(e.target.value, record.type);
+															console.log("newRecord[index].value", typeof (newRecord[index].value));
 															return newRecord;
 														});
 													}}

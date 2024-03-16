@@ -15,7 +15,7 @@ const records = new Hono();
 
 records.post("/create", async (c) => {
 	try {
-		const { collection_name, query } = await c.req.json();		
+		const { collection_name, query } = await c.req.json();
 
 		if (!collection_name) throw new Error("No collection name provided");
 		if (!query) throw new Error("No query provided");
@@ -27,14 +27,14 @@ records.post("/create", async (c) => {
 			throw new Error("Collection does not exist");
 
 		const record = await createRecord(query, collection_name);
-		try{
-		app.subscriptions[collection_name]?.forEach((socket: Socket) => {
-			socket.emit('recordAdded', {
-				collection_name,
-				record
-			});
-		})
-		}catch(err){
+		try {
+			app.subscriptions[collection_name]?.forEach((socket: Socket) => {
+				socket.emit('recordAdded', {
+					collection_name,
+					record
+				});
+			})
+		} catch (err) {
 			console.log(err);
 		}
 		return c.json({
@@ -54,21 +54,43 @@ records.post("/create", async (c) => {
 interface ReadQueryParams extends Record<string, string> {
 	query: string;
 	collection_name: string;
+	embed: string
 }
 
 records.get("/read", async (c) => {
 	try {
 		const params = c.req.query();
 
-		const { query, collection_name } = params as ReadQueryParams;
+		const { query, collection_name, embed } = params as ReadQueryParams;
 
 		if (!query) throw new Error("No query provided");
 		if (!collection_name) throw new Error("No collection name provided");
 
 		const queryJson = JSON.parse(query);
 
-		const record = await readRecord(queryJson, collection_name);
-
+		const record = await readRecord(queryJson, collection_name)
+		let embed_referenced_doc = false;
+		embed == 'true' ? embed_referenced_doc = true : false
+		if (embed_referenced_doc) {
+			for (let i = 0; i < record.length; i++) {
+				for (const key of Object.keys(record[i])) {
+					try {
+						// if record contains an object with a type foreign_key, return the referenced document
+						// embedded in the document to be read
+						if (typeof record[i][key] === 'object' && 'type' in record[i][key] && record[i][key]['type'] == 'foreign_key') {
+							let query = {
+								'_id': record[i][key]['ref']
+							};
+							let embedded_record = await readRecord(query, record[i][key]['collection']);
+							record[i][key] = embedded_record;
+						}
+					} catch (err) {
+						// If referenced doc has been deleted, set the embedded doc to null
+						record[i][key] = null;
+					}
+				}
+			}
+		}
 		return c.json({
 			data: record,
 			error: null,
@@ -83,7 +105,7 @@ records.get("/read", async (c) => {
 	}
 });
 
-records.patch("/update", async (c)=>{
+records.patch("/update", async (c) => {
 	try {
 		const { collection_name, id, new_record } = await c.req.json();
 
@@ -94,13 +116,13 @@ records.patch("/update", async (c)=>{
 		const record = await updateRecord(collection_name, id._id, new_record);
 
 		return c.json({
-            data: new_record,
-            error: null
-        });
+			data: new_record,
+			error: null
+		});
 
 	} catch (error) {
 		return c.json({
-			data:null,
+			data: null,
 			error: "Failed to update record"
 		});
 	}
@@ -115,15 +137,15 @@ records.delete("/delete", async (c) => {
 		if (typeof query !== "object") throw new Error("Query must be an object");
 
 		const record = await deleteRecord(query, queryOptions, collection_name);
-		try{
+		try {
 			app.subscriptions[collection_name]?.forEach((socket: Socket) => {
 				socket.emit('recordRemoved', {
 					collection_name,
 				});
 			})
-			}catch(err){
-				console.log(err);
-			}
+		} catch (err) {
+			console.log(err);
+		}
 		return c.json({
 			data: record,
 			error: null,
@@ -141,10 +163,11 @@ records.delete("/delete", async (c) => {
 records.get("/list", async (c) => {
 	try {
 		const params = c.req.query();
-		const { collection_name, query, queryOptions } = params as {
+		const { collection_name, query, queryOptions, embed } = params as {
 			collection_name: string;
 			query: string;
 			queryOptions: string;
+			embed: string
 		};
 
 		if (!collection_name) throw new Error("No collection name provided");
@@ -152,11 +175,34 @@ records.get("/list", async (c) => {
 		const queryJson = query ? JSON.parse(query) : {};
 		const queryOptionsJson = queryOptions ? JSON.parse(queryOptions) : {};
 
-		const records = await listRecords(
+		const records:any = await listRecords(
 			queryJson,
 			queryOptionsJson,
 			collection_name
 		);
+
+		let embed_referenced_doc = false;
+		embed == 'true' ? embed_referenced_doc = true : false
+		if (embed_referenced_doc) {
+			for (let i = 0; i < records.length; i++) {
+				for (const key of Object.keys(records[i])) {
+					try {
+						// if record contains an object with a type foreign_key, return the referenced document
+						// embedded in the document to be read
+						if (typeof records[i][key] === 'object' && 'type' in records[i][key] && records[i][key]['type'] == 'foreign_key') {
+							let query = {
+								'_id': records[i][key]['ref']
+							};
+							let embedded_record = await readRecord(query, records[i][key]['collection']);
+							records[i][key] = embedded_record;
+						}
+					} catch (err) {
+						// If referenced doc has been deleted, set the embedded doc to null
+						records[i][key] = null;
+					}
+				}
+			}
+		}
 
 		return c.json({
 			data: records,

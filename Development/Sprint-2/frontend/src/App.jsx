@@ -8,6 +8,7 @@ import ProtectedRoutes from "./pages/ProtectedRoutes";
 import RealtimeTest from "./pages/RealtimeTest";
 import FunctionsPage from "./pages/Functions";
 import StressTestPage from "./pages/StressTest";
+import SchemaPage from "./pages/SchemaPage";
 
 function App() {
 	return (
@@ -20,6 +21,7 @@ function App() {
 				<Route path="/rt" element={<RealtimeTest />}></Route>
 				<Route path="/functions" element={<FunctionsPage />}></Route>
 				<Route path="/stress" element={<StressTestPage />}></Route>
+				<Route path="/schema" element={<SchemaPage />}></Route>
 					{/* <Route path="/login" element={<Login />}></Route>
 					<Route path="/init" element={<Signup />}></Route> */}
 				{/* </Route> */}

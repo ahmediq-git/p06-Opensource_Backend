@@ -1,9 +1,10 @@
 import { useAtom } from "jotai";
 import { Database, BarChart3, Settings, Code2, Zap, Play } from "lucide-react";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { adminAtom } from "../lib/state/adminAtom";
 import { useNavigate } from "react-router-dom";
 import { Flame } from "lucide-react";
+import { Waypoints } from "lucide-react";
 
 export default function SideRail() {
 	const [active, setActive] = useState("");
@@ -30,10 +31,13 @@ export default function SideRail() {
 			case "stress":
 				setActive("stress");
 				break;
+			case "schema":
+				setActive("schema");
+				break;
 			default:
 				setActive("");
 		}
-	}, [location.pathname]); 
+	}, [location.pathname]);
 
 	const signOut = async () => {
 		setAdmin({ loggedIn: false, email: "" });
@@ -53,49 +57,51 @@ export default function SideRail() {
 					<section className="menu-section px-4">
 						<ul className="menu-items gap-4">
 							<li
-								onClick={() => {setActive("database"); navigate("/")}}
-								className={`menu-item ${
-									active === "database" && "menu-active"
-								}`}
+								onClick={() => { setActive("database"); navigate("/") }}
+								className={`menu-item ${active === "database" && "menu-active"
+									}`}
 							>
 								<Database />
 							</li>
 
 							<li
-								onClick={() => {setActive("logs"); navigate("/logs")}}
+								onClick={() => { setActive("logs"); navigate("/logs") }}
 								className={`menu-item ${active === "logs" && "menu-active"}`}
 							>
 								<BarChart3 />
 							</li>
 							<li
-								onClick={() => {setActive("settings"); navigate("/settings")}}
-								className={`menu-item ${
-									active === "settings" && "menu-active"
-								}`}
+								onClick={() => { setActive("schema"); navigate("/schema") }}
+								className={`menu-item ${active === "schema" && "schema"
+									}`}
+							>
+								<Waypoints />
+							</li>
+							<li
+								onClick={() => { setActive("settings"); navigate("/settings") }}
+								className={`menu-item ${active === "settings" && "menu-active"
+									}`}
 							>
 								<Settings />
 							</li>
 							<li
-								onClick={() => {setActive("realtimedemo"); navigate("/rt")}}
-								className={`menu-item ${
-									active === "realtimedemo" && "menu-active"
-								}`}
+								onClick={() => { setActive("realtimedemo"); navigate("/rt") }}
+								className={`menu-item ${active === "realtimedemo" && "menu-active"
+									}`}
 							>
 								<Zap />
 							</li>
 							<li
-								onClick={() => {setActive("functions"); navigate("/functions")}}
-								className={`menu-item ${
-									active === "functions" && "menu-active"
-								}`}
+								onClick={() => { setActive("functions"); navigate("/functions") }}
+								className={`menu-item ${active === "functions" && "menu-active"
+									}`}
 							>
 								<Play />
 							</li>
 							<li
-								onClick={() => {setActive("stress"); navigate("/stress")}}
-								className={`menu-item ${
-									active === "stress" && "menu-active"
-								}`}
+								onClick={() => { setActive("stress"); navigate("/stress") }}
+								className={`menu-item ${active === "stress" && "menu-active"
+									}`}
 							>
 								<Flame />
 							</li>
@@ -116,7 +122,7 @@ export default function SideRail() {
 					<div className="dropdown-menu dropdown-menu-top-right">
 
 						<a tabindex="-1" className="dropdown-item text-sm"
-						onClick={signOut}>
+							onClick={signOut}>
 							Sign out
 						</a>
 					</div>
