@@ -11,6 +11,7 @@ import { Initialize } from "./core/init";
 import { Server, Socket } from "socket.io";
 import functions from "./routers/functions";
 import stress from "./routers/stress_test";
+import schema from "./routers/schema";
 
 (async () => {
   await Initialize(); //initialize all the system defined parameters and collections
@@ -40,6 +41,7 @@ app.route("/auth", auth);
 app.route("/files", files);
 app.route("/functions", functions);
 app.route("/stress", stress);
+app.route("/schema", schema);
 
 const io = new Server({cors: {
   origin: "*",

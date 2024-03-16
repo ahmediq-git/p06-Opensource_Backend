@@ -11,6 +11,7 @@ import { isAuthCollection } from "../lib/utils/isAuthCollection";
 import RealtimeTest from "./RealtimeTest";
 import Bot from '../components/Bot';
 import FunctionsPage from './Functions';
+import Diagram from '../components/Diagram';
 
 export default function HomePage() {
 	
