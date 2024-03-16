@@ -13,7 +13,12 @@ collections.get("/", async (c: Context) => {
 		// config, logs
 		const systemCollections = ["config", "logs"];
 
-		return c.json({ data: collections.filter(collection => !systemCollections.includes(collection)), error: null });
+		return c.json({
+			data: collections.filter(
+				(collection) => !systemCollections.includes(collection)
+			),
+			error: null,
+		});
 	} catch (error) {
 		console.log(error);
 		return c.json({ error, data: null });

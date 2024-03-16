@@ -26,7 +26,7 @@ const fetcher = async (url) => {
 };
 export default function ProtectedRoutes() {
 	const { data, error, isLoading } = useSWR(
-		"http://127.0.0.1:3690/check_admin_exists",
+		"http://127.0.0.1:3690/api/auth/admin",
 		fetcher
 	);
 
@@ -40,8 +40,7 @@ export default function ProtectedRoutes() {
 	}, [admin]);
 
 	useLayoutEffect(() => {
-		console.log("data", data);
-		console.log("loggedIn", admin.loggedIn);
+
 		if (data && !admin.loggedIn) {
 			navigate("/login");
 		} else {

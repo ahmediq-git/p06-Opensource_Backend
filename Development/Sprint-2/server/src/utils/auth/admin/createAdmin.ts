@@ -1,26 +1,58 @@
-import Datastore from 'nedb';
-import * as jose from jose;
-import Database from '@src/database/database_handler';
+import Datastore from "nedb";
+import * as jose from "jose";
+import Database from "@src/database/database_handler";
 
-export default async function createAdmin() {
-    const db = Database.getInstance().getDataStore()['config']
-    
-    // new Datastore({ filename: './data/config.json', autoload: true });
+export default async function createAdmin(
+	email: string,
+	password: string
+): Promise<any> {
+	const db = Database.getInstance().getDataStore()["config"];
 
-    // get config
-    const config = await new Promise((resolve, reject) => {
-        db.findOne({ type: 'config' }, (err, doc) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(doc);
-            }
-        });
-    }
-    );
+	const hashedpassword = await Bun.password.hash(password);
 
-    
-    // create admin
+	const config: any = await new Promise((resolve, reject) => {
+		db.find({}, (err: any, doc: any) => {
+			if (err) {
+				reject(err);
+			}
 
-    return config;
+			resolve(doc);
+		});
+	});
+
+	// check if admin with this email already exists
+	if (config.length > 0) {
+		const admins = config[0].admins;
+
+		for (let i = 0; i < admins.length; i++) {
+			if (admins[i].email === email) {
+				return "Admin already exists";
+			}
+		}
+	}
+
+	const updated = await new Promise((resolve, reject) => {
+		db.update(
+			{ name: "Ezbase" },
+			{
+				$push: {
+					admins: {
+						email: email,
+						password: hashedpassword,
+					},
+				},
+			},
+			{ upsert: true },
+			function (err, numReplaced, upsert) {
+				if (err) {
+					reject(err);
+				}
+				resolve("Admin created");
+			}
+		);
+	});
+
+	console.log("Admin created", updated);
+
+	return updated;
 }

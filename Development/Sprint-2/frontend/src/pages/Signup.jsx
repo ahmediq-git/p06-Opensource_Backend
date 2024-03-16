@@ -29,7 +29,7 @@ export default function Signup() {
 			return;
 		}
 
-		const res = await fetch("http://127.0.0.1:3690/signup_admin", {
+		const res = await fetch("http://127.0.0.1:3690/api/auth/admin/create", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

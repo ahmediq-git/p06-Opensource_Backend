@@ -1,24 +1,45 @@
 import { Context, Hono } from "hono";
-import { setCookie} from 'hono/cookie'
+import { setCookie } from "hono/cookie";
 import createAdmin from "@src/utils/auth/admin/createAdmin";
+import { getCollection } from "@src/utils/getCollection";
+import checkAdminExists from "@src/utils/auth/admin/checkAdminExists";
+import checkLoginValid from "@src/utils/auth/admin/checkLoginValid";
 
 const auth = new Hono();
 
 auth.post("/admin/create", async (c: Context) => {
 	try {
-		const { username, password } = await c.req.json();
+		const { email, password } = await c.req.json();
 
-		const admin = await createAdmin(username, password);
+		if (!email || !password) throw new Error("Invalid email or password");
+
+		const admin = await createAdmin(email, password);
 
 		if (!admin) throw new Error("Failed to create admin");
 
-		return setCookie(c, "admin", JSON.stringify(username), { httpOnly: true });
+		setCookie(c, "admin", JSON.stringify(email), {
+			httpOnly: true,
+			secure: true,
+			sameSite: "Strict",
+			maxAge: 60 * 60 * 24 * 7,
+		});
+		return c.json({ error: null, data: admin });
 	} catch (error) {
 		console.log(error);
 
 		return c.json({ error, data: null });
 	}
 	return c.text("Create admin");
+});
+
+auth.get("/admin", async (c: Context) => {
+	try {
+		// check if an admin exists
+		const admin: boolean = await checkAdminExists();
+
+		return c.json({ error: null, data: admin });
+	} catch (error) {}
+	return c.text("Get admin");
 });
 
 auth.post("/admin/delete", async (c: Context) => {
@@ -29,6 +50,16 @@ auth.post("/admin/delete", async (c: Context) => {
 
 auth.post("/admin/login", async (c: Context) => {
 	try {
+		const { email, password } = await c.req.json();
+
+		if (!email || !password) throw new Error("Invalid email or password");
+
+		// check if an admin exists
+		const loginValid: boolean | string = await checkLoginValid(email, password);
+
+		console.log(loginValid);
+
+		return c.json({ error: null, data: loginValid });
 	} catch (error) {}
 	return c.text("Admin login");
 });

@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import SideRail from '../components/SideRail';
 import useSWR, { useSWRConfig } from 'swr';
 import { fetcher } from '../lib/utils/fetcher';
 import { Line, Bar } from 'react-chartjs-2';
-import Chart from 'chart.js/auto';
 
 export default function Logs() {
     const { mutate } = useSWRConfig();
@@ -14,56 +13,59 @@ export default function Logs() {
     const [data, setData] = useState(initialData);
     const [chartType, setChartType] = useState('timeTaken');
 
-    useEffect(() => {
-        setData(initialData);
-    }, [initialData]);
+	useEffect(() => {
+		setData(initialData);
+	}, [initialData]);
 
-    const formatDateTime = (dateTimeString) => {
-        return new Date(dateTimeString).toLocaleString();
-    };
+	const formatDateTime = (dateTimeString) => {
+		return new Date(dateTimeString).toLocaleString();
+	};
 
-    const formatTime = (dateTimeString) => {
-        return new Date(dateTimeString).toLocaleTimeString();
-    };
+	const formatTime = (dateTimeString) => {
+		return new Date(dateTimeString).toLocaleTimeString();
+	};
 
-    const pageSize = 12;
-    const [currentPage, setCurrentPage] = useState(1);
+	const pageSize = 12;
+	const [currentPage, setCurrentPage] = useState(1);
 
-    const totalPages = data && data.data ? Math.ceil(data.data.length / pageSize) : 1;
+	const totalPages =
+		data && data.data ? Math.ceil(data.data.length / pageSize) : 1;
 
-    const handleNextPage = () => {
-        if (currentPage < totalPages) {
-            setCurrentPage(currentPage + 1);
-        }
-    };
+	const handleNextPage = () => {
+		if (currentPage < totalPages) {
+			setCurrentPage(currentPage + 1);
+		}
+	};
 
-    const handlePreviousPage = () => {
-        if (currentPage > 1) {
-            setCurrentPage(currentPage - 1);
-        }
-    };
+	const handlePreviousPage = () => {
+		if (currentPage > 1) {
+			setCurrentPage(currentPage - 1);
+		}
+	};
 
-    const getTimeTakenData = () => {
-        const last12Logs = data.data.slice(0, 12);
-        last12Logs.reverse()
-        const timeTakenData = {
-            labels: [],
-            datasets: [{
-                label: 'Time Taken',
-                data: [],
-                fill: false,
-                borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1
-            }]
-        };
+	const getTimeTakenData = () => {
+		const last12Logs = data.data.slice(0, 12);
+		last12Logs.reverse();
+		const timeTakenData = {
+			labels: [],
+			datasets: [
+				{
+					label: "Time Taken",
+					data: [],
+					fill: false,
+					borderColor: "rgb(75, 192, 192)",
+					tension: 0.1,
+				},
+			],
+		};
 
-        last12Logs.forEach(log => {
-            timeTakenData.labels.push(formatTime(log.createdAt)); 
-            timeTakenData.datasets[0].data.push(log.time_taken);
-        });
+		last12Logs.forEach((log) => {
+			timeTakenData.labels.push(formatTime(log.createdAt));
+			timeTakenData.datasets[0].data.push(log.time_taken);
+		});
 
-        return timeTakenData;
-    };
+		return timeTakenData;
+	};
 
     const getDataSentReceived = () => {
         const last12Logs = data.data.slice(0, 24);
