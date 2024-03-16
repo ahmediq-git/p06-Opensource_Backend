@@ -3,6 +3,8 @@ import { ArrowRight, PlusCircle, MinusCircle } from "lucide-react";
 import { useAtom } from "jotai";
 import { selectionAtom } from "../lib/state/selectionAtom";
 import useSwr, { useSWRConfig } from "swr";
+import ArrayFieldForm from "./ArrayFieldForm";
+import ObjectFieldForm from "./ObjectFieldForm";
 import { fetcher } from "../lib/utils/fetcher";
 
 import { record, z } from "zod";
@@ -18,11 +20,15 @@ const dataSchema = z.union([
 
 // // Define the main schema for an array of objects
 const fieldSchema = z.object({
-	field: z.string().refine((val) => {
-		/^[a-zA-Z\-_]+$/.test(val.trim());
-	}, {
-		message: "Field should not contain numbers, spaces, or special characters.",
-	}),
+	field: z.string().refine(
+		(val) => {
+			/^[a-zA-Z\-_]+$/.test(val.trim());
+		},
+		{
+			message:
+				"Field should not contain numbers, spaces, or special characters.",
+		}
+	),
 	type: dataSchema,
 	data: z.lazy(() => {
 		return z.union([
@@ -45,6 +51,8 @@ const parseValue = (value, type) => {
 	}
 };
 
+
+
 export default function Documents() {
 	const [selection, setSelection] = useAtom(selectionAtom);
 	const [documentModal, setDocumentModal] = useState(false);
@@ -57,19 +65,29 @@ export default function Documents() {
 		},
 	]);
 
+
 	const { data, error, isLoading } = useSwr(
-		`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}`,
+		`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection
+		}`,
 		fetcher
 	);
 
 	const closeModal = () => {
 		setDocumentModal(false);
+		setSelection({ collection: selection.collection, document: "" });
+		setDoc([
+			{
+				field: "",
+				type: "number",
+				value: 0,
+			},
+		]);
 	};
 
 	useEffect(() => {
 		console.log("data", data);
 		console.log("error", error);
-	}, [ data, error, isLoading ]);
+	}, [data, error, isLoading]);
 
 	useEffect(() => {
 		// delay by 1 second and reset on input
@@ -82,7 +100,6 @@ export default function Documents() {
 		}, 1000);
 
 		return () => clearTimeout(timeout);
-
 	}, [doc]);
 
 	const setDocumentSelected = (doc) => {
@@ -91,9 +108,8 @@ export default function Documents() {
 
 	const createDocument = async () => {
 		try {
-
 			// const validatedData = fieldSchema.parse(Object.assign({}, ...doc));
-			console.log("DOC is", doc)
+			console.log("DOC is", doc);
 			const data = doc.map((record) => {
 				if (record.type === "boolean" && record.value === null) {
 					record.value = false;
@@ -116,23 +132,37 @@ export default function Documents() {
 				collection_name: selection.collection,
 				data: obj,
 			});
-			const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/record/create`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					collection_name: selection.collection,
-					query: obj,
-				}),
-			});
+			const res = await fetch(
+				`${import.meta.env.VITE_BACKEND_URL}/record/create`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						collection_name: selection.collection,
+						query: obj,
+					}),
+				}
+			);
 
 			const adsa = await res.json();
 
-			console.log("ADSA",adsa);
+			console.log("ADSA", adsa);
 
-			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}`);
+			mutate(
+				`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection
+				}`
+			);
 			setDocumentModal(false);
+			setSelection({ collection: selection.collection, document: "" });
+			setDoc([
+				{
+					field: "",
+					type: "number",
+					value: 0,
+				},
+			]);
 		} catch (error) {
 			console.log(error);
 		}
@@ -157,11 +187,10 @@ export default function Documents() {
 								data?.data.map((doc) => (
 									<li
 										key={doc._id}
-										className={`menu-item ${
-											selection?.document?._id === doc._id
+										className={`menu-item ${selection?.document?._id === doc._id
 												? "menu-active"
 												: null
-										} bg-gray-2 flex justify-between`}
+											} bg-gray-2 flex justify-between`}
 										onClick={() => setDocumentSelected(doc)}
 									>
 										<p>{doc._id}</p>
@@ -207,116 +236,161 @@ export default function Documents() {
 							{/* records */}
 							<div className="flex flex-col gap-6 justify-between w-full overflow-scroll">
 								{doc.map((record, index) => (
-									<div
-										key={index}
-										className="flex gap-6 justify-between items-end"
-									>
-										<div className="form-field w-full">
-											<label className="form-label">Field</label>
+									<div key={index}>
+										<div
+											key={index}
+											className="flex gap-6 justify-between items-end"
+										>
+											<div className="form-field w-full">
+												<label className="form-label">Field</label>
 
-											<input
-												placeholder="Type here"
-												type="text"
-												value={record.field}
-												onChange={(e) => {
+												<input
+													placeholder="Type here"
+													type="text"
+													value={record.field}
+													onChange={(e) => {
+														setDoc((prev) => {
+															const newRecord = [...prev];
+															newRecord[index].field = e.target.value;
+															return newRecord;
+														});
+													}}
+													className="input max-w-full"
+												/>
+												{error?.field && (
+													<label className="form-label">
+														<span className="form-label-alt">
+															error.field.message
+														</span>
+													</label>
+												)}
+											</div>
+											<div className="form-field w-full">
+												<label className="form-label">Type</label>
+
+												<select
+													className="select w-full"
+													value={record.type}
+													onChange={(e) => {
+														setDoc((prev) => {
+															const newRecord = [...prev];
+															newRecord[index].type = e.target.value;
+															console.log(
+																"newRecord[index].type",
+																newRecord[index].type
+															);
+															return newRecord;
+														});
+													}}
+												>
+													<option value="boolean">bool</option>
+													<option value="number">number</option>
+													<option value="string">string</option>
+													<option value="array">array</option>
+													<option value="object">object</option>
+												</select>
+												{error?.type && (
+													<label className="form-label">
+														<span className="form-label-alt">
+															error.type.message
+														</span>
+													</label>
+												)}
+											</div>
+											<div className="form-field w-full">
+												{record.type !== "array" && record.type !=="object" ? (
+													<label className="form-label">Value</label>
+												) : (
+													<div></div>
+												)}
+
+												{record.type === "boolean" ? (
+													<input
+														type="checkbox"
+														className="switch switch-primary switch-xl"
+														value={record.value}
+														onChange={(e) => {
+															setDoc((prev) => {
+																const newRecord = [...prev];
+																newRecord[index].value = e.target.checked
+																	? true
+																	: false;
+																return newRecord;
+															});
+														}}
+													/>
+												) : record.type === "array" || record.type==="object" ? (
+													<div className="max-w-full"></div>
+												) : (
+													<input
+														placeholder="Type here"
+														type={record.type}
+														className="input max-w-full"
+														value={record.value}
+														onChange={(e) => {
+															setDoc((prev) => {
+																const newRecord = [...prev];
+																newRecord[index].value = parseValue(
+																	e.target.value,
+																	record.type
+																);
+																console.log(
+																	"newRecord[index].value",
+																	typeof newRecord[index].value
+																);
+																return newRecord;
+															});
+														}}
+													/>
+												)}
+												{error?.value && (
+													<label className="form-label">
+														<span className="form-label-alt">
+															error.value.message
+														</span>
+													</label>
+												)}
+											</div>
+
+											<button
+												className="p-4 text-gray-200 flex w-32 gap-2 btn "
+												onClick={() => {
 													setDoc((prev) => {
 														const newRecord = [...prev];
-														newRecord[index].field = e.target.value;
-														return newRecord;
-													});
-												}}
-												className="input max-w-full"
-											/>
-											{error?.field && (
-												<label className="form-label">
-													<span className="form-label-alt">
-														error.field.message
-													</span>
-												</label>
-											)}
-										</div>
-										<div className="form-field w-full">
-											<label className="form-label">Type</label>
-
-											<select
-												className="select w-full"
-												value={record.type}
-												onChange={(e) => {
-													setDoc((prev) => {
-														const newRecord = [...prev];
-														newRecord[index].type = e.target.value;
-														console.log("newRecord[index].type", newRecord[index].type);
+														newRecord.splice(index, 1);
 														return newRecord;
 													});
 												}}
 											>
-												<option value="boolean">bool</option>
-												<option value="number">number</option>
-												<option value="string">string</option>
-												<option value="array">array</option>
-												<option value="object">object</option>
-											</select>
-											{error?.type && (
-												<label className="form-label">
-													<span className="form-label-alt">
-														error.type.message
-													</span>
-												</label>
-											)}
-										</div>
-										<div className="form-field w-full">
-											<label className="form-label">Value</label>
-
-											{record.type === "boolean" ? (
-												<input
-													type="checkbox"
-													class="switch switch-primary switch-xl"
-													value={record.value}
-													onChange={(e) => {
-														setDoc((prev) => {
-															const newRecord = [...prev];
-															newRecord[index].value = e.target.checked ? true: false;
-															return newRecord;
-														});
-													}}
-												/>
-											) : (
-												<input
-													placeholder="Type here"
-													type={record.type}
-													className="input max-w-full"
-													value={record.value}
-													onChange={(e) => {
-														setDoc((prev) => {
-															const newRecord = [...prev];
-															newRecord[index].value = parseValue(e.target.value, record.type);
-															console.log("newRecord[index].value", typeof(newRecord[index].value));
-															return newRecord;
-														});
-													}}
-												/>
-											)}
-											{error?.value && (
-												<label className="form-label">
-													<span className="form-label-alt">
-														error.value.message
-													</span>
-												</label>
-											)}
+												<MinusCircle />
+											</button>
 										</div>
 
-										<button
-											className="p-4 text-gray-200 flex w-32 gap-2 btn "
-											onClick={() => {
-												setDoc((prev) => {
-													const newRecord = [...prev];
-													newRecord.splice(index, 1);
-													return newRecord;
-												});
-											}}
-										>
-											<MinusCircle />
-										</button>
+										{record.type === "array" ? (
+											<div className="w-full">
+												<ArrayFieldForm
+													// record={record}
+													index={index}
+													setDoc={setDoc}
+													error={error}
+												/>
+											</div>
+										) : (
+											<div />
+										)}
+
+										{record.type === "object" ? (
+											<div className="w-full">
+												<ObjectFieldForm
+													// record={record}
+													index={index}
+													setDoc={setDoc}
+													error={error}
+												/>
+											</div>
+										) : (
+											<div />
+										)}
 									</div>
 								))}
 								<button
