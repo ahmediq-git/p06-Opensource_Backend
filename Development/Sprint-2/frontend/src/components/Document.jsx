@@ -5,11 +5,13 @@ import { selectionAtom } from "../lib/state/selectionAtom";
 import JSONPretty from "react-json-pretty";
 import { Trash2, MinusCircle, Pencil, PlusCircle } from "lucide-react";
 import { fetcher } from "../lib/utils/fetcher";
+import ObjectFieldForm from "./ObjectFieldForm";
+import ArrayFieldForm from "./ArrayFieldForm";
 import "/src/assets/custom.css";
 import { isAuthCollection } from "../lib/utils/isAuthCollection";
 import { record, z } from "zod";
 
-export default function Documents() {
+export default function Document() {
 	const [selection, setSelection] = useAtom(selectionAtom);
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
@@ -18,22 +20,54 @@ export default function Documents() {
 		const convertedArray = [];
 		for (const key in originalObject) {
 			if (Object.prototype.hasOwnProperty.call(originalObject, key) && key !== '_id' && key != 'updatedAt' && key != 'createdAt') {
+				let valueType=typeof originalObject[key]
+				if (Array.isArray(originalObject[key])) {
+					valueType = 'array';
+				} else if (valueType === 'object') {
+					valueType = 'object';
+				}
 				convertedArray.push({
 					field: key,
-					type: typeof originalObject[key],
+					type: valueType,
 					value: originalObject[key]
 				});
 			}
 		}
+		// console.log(convertedArray)
+		return convertedArray;
+	};
 
+	const preprocessArrayForForm = (originalArray) => {
+		const convertedArray = [];
+		originalArray?.forEach((element) => {
+			let valueType = typeof element;
+			convertedArray.push({
+				type: valueType,
+				value: element
+			});
+		});
+		return convertedArray;
+	};
+
+	const preprocessObjectForForm = (originalObject) => {
+		const convertedArray = [];
+		for (const key in originalObject) {
+			let valueType = typeof originalObject[key];
+			convertedArray.push({
+				key: key,
+				value: originalObject[key],
+				type: valueType
+			});
+		}
 		return convertedArray;
 	};
 
 	const [doc, setDoc] = useState(convertToDoc(selection.document));
-
 	const { mutate } = useSWRConfig();
-
-
+	
+	useEffect(() => {
+		setDoc(convertToDoc(selection.document));
+	}, [selection.document]);
 
 	// Define a function to validate data types associated with fields
 	const dataSchema = z.union([
@@ -103,13 +137,14 @@ export default function Documents() {
 			});
 
 			const data = await res.json();
-			console.log(data);
 
 			// remove the deleted collection from the list of collections
 			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}`);
-			setSelection({ collection: "", document: "" });
+			setSelection({ collection: selection.collection, document: "" });
 
 			setShowDeleteModal(false);
+			// So the collection still remains open when we delete a document
+
 		} catch (error) {
 			console.log(error);
 		}
@@ -145,7 +180,7 @@ export default function Documents() {
 
 			// remove the deleted collection from the list of collections
 			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}`);
-			setSelection({ collection: "", document: "" });
+			setSelection({ collection: selection.collection, document: "" });
 
 			setShowEditModal(false);
 		} catch (error) {
@@ -254,14 +289,14 @@ export default function Documents() {
 					>
 						✕
 					</label>
-					<h2 className="text-xl">Add New Record</h2>
+					<h2 className="text-xl">Update Record</h2>
 
 					<div className="basis-full flex flex-col overflow-y-scroll">
 						<div className="basis-full rounded-md bg-opacity-40 mt-2 p-4 gap-4 flex flex-col ">
 							{/* records */}
 							<div className="flex flex-col gap-6 justify-between w-full overflow-scroll">
-								{console.log(doc)}
 								{doc.map((record, index) => (
+									<div key={index}>
 									<div
 										key={index}
 										className="flex gap-6 justify-between items-end"
@@ -320,7 +355,11 @@ export default function Documents() {
 											)}
 										</div>
 										<div className="form-field w-full">
-											<label className="form-label">Value</label>
+											{record.type !== "array" && record.type !== "object" ? (
+												<label className="form-label">Value</label>
+											) : (
+												<div></div>
+											)}
 
 											{record.type === "boolean" ? (
 												<input
@@ -335,7 +374,9 @@ export default function Documents() {
 														});
 													}}
 												/>
-											) : (
+											) : record.type === "array" || record.type==="object" ? (
+												<div className="max-w-full"></div>
+											): (
 												<input
 													placeholder="Type here"
 													type={record.type}
@@ -372,6 +413,34 @@ export default function Documents() {
 										>
 											<MinusCircle />
 										</button>
+									</div>
+
+									{record.type === "array" ? (
+											<div className="w-full">
+												<ArrayFieldForm
+													index={index}
+													setDoc={setDoc}
+													error={error}
+													existingArray={preprocessArrayForForm(record.value)}
+												/>
+											</div>
+										) : (
+											<div />
+										)}
+
+										{record.type === "object" ? (
+											<div className="w-full">
+												<ObjectFieldForm
+													// record={record}
+													index={index}
+													setDoc={setDoc}
+													error={error}
+													existingObject={preprocessObjectForForm(record.value)}
+												/>
+											</div>
+										) : (
+											<div />
+										)}
 									</div>
 								))}
 								<button
