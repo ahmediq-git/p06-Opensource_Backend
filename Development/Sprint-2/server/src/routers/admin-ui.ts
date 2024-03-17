@@ -20,7 +20,7 @@ admin_ui.get("/settings", async (c: Context) => {
             error: null,
         });
     } catch (err) {
-        console.log("get settings",err);
+        console.log("get settings", err);
         return c.json({
             data: null,
             error: err
@@ -59,10 +59,10 @@ admin_ui.get("/settings/:setting_name", async (c: Context) => {
 });
 
 admin_ui.put("/settings", async (c: Context) => {
-    try{
-        const {setting_name, value}  = await c.req.json();
+    try {
+        const { setting_name, value } = await c.req.json();
         const config = getCollection("config");
-        const settings:any = await new Promise((resolve, reject) => {
+        const settings: any = await new Promise((resolve, reject) => {
             config.findOne({}, function (err, docs) {
                 if (err) {
                     reject(err);
@@ -76,8 +76,8 @@ admin_ui.put("/settings", async (c: Context) => {
         const setting = settings.hasOwnProperty(setting_name) ? true : false;
         if (!setting) throw new Error("Failed to get setting");
 
-        console.log("name",setting_name, settings[setting_name]);
-        console.log("value in request",value)
+        console.log("name", setting_name, settings[setting_name]);
+        console.log("value in request", value)
         settings[setting_name] = value;
         // console.log(settings);
         config.update({
@@ -96,8 +96,8 @@ admin_ui.put("/settings", async (c: Context) => {
         });
 
 
-    }catch (err){
-        console.log("put settings",err);
+    } catch (err) {
+        console.log("put settings", err);
         return c.json({
             data: null,
             error: err,

@@ -36,12 +36,14 @@ export type AppConfig = {
     url: string;
   };
   admins: Admin[];
-  s3: {
+  blobStorage: {
+    useBlobStorage: boolean;
     endpoint: string;
     bucket: string;
     region: string;
     access_key: string;
     secret: string;
+    force_path_style: boolean;
     createdAt: string;
     updatedAt: string;
   } | null;
@@ -67,7 +69,7 @@ export type AppConfig = {
 
 export async function Initialize() {
   console.log("Initializing app");
-  
+
   // instantiating the Database if its the first time
   Database.getInstance()
 
@@ -91,7 +93,7 @@ async function LogCullerSchedule() {
   const task = new Task('cull logs', async () => {
     try {
       const config = Database.getInstance().getDataStore()?.['config'];;
-  
+
       if (!config) throw new Error("Failed to get config");
       const appConfig: any = await new Promise((resolve, reject) => {
         config.findOne({}, function (err: any, docs: any) {
@@ -126,7 +128,7 @@ async function FunctionRunner() {
   const task = new Task('run functions', async () => {
     try {
       const functions = Database.getInstance().getDataStore()?.['functions'];
- 
+
       const allFunctions: any[] = await new Promise((resolve, reject) => {
         functions.find({}, function (err: any, docs: any) {
           if (err) {
@@ -138,7 +140,7 @@ async function FunctionRunner() {
       for (let x = 0; x < allFunctions.length; x++) {
         let lastRun = allFunctions[x].lastRun;
         // Check if lastRun is not null
-        let functLastRun = (lastRun !== null && lastRun != undefined ) ? lastRun.getTime() / 1000 : 0; // convert to seconds
+        let functLastRun = (lastRun !== null && lastRun != undefined) ? lastRun.getTime() / 1000 : 0; // convert to seconds
         let functRunAfter = allFunctions[x].runAfter;
         let currentTime = ((new Date()).getTime()) / 1000;
         // run function if more time elapsed than alloted
@@ -200,11 +202,11 @@ async function FunctionRunner() {
 }
 
 async function LoadUsers() {
-  
-  if (!Database.getInstance().getDataStore().hasOwnProperty('users')){
+
+  if (!Database.getInstance().getDataStore().hasOwnProperty('users')) {
     // create the users file if it doesn't exist
-    Database.getInstance().loadCollection('users',{autoload:true, timestampData: true})
-  } 
+    Database.getInstance().loadCollection('users', { autoload: true, timestampData: true })
+  }
 
   // retrieve the file
   const db = Database.getInstance().getDataStore()?.['users'];
@@ -233,8 +235,8 @@ async function LoadLogs() {
   // 		console.log(err);
   // 	}
   // });
-  if (!Database.getInstance().getDataStore().hasOwnProperty('logs')){
-    const db=Database.getInstance().loadCollection('logs',{autoload:true, timestampData: true})
+  if (!Database.getInstance().getDataStore().hasOwnProperty('logs')) {
+    const db = Database.getInstance().loadCollection('logs', { autoload: true, timestampData: true })
     return db;
   } else {
     const db = Database.getInstance().getDataStore()?.['logs']
@@ -243,8 +245,8 @@ async function LoadLogs() {
 }
 
 async function LoadFunctions() {
-  if (!Database.getInstance().getDataStore().hasOwnProperty('functions')){
-    const db=Database.getInstance().loadCollection('functions',{autoload:true, timestampData: true})
+  if (!Database.getInstance().getDataStore().hasOwnProperty('functions')) {
+    const db = Database.getInstance().loadCollection('functions', { autoload: true, timestampData: true })
     return db;
   } else {
     const db = Database.getInstance().getDataStore()?.['functions']
@@ -254,10 +256,10 @@ async function LoadFunctions() {
 
 async function LoadConfig() {
 
-  if (!Database.getInstance().getDataStore().hasOwnProperty('config')){
+  if (!Database.getInstance().getDataStore().hasOwnProperty('config')) {
     // create the config file if it doesn't exist
-    Database.getInstance().loadCollection('config',{autoload:true, timestampData: true})
-  } 
+    Database.getInstance().loadCollection('config', { autoload: true, timestampData: true })
+  }
   const config = Database.getInstance().getDataStore()?.['config']
 
   // get the current config object
@@ -281,7 +283,7 @@ async function LoadConfig() {
       url: "http://localhost:3690",
     },
     admins: [],
-    s3: null,
+    blobStorage: null,
     smtp: null,
     backup: {
       auto: false,
