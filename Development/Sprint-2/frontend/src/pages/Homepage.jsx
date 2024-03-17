@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Collections from "../components/Collections";
 import SideRail from "../components/SideRail";
 import Documents from "../components/Documents";
@@ -14,12 +14,88 @@ import FunctionsPage from './Functions';
 import Diagram from '../components/Diagram';
 
 export default function HomePage() {
-	
+
     const [selection, setSelection] = useAtom(selectionAtom);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showIndexModal, setShowIndexModal] = useState(false);
+    const [indices, setIndices] = useState([]);
+    const [indexField, setIndexField] = useState("");
+    const [indexUnique, setIndexUnique] = useState(false);
     const [activeState, setActiveState] = useState('database');
     const [botOpen, setBotOpen] = useState(false);
     const { mutate } = useSWRConfig();
+
+    useEffect(() => {
+        // Fetch indices when the index modal is opened
+        if (showIndexModal && selection.collection) {
+            fetchIndices();
+        }
+    }, [showIndexModal]);
+
+    const fetchIndices = async () => {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/index/get_all_indices_of_collection?collection_name=${selection.collection}`);
+            const data = await res.json();
+            console.log(data);
+            setIndices(data.data); // Update state with fetched indices
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const createIndex = async () => {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/index/create_index`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    collection_name: selection.collection,
+                    field: indexField,
+                    unique: false
+                })
+            });
+            const data = await res.json();
+            if (data.error == null) {
+                // Index created successfully, update indices state
+                alert("Index created")
+                fetchIndices();
+                setShowIndexModal(false);
+            } else {
+                alert(data.error)
+            }
+        } catch (error) {
+            alert(error)
+            console.log(error);
+        }
+    };
+
+    const deleteIndex = async () => {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/index/remove_index`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    collection_name: selection.collection,
+                    field: indexField,
+                })
+            });
+            const data = await res.json();
+            if (data.error == null) {
+                // Index deleted successfully, update indices state
+                alert("Index deleted")
+                fetchIndices();
+                setShowIndexModal(false);
+            } else {
+                alert("Error deleting index")
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     const deleteCollection = async () => {
         try {
@@ -29,9 +105,7 @@ export default function HomePage() {
                     "Content-Type": "application/json",
                 },
             });
-
             const data = await res.json();
-
             // remove the deleted collection from the list of collections
             setSelection({ collection: "", document: "" });
             mutate(`${import.meta.env.VITE_BACKEND_URL}/collections`);
@@ -64,7 +138,7 @@ export default function HomePage() {
             {/* Bot chat interface */}
             {botOpen && (
                 <div className="absolute bottom-4 right-4 z-20"> {/* Set higher z-index */}
-                    <Bot className='.react-chatbot-kit-chat-message-container'/>
+                    <Bot className='.react-chatbot-kit-chat-message-container' />
                 </div>
             )}
 
@@ -81,7 +155,7 @@ export default function HomePage() {
                 type="checkbox"
                 checked={showDeleteModal}
             />
-            {/* Modal */}
+            {/* Delete Modal */}
             <div className="modal modal-open overflow-y-scroll">
                 <label
                     className="modal-overlay"
@@ -126,12 +200,51 @@ export default function HomePage() {
                     </div>
                 </div>
             </div>
-            <SideRail setActiveState={setActiveState}/>
+            <label
+                className="hidden btn btn-primary"
+                htmlFor="index-modal"
+            >
+                Open Modal
+            </label>
+            <input
+                className="hidden modal-state"
+                id="index-modal"
+                type="checkbox"
+                checked={showIndexModal}
+            />
+            {/* Index Modal */}
+            <div className="modal modal-open overflow-y-scroll">
+                <label className="modal-overlay" htmlFor="index-modal"></label>
+                <div className={`modal-content flex flex-col gap-5 max-w-6xl transition-all duration-500 "w-1/4  h-1/4"`}>
+                    {indices.length > 0 && <div className='text-center font-semibold'>Existing indices</div>}
+                    {indices.length > 0 && indices.map((index, indexKey) => (
+                        <div key={indexKey} className="flex items-center justify-between border-b border-gray-300 py-2">
+                            <div>
+                                <div>On: {index.on}</div>
+                                <div>Unique: {index.unique ? "Yes" : "No"}</div>
+                            </div>
+                            <button className="text-black bg-red-500 rounded p-1 mr-1 mt-2" onClick={() => deleteIndex(index)}>Delete</button>
+                        </div>
+                    ))}
+                    <label htmlFor="index-modal" className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={() => setShowIndexModal(false)}>✕</label>
+                    <h2 className="text-xl text-center font-semibold">Create Index</h2>
+                    <div className="flex flex-col gap-2">
+                        <input type="text" className="input" placeholder="Field" value={indexField} onChange={(e) => setIndexField(e.target.value)} />
+                        {/* <label>
+                            <input type="checkbox" checked={indexUnique} onChange={(e) => setIndexUnique(e.target.checked)} />
+                            Unique
+                        </label> */}
+                    </div>
+                    <button className="btn bg-blue-500 hover:bg-blue-600 btn-block" onClick={createIndex}>Create</button>
+                </div>
+
+            </div>
+            <SideRail setActiveState={setActiveState} />
             <div className="w-[2px] h-screen bg-gray-100 opacity-10"></div>
-            {activeState=="database" &&<Collections />}
-            {activeState=="logs" &&<Logs />}
-            {activeState=="realtimedemo" &&<RealtimeTest />}
-            {activeState=="functions" &&<FunctionsPage />}
+            {activeState == "database" && <Collections />}
+            {activeState == "logs" && <Logs />}
+            {activeState == "realtimedemo" && <RealtimeTest />}
+            {activeState == "functions" && <FunctionsPage />}
 
 
             <div className="flex-1 relative">
@@ -144,6 +257,7 @@ export default function HomePage() {
                                         Collections /
                                     </span>
                                     <span className="">{selection.collection}</span>
+                                    <button className='button bg-blue-500 pl-2 pr-2 ml-4 text-base rounded' onClick={() => setShowIndexModal(true)}>Create index</button>
                                 </div>
                                 {selection.collection && !isAuthCollection(selection.collection) && (
                                     <div className="justify-self-end hover:scale-125 transition-all duration-150 cursor-pointer">
