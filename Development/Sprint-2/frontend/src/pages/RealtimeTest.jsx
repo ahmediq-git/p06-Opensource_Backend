@@ -66,7 +66,7 @@ const RealtimeTest = () => {
     , (data) => {
       console.log("datataa",data)
       updateCollectionData(data);
-      //  may want to distinguish between 'recordAdded' and 'recordRemoved' by adding another field in the data sent by the server.
+      //  may want to distinguish between 'recordAdded' and 'recordRemoved' by adding another field in the data sent by the server
     });
     setSubscribedCollections((prev) => [...prev, collectionName]);
   };

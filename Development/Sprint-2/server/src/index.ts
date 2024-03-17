@@ -9,8 +9,7 @@ import files from "@routers/files"
 import { cors } from "hono/cors";
 import { logConsoleDev, logConsoleProd } from "./middleware/log-console";
 import { Initialize } from "./core/init";
-import { Server, Socket } from "socket.io";
-import { Server as HttpServer, createServer } from 'http'
+import { Socket } from "socket.io";
 import functions from "./routers/functions";
 import stress from "./routers/stress_test";
 import schema from "./routers/schema";
