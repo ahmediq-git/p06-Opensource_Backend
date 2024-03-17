@@ -1,5 +1,5 @@
 import { useCallback, useState, useEffect, useMemo } from 'react';
-import ReactFlow, { addEdge, applyEdgeChanges, applyNodeChanges} from 'reactflow';
+import ReactFlow, { addEdge, applyEdgeChanges, applyNodeChanges } from 'reactflow';
 import 'reactflow/dist/style.css';
 
 import TextUpdaterNode from './SchemaNode';
@@ -21,19 +21,21 @@ const Diagram = () => {
         }
         const apiData = await response.json();
         let edges = [];
-        const initialNodes = apiData.data.map(([collection, { concrete, loose }]) => ({
+        let x_start = 80
+        let y_start = 200
+        const initialNodes = apiData.data.map(([collection, { concrete, loose }], index) => ({
           id: `node-${collection}`,
           type: 'textUpdater',
-          position: { x: Math.random() * 500, y: Math.random() * 500 },
+          position: { x: x_start + 170*index, y: y_start },
           data: { collection, concrete, loose }
         }));
         setNodes(initialNodes);
-        for(let i = 0; i < apiData.data.length; i++) {
-          for(let key in apiData.data[i][1].concrete) {
-            if(apiData.data[i][1].concrete[key] == null || apiData.data[i][1].concrete[key] == undefined ) {
+        for (let i = 0; i < apiData.data.length; i++) {
+          for (let key in apiData.data[i][1].concrete) {
+            if (apiData.data[i][1].concrete[key] == null || apiData.data[i][1].concrete[key] == undefined) {
               continue
             }
-            if(apiData.data[i][1].concrete[key].includes('--->')) {
+            if (apiData.data[i][1].concrete[key].includes('--->')) {
               let [n1, n2] = apiData.data[i][1].concrete[key].split(' ---> ');
               edges.push({
                 id: key,
@@ -41,13 +43,13 @@ const Diagram = () => {
                 target: `node-${n2}`
               })
             }
-            
+
           }
-          for(let key in apiData.data[i][1].loose){
-            if(apiData.data[i][1].loose[key] == null || apiData.data[i][1].loose[key] == undefined ) {
+          for (let key in apiData.data[i][1].loose) {
+            if (apiData.data[i][1].loose[key] == null || apiData.data[i][1].loose[key] == undefined) {
               continue
             }
-            if(apiData.data[i][1].loose[key].includes('--->')) {
+            if (apiData.data[i][1].loose[key].includes('--->')) {
               let [n1, n2] = apiData.data[i][1].loose[key].split(' ---> ');
               edges.push({
                 id: key,
@@ -58,11 +60,11 @@ const Diagram = () => {
           }
         }
         setEdges(edges);
-        setLoading(false); // Set loading to false after data is fetched
+        setLoading(false); 
       } catch (error) {
         alert("Unable to generate schema")
         console.error('Error fetching data:', error);
-        setLoading(false); // Set loading to false on error
+        setLoading(false);
       }
     };
     fetchData();
@@ -78,7 +80,7 @@ const Diagram = () => {
     (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
     [setEdges]
   );
-  
+
   const onConnect = useCallback(
     (connection) => setEdges((eds) => addEdge(connection, eds)),
     [setEdges]
@@ -98,6 +100,7 @@ const Diagram = () => {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           nodeTypes={nodeTypes}
+          fitView
         />
       )}
     </div>

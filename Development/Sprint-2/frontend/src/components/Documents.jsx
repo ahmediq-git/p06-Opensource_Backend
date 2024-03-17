@@ -210,7 +210,7 @@ export default function Documents() {
 	return (
 		<>
 			{/* main div */}
-			<div className="basis-1/4 w-full p-4 rounded-sm gap-4 flex flex-col max-h-screen overflow-y-scroll ">
+			<div className="basis-1/4 w-full p-4 rounded-sm gap-4 flex flex-col max-h-screen overflow-y-scroll no-scrollbar">
 				<p>Documents</p>
 				<button
 					onClick={() => {
@@ -260,7 +260,7 @@ export default function Documents() {
 			<div className="modal modal-open ">
 				<label className="modal-overlay" htmlFor="add-collection-modal"></label>
 				<div
-					className={`modal-content flex flex-col gap-5 max-w-6xl transition-all duration-500 w-2/3 h-3/4`}
+					className={`h-fit w-full modal-content flex flex-col gap-5 max-w-6xl transition-all duration-500 w-2/3 h-3/4`}
 				>
 					<label
 						htmlFor="add-collection-modal"
@@ -271,10 +271,10 @@ export default function Documents() {
 					</label>
 					<h2 className="text-xl">Add New Record</h2>
 
-					<div className="basis-full flex flex-col overflow-y-scroll">
-						<div className="basis-full rounded-md bg-opacity-40 mt-2 p-4 gap-4 flex flex-col ">
+					<div className="basis-full flex flex-col overflow-y-visible">
+						<div className="basis-full rounded-md bg-opacity-40 mt-2 p-4 gap-4 flex flex-col">
 							{/* records */}
-							<div className="flex flex-col gap-6 justify-between w-full overflow-scroll">
+							<div className="flex flex-col gap-6 justify-between w-full overflow-visible">
 								{doc.map((record, index) => (
 									<div key={index}>
 									<div

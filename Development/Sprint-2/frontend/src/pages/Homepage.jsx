@@ -47,7 +47,7 @@ export default function HomePage() {
     };
 
     return (
-        <div className="flex bg-neutral-950 text-gray-50 h-screen max-h-screen overflow-y-scroll relative"> {/* Set relative positioning */}
+        <div className="flex bg-neutral-950 text-gray-50 h-screen max-h-screen overflow-y-visible relative"> {/* Set relative positioning */}
             {/* Bot circular button or chat interface */}
             <div className="absolute bottom-4 right-4 z-10"> {/* Set higher z-index */}
                 {botOpen ? (
@@ -156,7 +156,7 @@ export default function HomePage() {
                                 <div className="divider divider-horizontal m-0"></div>
                             </div>
 
-                            <div className="basis-full flex gap-2 overflow-y-scroll w-full grow">
+                            <div className="basis-full flex gap-2 overflow-y-scroll no-scrollbar w-full grow">
                                 {/* all docs for the collection */}
                                 <Documents />
 

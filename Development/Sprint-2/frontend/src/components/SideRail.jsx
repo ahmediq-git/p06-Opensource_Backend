@@ -52,7 +52,7 @@ export default function SideRail() {
 					<span>EzBase</span>
 				</div>
 			</section>
-			<section className="sidebar-content h-fit min-h-[20rem] overflow-visible mt-4">
+			<section className="sidebar-content h-full min-h-[20rem] overflow-visible mt-4">
 				<nav className="menu rounded-md">
 					<section className="menu-section px-4">
 						<ul className="menu-items gap-4">
