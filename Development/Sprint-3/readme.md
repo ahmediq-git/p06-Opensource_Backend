@@ -78,14 +78,13 @@ HOW TO ACCESS THE SYSTEM
 
 1. The documentation site can be visited on http://ezbase.vercel.app
 2. The SDK can be downloaded on npm repository on https://www.npmjs.com/package/ezbase-ts
-3. The server will be downloadable from the documentation site in the upcoming sprints (we have had issues with making an executable for windows. Linux and mac executables are done), however for it can be run be following the steps below:
-    - Go to the server repository in Sprint 1
-    - Execute cargo run on the terminal to start the server
-4. The UI can also be locally accessed and run by following the steps below:
-    - In frontend directory, execute pnpm i
-    - Then execute pnpm run dev on the terminal to start the UI
+3. The steps to use our system
+    - Go to the server repository in Sprint 3
+    - run bun i or pnpm i and then bun/pnpm run dev
+    - Go to sdk folder run npm i and then npm run build
+    - Go to frontend folder run pnpm i and then pnpm run dev
 
-    In the upcoming sprints the UI will be bundled with the server and when the server starts, the UI will also start on a separate port
+    In the next sprint the UI will be bundled with the server and when the server starts, the UI will also start on a separate port
 
 
 
