@@ -85,6 +85,9 @@ HOW TO ACCESS THE SYSTEM
     - Go to frontend folder run pnpm i and then pnpm run dev
 
     In the next sprint the UI will be bundled with the server and when the server starts, the UI will also start on a separate port
+* A deployment does exist at https://ezbase-frontend.vercel.app/ , However the backend is deployed on Koyeb which provides ephemeral disk storage
+and may result in variying performance. Additionally realtime stuff is not possible due to the nature of the deployment platform and hence the 
+page is removed on the deployment.
 
 
 
