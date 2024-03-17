@@ -110,7 +110,7 @@ export default function Documents() {
 			const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${coll}`);
 			const data = await response.json();
 			if (data?.data) {
-				setForeignDocOptions(data.data.map(option => ({ _id: option._id })));
+				setForeignDocOptions(data?.data?.map(option => ({ _id: option._id })));
 			}
 		} catch (error) {
 			console.error("Error fetching foreign options:", error);
@@ -123,6 +123,7 @@ export default function Documents() {
 			try {
 				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/collections`,);
 				const data = await response.json();
+				
 				if (data?.data) {
 					setForeignCollOptions(data.data);
 				}
@@ -224,7 +225,7 @@ export default function Documents() {
 					<section className="menu-section">
 						<ul className="menu-items gap-2">
 							{data?.length !== 0 ? (
-								data?.data.map((doc) => (
+								data?.data?.map((doc) => (
 									<li
 										key={doc._id}
 										className={`menu-item ${selection?.document?._id === doc._id

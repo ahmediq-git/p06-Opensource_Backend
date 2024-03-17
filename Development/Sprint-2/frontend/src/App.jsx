@@ -15,16 +15,16 @@ function App() {
 		<BrowserRouter>
 			<Routes>
 				<Route path="/" element={<ProtectedRoutes />}>
-				<Route path="/" element={<HomePage />}></Route>
-				<Route path="/logs" element={<Logs />}></Route>
-				<Route path="/settings" element={<Settings />}></Route>
-				<Route path="/rt" element={<RealtimeTest />}></Route>
-				<Route path="/functions" element={<FunctionsPage />}></Route>
-				<Route path="/stress" element={<StressTestPage />}></Route>
-				<Route path="/schema" element={<SchemaPage />}></Route>
+					<Route path="/" element={<HomePage />}></Route>
+					<Route path="/logs" element={<Logs />}></Route>
+					<Route path="/settings" element={<Settings />}></Route>
+					<Route path="/rt" element={<RealtimeTest />}></Route>
+					<Route path="/functions" element={<FunctionsPage />}></Route>
+					<Route path="/stress" element={<StressTestPage />}></Route>
+					<Route path="/schema" element={<SchemaPage />}></Route>
 					{/* <Route path="/login" element={<Login />}></Route>
 					<Route path="/init" element={<Signup />}></Route> */}
-				{/* </Route> */}
+					{/* </Route> */}
 					<Route path="/login" element={<Login />}></Route>
 					<Route path="/init" element={<Signup />}></Route>
 				</Route>

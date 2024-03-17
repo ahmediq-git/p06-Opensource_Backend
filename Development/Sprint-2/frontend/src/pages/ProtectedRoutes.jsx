@@ -11,18 +11,11 @@ import { useLocation } from "react-router-dom";
 import { useAtom } from "jotai";
 import { adminAtom } from "../lib/state/adminAtom";
 
-const parseBool = (str) => {
-	if (str === "true") {
-		return true;
-	}
-
-	return false;
-};
 const fetcher = async (url) => {
 	const res = await fetch(url);
 	const data = await res.json();
 
-	return parseBool(data);
+	return data.data;
 };
 export default function ProtectedRoutes() {
 	const { data, error, isLoading } = useSWR(
@@ -32,33 +25,17 @@ export default function ProtectedRoutes() {
 
 	const [admin, setAdmin] = useAtom(adminAtom);
 	const navigate = useNavigate();
-
-	useLayoutEffect(() => {
-		if (admin.loggedIn) {
-			navigate("/");
-		}
-	}, [admin]);
-
-	useLayoutEffect(() => {
-
-		if (data && !admin.loggedIn) {
-			navigate("/login");
-		} else {
-			navigate("/init");
-		}
-	}, [data]);
-
 	const location = useLocation();
 
 	useLayoutEffect(() => {
+		if (data && !admin.loggedIn && location.pathname !== "/login") {
+			navigate("/login", { replace: true });
+		}
+
 		if (!data && location.pathname !== "/init") {
 			navigate("/init");
 		}
-
-		if (data && location.pathname === "/init") {
-			navigate("/login");
-		}
-	}, [location]);
+	}, [data, admin.loggedIn, navigate]);
 
 	return <Outlet></Outlet>;
 }

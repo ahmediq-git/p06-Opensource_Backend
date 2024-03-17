@@ -32,8 +32,11 @@ export default function Login() {
 			setLoading(false);
 			return;
 		}
-
-		setAdmin({ loggedIn: true, email: email });
+		if (resData.data){
+			setAdmin({ loggedIn: true, email: email });
+		} else {
+			setAdmin({ loggedIn: false, email: "" });
+		}
 
 		setLoading(false);
 		navigate("/");
