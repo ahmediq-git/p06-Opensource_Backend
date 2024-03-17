@@ -18,6 +18,7 @@ import {io, broadcastRecord} from "./realtime/init";
 import { EventEmitter } from "node:events";
 
 
+import { parseAuthHeader } from "./middleware/parseAuthHeader";
 
 (async () => {
   await Initialize(); //initialize all the system defined parameters and collections
@@ -34,6 +35,8 @@ app.use("*", cors({
 }));
 
 process.env.DEV ? app.use("*", logConsoleDev): app.use("*", logConsoleProd)
+
+app.use("*", parseAuthHeader);
 
 app.get("/", async (c: Context) => {
   return c.text("Hello world");
