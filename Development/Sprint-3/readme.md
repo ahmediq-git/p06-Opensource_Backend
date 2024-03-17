@@ -85,7 +85,8 @@ HOW TO ACCESS THE SYSTEM
     In the next sprint the UI will be bundled with the server and when the server starts, the UI will also start on a separate port
 * A deployment does exist at https://ezbase-frontend.vercel.app/ , However the backend is deployed on Koyeb which provides ephemeral disk storage
 and may result in varying performance. Additionally realtime stuff is not possible due to the nature of the deployment platform and hence the 
-page is not present on the deployed site. Also refrain from stress testing too much as heavy traffic may incur hosting costs.
+page is not present on the deployed site. Also refrain from stress testing too much as heavy traffic may incur hosting costs. Also for file related
+stuff please see the demo video as file storage on an actual deployed server is expensive.
 
 
 ------------------------------------------------------------------------------------------------
