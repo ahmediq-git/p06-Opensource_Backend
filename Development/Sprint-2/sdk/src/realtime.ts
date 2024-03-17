@@ -11,36 +11,32 @@ class RealtimeService {
   private client: any;
   private authStore: any;
 
-//   constructor(serverUrl: string) {
-//     this.socket = io(serverUrl);
-//     this.setupSocketListeners();
-//   }
   constructor(ezBaseClient: any, authStore: any) {
-    this.client = ezBaseClient; //passing the client object to send to the user.
-    this.authStore = authStore; //passing the authStore object to send to the user.
+    this.client = ezBaseClient; 
+    this.authStore = authStore;
     this.socket = io(ezBaseClient.socketUrl);
     this.setupSocketListeners();
 }
 
   private setupSocketListeners() {
     this.socket.on('connect', () => {
-      console.log('Socket connected:', this.socket.id);
+      // console.log('Socket connected:', this.socket.id);
       // Reinitialize subscriptions on reconnect
       this.reinitializeSubscriptions();
     });
 
     this.socket.on('subscribed', (response) => {
-      console.log('Subscribed to collection:', response.collection);
+      // console.log('Subscribed to collection:', response.collection);
     });
 
     this.socket.on('unsubscribed', (response) => {
-      console.log('Unsubscribed from collection:', response.collection);
+      // console.log('Unsubscribed from collection:', response.collection);
     });
 
     // Handle other server events as necessary
   }
 
-  // Call this method to subscribe to a collection
+
   public subscribe(collection: string, query: any, callback: (data: any) => void) {
     const subscription = { collection, query };
     if (!this.subscriptions[collection]) {
@@ -55,7 +51,7 @@ class RealtimeService {
     this.socket.emit('subscribe', { collection, query });
   }
 
-  // Call this method to unsubscribe from a collection
+
   public unsubscribe(collection: string) {
     // Remove the local subscription
     if (this.subscriptions[collection]) {
@@ -69,7 +65,7 @@ class RealtimeService {
     this.socket.emit('unsubscribe', { collection });
   }
 
-  // Use this method to reinitialize subscriptions after reconnecting
+  //  to reinitialize subscriptions after reconnecting
   private reinitializeSubscriptions() {
     for (const collection in this.subscriptions) {
       for (const subscription of this.subscriptions[collection]) {
