@@ -14,7 +14,7 @@ export const logConsoleDev = async (c: Context, next: () => Promise<void>) => {
 	let resp_blob = await c.res.blob()
 	let response_size = resp_blob.size;
 	let res = new Response(resp_blob);
-	if(!c.req.url.includes('list?collection_name=logs')){ // dont log the fetching of logs
+	if(!c.req.url.includes('list?collection_name=logs') && !c.req.url.includes('stress/stress_test')){ // dont log the fetching of logs or stress testing
 	const db = Database.getInstance().getDataStore()?.logs
 	// new DataStore({ filename: "./data/logs.json", timestampData: true, autoload: true});
 	const log = {

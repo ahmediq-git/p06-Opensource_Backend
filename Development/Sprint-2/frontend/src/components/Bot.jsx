@@ -6,7 +6,7 @@ import 'react-chatbot-kit/build/main.css';
 
 export default function Bot() {
   return (
-    <div>
+    <div className='text-black text-xl font-semibold'>
       <Chatbot
         config={config}
         messageParser={MessageParser}

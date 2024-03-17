@@ -6,6 +6,10 @@ export default async function createCollection(
 	collection_name: string
 ): Promise<any> {
 	try {
+		if (Database.getInstance().getDataStore()?.[collection_name]){
+			throw new Error("Collection already exists")
+		}
+		
 		const collection = Database.getInstance().loadCollection(collection_name, {autoload: true, timestampData: true})
 		
 		// new DataStore({

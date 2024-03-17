@@ -12,6 +12,8 @@ import { Initialize } from "./core/init";
 import { Server, Socket } from "socket.io";
 import { Server as HttpServer, createServer } from 'http'
 import functions from "./routers/functions";
+import stress from "./routers/stress_test";
+import schema from "./routers/schema";
 import {io, broadcastRecord} from "./realtime/init";
 import { EventEmitter } from "node:events";
 
@@ -44,6 +46,8 @@ app.route("/mail", mail);
 app.route("/auth", auth);
 app.route("/files", files);
 app.route("/functions", functions);
+app.route("/stress", stress);
+app.route("/schema", schema);
 
 
 io.listen(3691);

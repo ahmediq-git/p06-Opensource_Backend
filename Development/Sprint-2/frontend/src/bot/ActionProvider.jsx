@@ -64,6 +64,62 @@ const ActionProvider = ({ createChatBotMessage, setState, children }) => {
           messages: [...prev.messages, botMessage],
         }));
     };
+
+    const handleFunctions = () => {
+      const botMessage = createChatBotMessage('The play icon is the functions page, it is where you can add functions to run periodically on your database. Functions include creating exports files, making backups and so on.');
+        setState((prev) => ({
+          ...prev,
+          messages: [...prev.messages, botMessage],
+        }));
+    }
+
+    const handleDocEdit = () => {
+      const botMessage = createChatBotMessage('Existing documents can be edited by clicking the pencil icon when viewing a document.');
+        setState((prev) => ({
+          ...prev,
+          messages: [...prev.messages, botMessage],
+        }));
+    }
+
+    const handleIdentityInquiry = () => {
+      const botMessage = createChatBotMessage('I am Moiz Raza Amir, a student of LUMS, trapped in this bot. HELP ME.');
+        setState((prev) => ({
+          ...prev,
+          messages: [...prev.messages, botMessage],
+        }));
+    }
+
+    const handleHelp = () => {
+      const botMessage = createChatBotMessage('Ask me anything\n. How to create a collection\n. How to create a record\n. What do the icons do on the left\n I will answer any such questions to the best of my ability');
+        setState((prev) => ({
+          ...prev,
+          messages: [...prev.messages, botMessage],
+        }));
+    }
+
+    const handleSecurity = () => {
+      const botMessage = createChatBotMessage('Ezbase guarantees state of the art security. We utilize industry best practices to make sure your data is safe.');
+        setState((prev) => ({
+          ...prev,
+          messages: [...prev.messages, botMessage],
+        }));
+    }
+
+    const handlePerformance = () => {
+      const botMessage = createChatBotMessage('Ezbase utilizes NEDB, NeDB is not intended to be a replacement of large-scale databases such as MongoDB, and as such was not designed for speed. That said, it is still pretty fast on the expected datasets, especially if you use indexing. On a typical, not-so-fast dev machine, for a collection containing 10,000 documents, with indexing:\n Insert: 10,680 ops/s\n Find: 43,290 ops/s\nUpdate: 8,000 ops/s\nRemove: 11,750 ops/s');
+        setState((prev) => ({
+          ...prev,
+          messages: [...prev.messages, botMessage],
+        }));
+    }
+    
+    const handleElse = (message) => {
+      const botMessage = createChatBotMessage(`https://google.com/search?q=${message}`);
+        setState((prev) => ({
+          ...prev,
+          messages: [...prev.messages, botMessage],
+        }));
+    }
   
     return (
       <div>
@@ -78,6 +134,13 @@ const ActionProvider = ({ createChatBotMessage, setState, children }) => {
               handleDeleteCollection,
               handleLogs,
               handleRecordFieldTypes,
+              handleFunctions,
+              handleDocEdit,
+              handleIdentityInquiry,
+              handleElse,
+              handleHelp,
+              handleSecurity,
+              handlePerformance
             },
           });
         })}

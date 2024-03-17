@@ -11,7 +11,7 @@ export async function createRecord(
 ) {
 	return new Promise((resolve, reject) => {
 		const collection = getCollection(collection_name);
-
+		
 		collection.insert(record, function (err: Error | null, new_doc: any) {
 			if (err) {
 				reject(err);
@@ -40,10 +40,9 @@ export async function readRecord(
 	return docs;
 }
 
-export function updateRecord(id: string, record: any) {
+export function updateRecord(collection_name: string, id: string, record: any) {
 	return new Promise((resolve, reject) => {
-		const collection = getCollection(record.collection_name);
-
+		const collection = getCollection(collection_name);
 		collection.update(
 			{ _id: id },
 			record,
