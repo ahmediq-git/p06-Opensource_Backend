@@ -1,4 +1,5 @@
 import { Context, Hono } from "hono";
+import { ServerWebSocket, serve } from "bun";
 import record_crud from "@routers/record-crud";
 import collection_crud from "@routers/collection-crud";
 import admin_ui from "@routers/admin-ui"; 
@@ -8,10 +9,14 @@ import files from "@routers/files"
 import { cors } from "hono/cors";
 import { logConsoleDev, logConsoleProd } from "./middleware/log-console";
 import { Initialize } from "./core/init";
-import { Server, Socket } from "socket.io";
+import { Socket } from "socket.io";
 import functions from "./routers/functions";
 import stress from "./routers/stress_test";
 import schema from "./routers/schema";
+import {io, broadcastRecord} from "./realtime/init";
+import { EventEmitter } from "node:events";
+
+
 
 (async () => {
   await Initialize(); //initialize all the system defined parameters and collections
@@ -43,45 +48,61 @@ app.route("/functions", functions);
 app.route("/stress", stress);
 app.route("/schema", schema);
 
-const io = new Server({cors: {
-  origin: "*",
-  methods: ["GET", "POST", "PATCH", "DELETE", "PUT", "OPTIONS"]
-}});
-
-let subscriptions: any = {};
-
-io.on("connection", (socket) => {
-  console.log(`socket connected: ${socket.id}`);
-
-  socket.on("subscribe", (msg) => {
-    if (!subscriptions[msg]) {
-      subscriptions[msg] = [];
-    }
-    subscriptions[msg].push(socket);
-    io.emit("subscribed", msg);
-  });
-
-  socket.on("unsubscribe", (msg) => {
-    if (subscriptions[msg]) {
-      let index = subscriptions[msg].indexOf(`${socket}`);
-      subscriptions[msg].splice(index, 1);
-      io.emit("unsubscribed", msg);
-    }
-  });
-
-  socket.on("disconnect", (reason) => {
-    console.log(`socket disconnected: ${socket.id} for ${reason}`);
-    for (const collection in subscriptions) {
-      subscriptions[collection] = subscriptions[collection].filter((subbed: Socket) => subbed !== socket);
-    }
-  });
-});
 
 io.listen(3691);
+
+type Subscription = {
+  socket: Socket;
+  collection: string;
+  query: any;
+}
+
+type Subscriptions = {
+  [collection: string]: Subscription[];
+};
+
+const subscriptions: Subscriptions = {};
+
+export const sse = new EventEmitter();
+
+sse.on('broadcastRecord', (data) => {
+  const {collection_name, record} = data;
+  broadcastRecord(collection_name, record);
+});
+
+// io.on("connection", (socket) => {
+//   console.log(`socket connected: ${socket.id}`);
+
+//   socket.on("subscribe", (msg) => {
+//     if (!subscriptions[msg]) {
+//       subscriptions[msg] = [];
+//     }
+//     subscriptions[msg].push(socket);
+//     io.emit("subscribed", msg);
+//   });
+
+//   socket.on("unsubscribe", (msg) => {
+//     if (subscriptions[msg]) {
+//       let index = subscriptions[msg].indexOf(`${socket}`);
+//       subscriptions[msg].splice(index, 1);
+//       io.emit("unsubscribed", msg);
+//     }
+//   });
+
+//   socket.on("disconnect", (reason) => {
+//     console.log(`socket disconnected: ${socket.id} for ${reason}`);
+//     for (const collection in subscriptions) {
+//       subscriptions[collection] = subscriptions[collection].filter((subbed: Socket) => subbed !== socket);
+//     }
+//   });
+// });
+
+// io.listen(3691);
 
 export default {
   port: 3690,
   fetch: app.fetch,
-  io,
-  subscriptions,
+  subscriptions
 };
+// io.attach(server);
+//make sdk 
