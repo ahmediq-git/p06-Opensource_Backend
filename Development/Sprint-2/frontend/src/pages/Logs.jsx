@@ -3,6 +3,7 @@ import SideRail from '../components/SideRail';
 import useSWR, { useSWRConfig } from 'swr';
 import { fetcher } from '../lib/utils/fetcher';
 import { Line, Bar } from 'react-chartjs-2';
+import Chart from 'chart.js/auto';
 
 export default function Logs() {
     const { mutate } = useSWRConfig();

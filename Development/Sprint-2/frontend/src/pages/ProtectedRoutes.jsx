@@ -19,7 +19,7 @@ const fetcher = async (url) => {
 };
 export default function ProtectedRoutes() {
 	const { data, error, isLoading } = useSWR(
-		"http://127.0.0.1:3690/api/auth/admin",
+		`${import.meta.env.VITE_BACKEND_URL}/auth/admin`,
 		fetcher
 	);
 

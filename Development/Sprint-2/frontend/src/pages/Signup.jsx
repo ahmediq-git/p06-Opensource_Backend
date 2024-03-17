@@ -49,7 +49,7 @@ export const AdminSignupForm = ({ redirectTo }) => {
 			return;
 		}
 
-		const res = await fetch("http://127.0.0.1:3690/api/auth/admin/create", {
+		const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/admin/create`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

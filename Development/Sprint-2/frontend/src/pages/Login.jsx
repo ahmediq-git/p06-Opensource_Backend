@@ -17,7 +17,7 @@ export default function Login() {
 		const email = data.get("email");
 		const password = data.get("password");
 
-		const res = await fetch("http://127.0.0.1:3690/api/auth/admin/login", {
+		const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/admin/login`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
