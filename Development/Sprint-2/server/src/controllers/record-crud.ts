@@ -11,12 +11,15 @@ export async function createRecord(
 ) {
 	return new Promise((resolve, reject) => {
 		const collection = getCollection(collection_name);
+		console.log("Record: ", record);
 		
 		collection.insert(record, function (err: Error | null, new_doc: any) {
 			if (err) {
+				console.log("Error: ", err);
 				reject(err);
 			}
-
+			console.log("new_doc", new_doc);
+			
 			resolve(new_doc);
 		});
 	});

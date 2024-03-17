@@ -17,7 +17,7 @@ export default function Login() {
 		const email = data.get("email");
 		const password = data.get("password");
 
-		const res = await fetch("http://127.0.0.1:3690/signin_admin", {
+		const res = await fetch("http://127.0.0.1:3690/api/auth/admin/login", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -32,8 +32,11 @@ export default function Login() {
 			setLoading(false);
 			return;
 		}
-
-		setAdmin({ loggedIn: true, email: email });
+		if (resData.data){
+			setAdmin({ loggedIn: true, email: email });
+		} else {
+			setAdmin({ loggedIn: false, email: "" });
+		}
 
 		setLoading(false);
 		navigate("/");
@@ -56,7 +59,7 @@ export default function Login() {
 						className="mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8 "
 					>
 						<div>
-							<label for="email" className="sr-only">
+							<label htmlFor="email" className="sr-only">
 								Email
 							</label>
 
@@ -88,7 +91,7 @@ export default function Login() {
 						</div>
 
 						<div>
-							<label for="password" className="sr-only">
+							<label htmlFor="password" className="sr-only">
 								Password
 							</label>
 

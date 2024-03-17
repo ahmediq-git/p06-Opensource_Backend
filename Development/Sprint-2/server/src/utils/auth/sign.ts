@@ -1,5 +1,5 @@
-import {EncryptJWT} from 'jose';
+import jwt from 'jsonwebtoken';
 
 export default async function sign(payload: any, key: string) {
-    return await EncryptJWT(payload, key);
+    return jwt.sign(payload, key);
 }

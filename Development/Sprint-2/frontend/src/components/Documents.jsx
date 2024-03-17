@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, PlusCircle, MinusCircle } from "lucide-react";
+import { ArrowRight, PlusCircle, MinusCircle, RefreshCcwDotIcon } from "lucide-react";
 import { useAtom } from "jotai";
 import { selectionAtom } from "../lib/state/selectionAtom";
 import useSwr, { useSWRConfig } from "swr";
+import ArrayFieldForm from "./ArrayFieldForm";
+import ObjectFieldForm from "./ObjectFieldForm";
 import { fetcher } from "../lib/utils/fetcher";
 
 import { record, z } from "zod";
@@ -14,15 +16,20 @@ const dataSchema = z.union([
 	z.literal("string"),
 	z.literal("object"),
 	z.literal("array"),
+	z.literal("foreign"),
 ]);
 
 // // Define the main schema for an array of objects
 const fieldSchema = z.object({
-	field: z.string().refine((val) => {
-		/^[a-zA-Z\-_]+$/.test(val.trim());
-	}, {
-		message: "Field should not contain numbers, spaces, or special characters.",
-	}),
+	field: z.string().refine(
+		(val) => {
+			/^[a-zA-Z\-_]+$/.test(val.trim());
+		},
+		{
+			message:
+				"Field should not contain numbers, spaces, or special characters.",
+		}
+	),
 	type: dataSchema,
 	data: z.lazy(() => {
 		return z.union([
@@ -45,6 +52,8 @@ const parseValue = (value, type) => {
 	}
 };
 
+
+
 export default function Documents() {
 	const [selection, setSelection] = useAtom(selectionAtom);
 	const [documentModal, setDocumentModal] = useState(false);
@@ -56,20 +65,32 @@ export default function Documents() {
 			value: null,
 		},
 	]);
+	const [foreignDocOptions, setForeignDocOptions] = useState([]);
+	const [foreignCollOptions, setForeignCollOptions] = useState([]);
+	const [foreignCollSelected, setForeignCollSelected] = useState("");
+
 
 	const { data, error, isLoading } = useSwr(
-		`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}`,
+		`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}&embed=false`,
 		fetcher
 	);
 
 	const closeModal = () => {
 		setDocumentModal(false);
+		setSelection({ collection: selection.collection, document: "" });
+		setDoc([
+			{
+				field: "",
+				type: "number",
+				value: 0,
+			},
+		]);
 	};
 
 	useEffect(() => {
 		console.log("data", data);
 		console.log("error", error);
-	}, [ data, error, isLoading ]);
+	}, [data, error, isLoading]);
 
 	useEffect(() => {
 		// delay by 1 second and reset on input
@@ -82,7 +103,37 @@ export default function Documents() {
 		}, 1000);
 
 		return () => clearTimeout(timeout);
+	}, [doc]);
 
+	const fetchForeignOptions = async (coll) => {
+		try {
+			const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${coll}`);
+			const data = await response.json();
+			if (data?.data) {
+				setForeignDocOptions(data?.data?.map(option => ({ _id: option._id })));
+			}
+		} catch (error) {
+			console.error("Error fetching foreign options:", error);
+		}
+	};
+
+
+	useEffect(() => {
+		const fetchForeignCollOptions = async () => {
+			try {
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/collections`,);
+				const data = await response.json();
+				
+				if (data?.data) {
+					setForeignCollOptions(data.data);
+				}
+			} catch (error) {
+				console.error("Error fetching foreign options:", error);
+			}
+		};
+		if (doc.some(record => record.type === "foreign")) {
+			fetchForeignCollOptions();
+		}
 	}, [doc]);
 
 	const setDocumentSelected = (doc) => {
@@ -91,12 +142,20 @@ export default function Documents() {
 
 	const createDocument = async () => {
 		try {
-
 			// const validatedData = fieldSchema.parse(Object.assign({}, ...doc));
-			console.log("DOC is", doc)
+			console.log("DOC is", doc);
 			const data = doc.map((record) => {
 				if (record.type === "boolean" && record.value === null) {
 					record.value = false;
+				}else if(record.type === "foreign") {
+					let obj = {
+						"type": "foreign_key",
+						"ref": (record.value != '' && record.value != null) ? record.value : foreignDocOptions[0]._id,
+						"collection": foreignCollSelected
+					}
+					return {
+						[record.field] : obj
+					}
 				}
 				return {
 					[record.field]: record.value,
@@ -116,22 +175,34 @@ export default function Documents() {
 				collection_name: selection.collection,
 				data: obj,
 			});
-			const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/record/create`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					collection_name: selection.collection,
-					query: obj,
-				}),
-			});
+
+			const res = await fetch(
+				`${import.meta.env.VITE_BACKEND_URL}/record/create`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						collection_name: selection.collection,
+						query: obj,
+					}),
+				}
+			);
 
 			const adsa = await res.json();
 
-			console.log("ADSA",adsa);
+			console.log("ADSA", adsa);
 
-			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}`);
+			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}&embed=false`);
+			setSelection({ collection: selection.collection, document: "" });
+			setDoc([
+				{
+					field: "",
+					type: "number",
+					value: 0,
+				},
+			]);
 			setDocumentModal(false);
 		} catch (error) {
 			console.log(error);
@@ -140,7 +211,7 @@ export default function Documents() {
 	return (
 		<>
 			{/* main div */}
-			<div className="basis-1/4 w-full p-4 rounded-sm gap-4 flex flex-col max-h-screen overflow-y-scroll ">
+			<div className="basis-1/4 w-full p-4 rounded-sm gap-4 flex flex-col max-h-screen overflow-y-scroll no-scrollbar">
 				<p>Documents</p>
 				<button
 					onClick={() => {
@@ -154,14 +225,13 @@ export default function Documents() {
 					<section className="menu-section">
 						<ul className="menu-items gap-2">
 							{data?.length !== 0 ? (
-								data?.data.map((doc) => (
+								data?.data?.map((doc) => (
 									<li
 										key={doc._id}
-										className={`menu-item ${
-											selection?.document?._id === doc._id
+										className={`menu-item ${selection?.document?._id === doc._id
 												? "menu-active"
 												: null
-										} bg-gray-2 flex justify-between`}
+											} bg-gray-2 flex justify-between`}
 										onClick={() => setDocumentSelected(doc)}
 									>
 										<p>{doc._id}</p>
@@ -191,7 +261,7 @@ export default function Documents() {
 			<div className="modal modal-open ">
 				<label className="modal-overlay" htmlFor="add-collection-modal"></label>
 				<div
-					className={`modal-content flex flex-col gap-5 max-w-6xl transition-all duration-500 w-2/3 h-3/4`}
+					className={`h-fit w-full modal-content flex flex-col gap-5 max-w-6xl transition-all duration-500 w-2/3 h-3/4`}
 				>
 					<label
 						htmlFor="add-collection-modal"
@@ -202,11 +272,12 @@ export default function Documents() {
 					</label>
 					<h2 className="text-xl">Add New Record</h2>
 
-					<div className="basis-full flex flex-col overflow-y-scroll">
-						<div className="basis-full rounded-md bg-opacity-40 mt-2 p-4 gap-4 flex flex-col ">
+					<div className="basis-full flex flex-col overflow-y-visible">
+						<div className="basis-full rounded-md bg-opacity-40 mt-2 p-4 gap-4 flex flex-col">
 							{/* records */}
-							<div className="flex flex-col gap-6 justify-between w-full overflow-scroll">
+							<div className="flex flex-col gap-6 justify-between w-full overflow-visible">
 								{doc.map((record, index) => (
+									<div key={index}>
 									<div
 										key={index}
 										className="flex gap-6 justify-between items-end"
@@ -255,6 +326,7 @@ export default function Documents() {
 												<option value="string">string</option>
 												<option value="array">array</option>
 												<option value="object">object</option>
+												<option value="foreign">foreign</option>
 											</select>
 											{error?.type && (
 												<label className="form-label">
@@ -265,58 +337,130 @@ export default function Documents() {
 											)}
 										</div>
 										<div className="form-field w-full">
-											<label className="form-label">Value</label>
+											{record.type !== "array" && record.type !=="object" ? (
+													<label className="form-label">Value</label>
+												) : (
+													<div></div>
+											)}
 
 											{record.type === "boolean" ? (
 												<input
 													type="checkbox"
-													class="switch switch-primary switch-xl"
+													className="switch switch-primary switch-xl"
 													value={record.value}
 													onChange={(e) => {
 														setDoc((prev) => {
 															const newRecord = [...prev];
-															newRecord[index].value = e.target.checked ? true: false;
+															newRecord[index].value = e.target.checked ? true : false;
 															return newRecord;
 														});
 													}}
 												/>
-											) : (
-												<input
-													placeholder="Type here"
-													type={record.type}
-													className="input max-w-full"
-													value={record.value}
-													onChange={(e) => {
-														setDoc((prev) => {
-															const newRecord = [...prev];
-															newRecord[index].value = parseValue(e.target.value, record.type);
-															console.log("newRecord[index].value", typeof(newRecord[index].value));
-															return newRecord;
-														});
-													}}
-												/>
-											)}
-											{error?.value && (
-												<label className="form-label">
-													<span className="form-label-alt">
-														error.value.message
-													</span>
-												</label>
-											)}
+											) : record.type === "foreign" ? (
+												<div>
+													<select
+														className="select w-full"
+														type="dropdown"
+														onSelect={(e) => {
+															setForeignCollSelected(e.target.value)
+															fetchForeignOptions(e.target.value)
+														}}
+														onChange={(e) => {
+															setForeignCollSelected(e.target.value)
+															fetchForeignOptions(e.target.value)
+														}}>
+														{foreignCollOptions.map(option => (
+															<option key={option} value={option}>{option}</option>
+														))}
+													</select>
+													<select
+														className="select w-full"
+														value={record.value}
+														onChange={(e) => {
+															setDoc((prev) => {
+																const newRecord = [...prev];
+																newRecord[index].value = e.target.value;
+																return newRecord;
+															});
+														}}
+													>
+														{foreignDocOptions.map(option => (
+															<option key={option._id} value={option._id}>{option._id}</option>
+														))}
+													</select>
+												</div>
+											) : record.type === "array" || record.type==="object" ? (
+													<div className="max-w-full"></div>
+												) : (
+													<input
+														placeholder="Type here"
+														type={record.type}
+														className="input max-w-full"
+														value={record.value}
+														onChange={(e) => {
+															setDoc((prev) => {
+																const newRecord = [...prev];
+																newRecord[index].value = parseValue(
+																	e.target.value,
+																	record.type
+																);
+																console.log(
+																	"newRecord[index].value",
+																	typeof newRecord[index].value
+																);
+																return newRecord;
+															});
+														}}
+													/>
+												)}
+												{error?.value && (
+													<label className="form-label">
+														<span className="form-label-alt">
+															error.value.message
+														</span>
+													</label>
+												)}
+											</div>
+
+											<button
+												className="p-4 text-gray-200 flex w-32 gap-2 btn "
+												onClick={() => {
+													setDoc((prev) => {
+														const newRecord = [...prev];
+														newRecord.splice(index, 1);
+														return newRecord;
+													});
+												}}
+											>
+												<MinusCircle />
+											</button>
 										</div>
 
-										<button
-											className="p-4 text-gray-200 flex w-32 gap-2 btn "
-											onClick={() => {
-												setDoc((prev) => {
-													const newRecord = [...prev];
-													newRecord.splice(index, 1);
-													return newRecord;
-												});
-											}}
-										>
-											<MinusCircle />
-										</button>
+										{record.type === "array" ? (
+											<div className="w-full">
+												<ArrayFieldForm
+													// record={record}
+													index={index}
+													setDoc={setDoc}
+													error={error}
+												/>
+											</div>
+										) : (
+											<div />
+										)}
+
+										{record.type === "object" ? (
+											<div className="w-full">
+												<ObjectFieldForm
+													// record={record}
+													index={index}
+													setDoc={setDoc}
+													error={error}
+												/>
+											</div>
+										) : (
+											<div />
+										)}
 									</div>
 								))}
 								<button
