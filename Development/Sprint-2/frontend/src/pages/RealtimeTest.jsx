@@ -1,26 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client';
+// import io from 'socket.io-client';
 import SideRail from '../components/SideRail';
+import ezbase from "./../../../sdk/dist/index";
 
-const socket = io(`${import.meta.env.VITE_BACKEND_SOCKET_URL}`);
+// const socket = io(`${import.meta.env.VITE_BACKEND_SOCKET_URL}`);
 
 const RealtimeTest = () => {
   const [collections, setCollections] = useState([]);
   const [subscribedCollections, setSubscribedCollections] = useState([]);
   const [message, setMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
+  const [realtimeService, setRealtimeService] = useState(null);
+  const eb = new ezbase("http://localhost:3690","http://localhost:3691");
 
   useEffect(() => {
+    // Initialize the RealtimeService
+    const service = eb.rts;
+    setRealtimeService(service);
+
     // Fetch collections from backend
     fetchCollections();
 
-    // Listen for changes in subscribed collections
-    socket.on('recordAdded', updateCollectionData);
-    socket.on('recordRemoved', removeRecordFromCollection);
-
     return () => {
-      socket.off('recordAdded', updateCollectionData);
-      socket.off('recordRemoved', removeRecordFromCollection);
+      // Cleanup: unsubscribe from all collections on unmount
+      subscribedCollections.forEach((collection) => {
+        service.unsubscribe(collection);
+      });
     };
   }, []);
 
@@ -35,8 +40,8 @@ const RealtimeTest = () => {
   };
 
   const updateCollectionData = (updateInfo) => {
-    const { collection_name, record } = updateInfo;
-    setMessage(`Collection ${collection_name} updated with new record: ${JSON.stringify(record)}`);
+    const { collection, record } = updateInfo;
+    setMessage(`Collection ${collection} updated with new record: ${JSON.stringify(record)}`);
     setShowToast(true);
     setTimeout(() => {
       setShowToast(false);
@@ -55,19 +60,22 @@ const RealtimeTest = () => {
   };
 
   const handleSubscribe = (collectionName) => {
-    // Send subscription event to backend
-    socket.emit('subscribe', collectionName);
-    setSubscribedCollections(prevSubscriptions => [
-      ...prevSubscriptions,
-      collectionName,
-    ]);
+    // Use the RealtimeService to subscribe
+    realtimeService?.subscribe(collectionName, 
+      {}   //{"$and":[{"age":{"$gt":25}},{"male":true}]} query if we want to get records that match specific query leave empty for all records
+    , (data) => {
+      console.log("datataa",data)
+      updateCollectionData(data);
+      //  may want to distinguish between 'recordAdded' and 'recordRemoved' by adding another field in the data sent by the server.
+    });
+    setSubscribedCollections((prev) => [...prev, collectionName]);
   };
 
   const handleUnsubscribe = (collectionName) => {
-    // Send unsubscribe event to backend
-    socket.emit('unsubscribe', collectionName);
-    setSubscribedCollections(prevSubscriptions =>
-      prevSubscriptions.filter(collection => collection !== collectionName)
+    // Use the RealtimeService to unsubscribe
+    realtimeService?.unsubscribe(collectionName);
+    setSubscribedCollections((prev) =>
+      prev.filter((collection) => collection !== collectionName)
     );
   };
 
