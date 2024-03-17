@@ -2,8 +2,8 @@ import { Context, Hono } from "hono";
 import { resolve } from "path";
 import { v4 } from "uuid";
 import { getCollection } from "@src/utils/getCollection";
-import { createMetaData } from "@src/utils/files/createMetaData";
-import { getMetaData } from "@src/utils/files/getMetaData";
+import { createMetaData } from "@src/utils/files_helper/createMetaData";
+import { getMetaData } from "@src/utils/files_helper/getMetaData";
 import { unlink } from "node:fs/promises";
 import {readFilesInDirectory} from "@src/utils/misc/readFilesInDirectory";
 
@@ -14,7 +14,6 @@ files.post("/", async (c) => {
   try {
     const data = await c.req.formData();
     const file = data.get("file");
-
     const id = v4().replaceAll('-', '').slice(0,16);
 
     if (!file) throw new Error("No file provided in the `file` field");
@@ -52,7 +51,7 @@ files.post("/", async (c) => {
     }
 
   } catch (err) {
-    
+    console.log(err)
     return c.json({ error: err, data: null });
   }
 });
@@ -123,7 +122,7 @@ files.get("/metadata", async(c:Context)=>{
 files.delete("/:id", async(c:Context)=>{
   try {
     const { id } = c.req.param();
-  
+    console.log(id)
     const meta = await getMetaData(id)
 
     await unlink(`./files/${meta.stored_name}`);
@@ -164,7 +163,7 @@ files.get("/list", async(c:Context)=>{
       error: false,
       data: meta_data_files,
     });
-    
+
   } catch (error) {
     return c.json({
       error: "Error Listing files",
