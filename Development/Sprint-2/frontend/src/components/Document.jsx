@@ -39,6 +39,9 @@ export default function Document() {
 
 	const preprocessArrayForForm = (originalArray) => {
 		const convertedArray = [];
+		if (!Array.isArray(originalArray)){
+			return convertedArray
+		}
 		originalArray?.forEach((element) => {
 			let valueType = typeof element;
 			convertedArray.push({
@@ -76,6 +79,7 @@ export default function Document() {
 		z.literal("string"),
 		z.literal("object"),
 		z.literal("array"),
+		z.literal("foreign_key")
 	]);
 
 	// // Define the main schema for an array of objects
@@ -139,7 +143,7 @@ export default function Document() {
 			const data = await res.json();
 
 			// remove the deleted collection from the list of collections
-			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}`);
+			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}&embed=false`);
 			setSelection({ collection: selection.collection, document: "" });
 
 			setShowDeleteModal(false);
@@ -179,9 +183,15 @@ export default function Document() {
 			console.log("return is", adsa);
 
 			// remove the deleted collection from the list of collections
-			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}`);
+			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}&embed=false`);
 			setSelection({ collection: selection.collection, document: "" });
-
+			setDoc([
+				{
+					field: "",
+					type: "number",
+					value: 0,
+				},
+			])
 			setShowEditModal(false);
 		} catch (error) {
 			console.log(error);
@@ -190,7 +200,7 @@ export default function Document() {
 
 
 	const { data, error, isLoading } = useSwr(
-		`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}`,
+		`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}&embed=false`,
 		fetcher
 	);
 

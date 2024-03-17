@@ -119,7 +119,6 @@ export default function Documents() {
 
 
 	useEffect(() => {
-
 		const fetchForeignCollOptions = async () => {
 			try {
 				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/collections`,);
@@ -175,6 +174,7 @@ export default function Documents() {
 				collection_name: selection.collection,
 				data: obj,
 			});
+
 			const res = await fetch(
 				`${import.meta.env.VITE_BACKEND_URL}/record/create`,
 				{
@@ -193,11 +193,7 @@ export default function Documents() {
 
 			console.log("ADSA", adsa);
 
-			mutate(
-				`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection
-				}`
-			);
-			setDocumentModal(false);
+			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}&embed=false`);
 			setSelection({ collection: selection.collection, document: "" });
 			setDoc([
 				{
@@ -206,6 +202,7 @@ export default function Documents() {
 					value: 0,
 				},
 			]);
+			setDocumentModal(false);
 		} catch (error) {
 			console.log(error);
 		}
@@ -339,11 +336,17 @@ export default function Documents() {
 											)}
 										</div>
 										<div className="form-field w-full">
-											<label className="form-label">Value</label>
+											{record.type !== "array" && record.type !=="object" ? (
+													<label className="form-label">Value</label>
+												) : (
+													<div></div>
+											)}
+
+											{record.type === "boolean" ? (
 												<input
-													placeholder="Type here"
-													type="text"
-													value={record.field}
+													type="checkbox"
+													className="switch switch-primary switch-xl"
+													value={record.value}
 													onChange={(e) => {
 														setDoc((prev) => {
 															const newRecord = [...prev];
@@ -385,72 +388,7 @@ export default function Documents() {
 														))}
 													</select>
 												</div>
-											) : (
-												<input
-													placeholder="Type here"
-													type={record.type}
-													className="input max-w-full"
-												/>
-												{error?.field && (
-													<label className="form-label">
-														<span className="form-label-alt">
-															error.field.message
-														</span>
-													</label>
-												)}
-											</div>
-											<div className="form-field w-full">
-												<label className="form-label">Type</label>
-
-												<select
-													className="select w-full"
-													value={record.type}
-													onChange={(e) => {
-														setDoc((prev) => {
-															const newRecord = [...prev];
-															newRecord[index].value = parseValue(e.target.value, record.type);
-															console.log("newRecord[index].value", typeof (newRecord[index].value));
-															return newRecord;
-														});
-													}}
-												>
-													<option value="boolean">bool</option>
-													<option value="number">number</option>
-													<option value="string">string</option>
-													<option value="array">array</option>
-													<option value="object">object</option>
-												</select>
-												{error?.type && (
-													<label className="form-label">
-														<span className="form-label-alt">
-															error.type.message
-														</span>
-													</label>
-												)}
-											</div>
-											<div className="form-field w-full">
-												{record.type !== "array" && record.type !=="object" ? (
-													<label className="form-label">Value</label>
-												) : (
-													<div></div>
-												)}
-
-												{record.type === "boolean" ? (
-													<input
-														type="checkbox"
-														className="switch switch-primary switch-xl"
-														value={record.value}
-														onChange={(e) => {
-															setDoc((prev) => {
-																const newRecord = [...prev];
-																newRecord[index].value = e.target.checked
-																	? true
-																	: false;
-																return newRecord;
-															});
-														}}
-													/>
-												) : record.type === "array" || record.type==="object" ? (
+											) : record.type === "array" || record.type==="object" ? (
 													<div className="max-w-full"></div>
 												) : (
 													<input
