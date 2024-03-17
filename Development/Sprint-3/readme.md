@@ -7,15 +7,15 @@ Team: 06
 - 24100296 Moiz Raza Amir
 - 24100085 Ahmed Mozammil Iqbal
 
-SPRINT-2 SUBMISSION GUIDELINES
+SPRINT-3 SUBMISSION GUIDELINES
 
 1. Properly tested working system deployed on an online hosting platform.
 2. Code with readable comments uploaded in “Development/Sprint-2” folder of your project’s Github repository.
 3. 3-4 minutes video that explains the functionality of your system developed so far. This must be uploaded in “Sprint-2” folder of your project’s Github repository.
 4. Updated architecture and data model must be uploaded in the respective folders on Github.
-5. Test case execution report. 
-6. Update project schedule.  
-7. This "Readme" file should be uploaded in Sprint-2 folder. 
+5. Test case execution report.
+6. Update project schedule.
+7. This "Readme" file should be uploaded in Sprint-2 folder.
 
 
 
@@ -23,9 +23,18 @@ SPRINT-2 SUBMISSION GUIDELINES
 
 LIST OF REQUIREMENTS COMPLETED IN THE SPRINT
 
-1. Migration of SDK to Typescript due to speed and typechecking
-2. Migration of Server to Typescript due to Rust's complexity.
-3. With the
+1. File Creation/Deletion/Downloading and Viewing.
+2. Create/Delete Indexes on a collection.
+3. Embedded Documents within a document
+4. Lambda functions on database with ability to schedule them in time.
+5. Realtime Database, Frontend, Backend and SDK
+6. Stress Test Page for user to check load on server
+7. Foreign Keys in a document
+8. Generate Schema diagram acording to collections and their records.
+9. Implementation of design pattern singleton of the database to speed up the database and overcome any faults in the system
+10. Settings
+11. Auth applied on the frontend and server.
+12. Logs page to view requests in real time, as well as view past requests.
 
 ------------------------------------------------------------------------------------------------
 
@@ -42,10 +51,23 @@ LIST OF REQUIREMENTS COMPLETED SO FAR
 8.  Create and remove an index on a collection through the UI
 9.  Create a user with username and password through API and UI
 10. Log in/out user
-11. User Logs (Partially)
+11. User Logs
 12. Information website with Documentation (for the usecases completed so far)
 13.	Start a Server to serve all the requests
-14. Create an Admin, Delete an Admin through the UI (Partially)
+14. Create an Admin, Delete an Admin through the UI
+15. File Creation/Deletion/Downloading and Viewing.
+16. Create Indexes on a collection.
+
+17. Embedded Documents within a document
+18. Lambda functions on database with ability to schedule them in time.
+19. Realtime Database, Frontend, Backend and SDK
+20. Stress Test Page for user to check load on server
+21. Foreign Keys in a document
+22. Generate Schema diagram acording to collections and their records.
+23. Implementation of design pattern singleton of the database to speed up the database and overcome any faults in the system
+24. Settings.
+25. Auth applied on the frontend and server.
+26. Logs page to view requests in real time, as well as view past requests.
 
 
 
@@ -73,6 +95,3 @@ HOW TO ACCESS THE SYSTEM
 
 
 ADDITIONAL INFORMATION
-
-1. As this sprint was spent converting the entire codebase to Typescript due to complexities faced in debugging and expanding the rust backend system, this sprint was spent in migrating the server and sdk to typescript.
-2. As the functionality remains constant therefore the demo videos in sprint 1 should suffice for this sprint.
