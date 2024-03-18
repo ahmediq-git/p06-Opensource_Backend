@@ -5,3 +5,4 @@ files/
 backups/
 exports/
 files-metadata/
+.env
