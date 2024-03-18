@@ -5,6 +5,7 @@ import { adminAtom } from "../lib/state/adminAtom";
 import { useNavigate } from "react-router-dom";
 import { Flame } from "lucide-react";
 import { Waypoints } from "lucide-react";
+import {Folder} from "lucide-react";
 
 export default function SideRail() {
 	const [active, setActive] = useState("");
@@ -33,6 +34,9 @@ export default function SideRail() {
 				break;
 			case "schema":
 				setActive("schema");
+				break;
+			case "files":
+				setActive("files");
 				break;
 			default:
 				setActive("");
@@ -76,6 +80,13 @@ export default function SideRail() {
 									}`}
 							>
 								<Waypoints />
+							</li>
+							<li
+								onClick={() => { setActive("files"); navigate("/files") }}
+								className={`menu-item ${active === "files" && "menu-active"
+									}`}
+							>
+								<Folder />
 							</li>
 							<li
 								onClick={() => { setActive("settings"); navigate("/settings") }}

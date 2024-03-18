@@ -9,6 +9,7 @@ import RealtimeTest from "./pages/RealtimeTest";
 import FunctionsPage from "./pages/Functions";
 import StressTestPage from "./pages/StressTest";
 import SchemaPage from "./pages/SchemaPage";
+import FilesPage from "./pages/FilesPage";
 
 function App() {
 	return (
@@ -27,6 +28,7 @@ function App() {
 					{/* </Route> */}
 					<Route path="/login" element={<Login />}></Route>
 					<Route path="/init" element={<Signup />}></Route>
+					<Route path="/files" element={<FilesPage />}></Route>
 				</Route>
 			</Routes>
 		</BrowserRouter>

@@ -26,6 +26,9 @@ dependencies:
   object-sizeof:
     specifier: ^2.6.4
     version: 2.6.4
+  sift:
+    specifier: ^17.0.1
+    version: 17.0.1
   socket.io:
     specifier: ^4.7.4
     version: 4.7.4
@@ -656,6 +659,10 @@ packages:
 
   /set-blocking@2.0.0:
     resolution: {integrity: sha512-KiKBS8AnWGEyLzofFfmvKwpdPzqiy16LvQfK3yv/fVH7Bj13/wl3JSR1J+rfgRE9q7xUJK4qvgS8raSOeLUehw==}
+    dev: false
+
+  /sift@17.0.1:
+    resolution: {integrity: sha512-10rmPF5nuz5UdKuhhxgfS7Vz1aIRGmb+kn5Zy6bntCgNwkbZc0a7Z2dUw2Y9wSoRrBzf7Oim81SUsYdOkVnI8Q==}
     dev: false
 
   /signal-exit@3.0.7:
