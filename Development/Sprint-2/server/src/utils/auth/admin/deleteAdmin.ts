@@ -2,13 +2,8 @@ import Datastore from "nedb";
 import * as jose from "jose";
 import Database from "@src/database/database_handler";
 
-export default async function createAdmin(
-	email: string,
-	password: string
-): Promise<any> {
+export default async function deleteAdmin(email: string): Promise<any> {
 	const db = Database.getInstance().getDataStore()["config"];
-
-	const hashedpassword = await Bun.password.hash(password);
 
 	const config: any = await new Promise((resolve, reject) => {
 		db.find({}, (err: any, doc: any) => {
@@ -20,27 +15,31 @@ export default async function createAdmin(
 		});
 	});
 
+	let exists = false;
+
 	// check if admin with this email already exists
 	if (config.length > 0) {
-		const admins = config[0].admins;
+		const admins = config[0]?.admins;
 
 		for (let i = 0; i < admins.length; i++) {
 			if (admins[i].email === email) {
-				return "Admin already exists";
+				exists = true;
+				break;
 			}
 		}
 	}
 
-	const updated = await new Promise((resolve, reject) => {
+	if (!exists) {
+		return "Admin does not exist";
+	}
+
+	const removed = await new Promise((resolve, reject) => {
 		db.update(
-			{ },
+			{},
 			{
-				$push: {
+				$pull: {
 					admins: {
 						email: email,
-						password: hashedpassword,
-						createdAt: new Date(),
-						updatedAt: new Date(),
 					},
 				},
 			},
@@ -49,12 +48,12 @@ export default async function createAdmin(
 				if (err) {
 					reject(err);
 				}
-				resolve("Admin created");
+				resolve("Admin removed");
 			}
 		);
 	});
 
-	console.log(updated);
+	console.log(removed);
 
-	return updated;
+	return removed;
 }

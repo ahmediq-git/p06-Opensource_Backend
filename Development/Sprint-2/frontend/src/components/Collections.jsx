@@ -100,10 +100,10 @@ export default function Collections() {
         checked={modal}
       />
       {/* Modal */}
-      <div className="modal modal-open overflow-y-scroll">
+      <div className="modal modal-open">
         <label className="modal-overlay" htmlFor="add-collection-modal"></label>
         <div
-          className={`modal-content flex flex-col gap-5 max-w-6xl transition-all duration-500 ${
+          className={`h-fit modal-content flex flex-col gap-5 max-w-6xl transition-all duration-500 ${
             collectionName ? "w-2/3 h-3/4" : "w-1/4  h-1/4"
           }`}
         >
@@ -219,7 +219,7 @@ export default function Collections() {
       </div>
       {/* Bar */}
       <aside className="sidebar h-full justify-start bg-gray-1 border-r border-gray-100 border-opacity-10">
-        <section className="sidebar-content h-fit min-h-[20rem] overflow-visible mt-10">
+        <section className="sidebar-content h-fit min-h-[20rem] overflow-y-scroll no-scrollbar mt-10">
           <nav className="menu rounded-md">
             <section className="menu-section px-4">
               <span className="menu-title text-lg">Collections</span>
@@ -234,8 +234,7 @@ export default function Collections() {
                   New Collection
                 </button>
 
-                <ul className="menu-items gap-4 border-2 border-red-500 p-2 rounded-lg">
-                  <Lock size={18} className="self-end absolute z-10" />
+                <ul className="flex flex-row justify-between menu-items gap-4 border-2 border-red-500 p-2 rounded-lg">
                   {collectionData?.data?.length > 0 &&
                     collectionData?.data.map((collection, index) => (
                       <li
@@ -252,6 +251,7 @@ export default function Collections() {
                         <span>{collection}</span>
                       </li>
                     ))}
+                    <Lock size={16} className="relative z-10 mt-2 mr-2" />
                 </ul>
 
                 {collectionData?.data?.length > 0 &&

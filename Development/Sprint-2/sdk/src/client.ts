@@ -3,17 +3,18 @@ import ValidationUtils from "./validators/validators";
 
 class EzBaseClient {
     private backendUrl: string;
+    private socketUrl: string;
     authStore: any;
 
-    constructor(backendUrl: string, authStore: any) {
+    constructor(backendUrl: string, authStore: any, socketUrl: string) {
         if (!ValidationUtils.isValidUrl(backendUrl)) {
             throw new Error('Invalid URL for backend. Please provide a valid URL.');
         }
 
-        if (!backendUrl.startsWith("http://")) {
-            backendUrl = "http://" + backendUrl;
-        }
-
+        // if (!backendUrl.startsWith("http://")) {
+        //     backendUrl = "http://" + backendUrl;
+        // }
+        this.socketUrl = socketUrl;
         this.backendUrl = backendUrl;
         this.authStore = authStore;
     }

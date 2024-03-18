@@ -7,8 +7,8 @@ import { localStorageProvider } from "./lib/utils/localStorageProvider";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
 	<React.StrictMode>
-<SWRConfig value={{ provider: localStorageProvider }}>
-		<App></App>
+		<SWRConfig value={{ provider: localStorageProvider }}>
+			<App></App>
 		</SWRConfig>
 	</React.StrictMode>
 );

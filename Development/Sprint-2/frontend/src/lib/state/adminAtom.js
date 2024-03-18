@@ -1,6 +1,7 @@
 // import { atom  } from 'jotai'
-import { atomWithStorage } from 'jotai/utils'
+import { atom } from 'jotai'
 
-export const adminAtom = atomWithStorage("admin", {
+export const adminAtom = atom({
     loggedIn: false,
+    email: ""
 })

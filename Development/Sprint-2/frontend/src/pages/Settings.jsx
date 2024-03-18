@@ -9,6 +9,7 @@ import SideRail from "../components/SideRail";
 import ApplicationSettings from "../components/ApplicationSettings";
 import MailSettings from "../components/MailSettings";
 import FilesStorageSettings from "../components/FileSettings";
+import Admins from "../components/AdminSettings";
 
 export default function Settings() {
   const [activeSetting, setActiveSetting] = useState('application');
@@ -61,11 +62,9 @@ export default function Settings() {
                 </form>
               </CardContent>
             </Card> */}
-          </div>
-        </div>
-      </main>
-    </div>
-  )
+					</div>
+				</div>
+			</main>
+		</div>
+	);
 }
-
-
