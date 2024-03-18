@@ -12,35 +12,30 @@ import FilesStorageSettings from "../components/FileSettings";
 import Admins from "../components/AdminSettings";
 
 export default function Settings() {
-	const [activeSetting, setActiveSetting] = useState("application");
-	const renderSettingComponent = () => {
-		switch (activeSetting) {
-			case "application":
-				return <ApplicationSettings />;
-			case "mail":
-				return <MailSettings />;
-			case "files":
-				return <FilesStorageSettings />;
-			// ... case for other setting components
-			case "admin":
-				return <Admins/>;
-			default:
-				return null;
-		}
-	};
+  const [activeSetting, setActiveSetting] = useState('application');
+  const renderSettingComponent = () => {
+    switch (activeSetting) {
+      case 'application':
+        return <ApplicationSettings />;
+      case 'mail':
+        return <MailSettings />;
+      case 'file':
+        return <FilesStorageSettings />;
+      // ... case for other setting components
+      default:
+        return null;
+    }
+  }
 
-	return (
-		<div className="flex h-screen bg-gray-1">
-			<SideRail />
-			<SettingsRail
-				setActiveSetting={setActiveSetting}
-				activeSetting={activeSetting}
-			/>
-			<main className="flex-1">
-				<div className="px-10 py-6">
-					<div className="mt-6">
-						{renderSettingComponent()}
-						{/* <Card className="max-w-4xl mx-auto">
+  return (
+    <div className="flex h-screen bg-gray-1">
+      <SideRail />
+      <SettingsRail setActiveSetting={setActiveSetting} activeSetting={activeSetting} />
+      <main className="flex-1">
+        <div className="px-10 py-6">
+          <div className="mt-6">
+            {renderSettingComponent()}
+            {/* <Card className="max-w-4xl mx-auto">
               <CardContent>
                 <form>
                   <div className="grid grid-cols-2 gap-6">
