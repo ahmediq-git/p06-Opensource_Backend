@@ -43,9 +43,9 @@ export default function FilesPage() {
                                     <File />
                                 ) : (
                                     <div className="flex flex-col justify-center items-center gap-2 w-full h-full basis-3/4">
-                                        <h2 className="text-2xl">No document selected</h2>
+                                        <h2 className="text-2xl">No File selected</h2>
                                         <p className="text-gray-500">
-                                            Select a document to view its data
+                                            Select a File to view its data
                                         </p>
                                     </div>
                                 )}

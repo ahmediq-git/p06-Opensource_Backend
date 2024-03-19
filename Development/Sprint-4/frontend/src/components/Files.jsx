@@ -59,9 +59,9 @@ export default function Files() {
                 }
             );
 
-			const adsa = await res.json();
+			// const adsa = await res.json();
 
-			console.log("ADSA", adsa);
+			// console.log("ADSA", adsa);
 
 			mutate(`${import.meta.env.VITE_BACKEND_URL}/files/list`);
 			
