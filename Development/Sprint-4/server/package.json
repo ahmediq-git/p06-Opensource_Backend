@@ -4,6 +4,8 @@
     "test": "bun run src/tests/collection-crud.ts"
   },
   "dependencies": {
+    "@azure/functions": "^4.3.0",
+    "@azure/storage-blob": "^12.17.0",
     "@types/bcrypt": "^5.0.2",
     "bcrypt": "^5.1.1",
     "hono": "^3.12.6",

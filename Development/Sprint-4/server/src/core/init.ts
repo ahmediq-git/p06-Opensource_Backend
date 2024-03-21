@@ -11,58 +11,60 @@ import { SimpleIntervalJob, Task, ToadScheduler } from "toad-scheduler";
 import fs from "fs";
 
 export enum CollectionType {
-	user = "user",
-	system = "system",
+  user = "user",
+  system = "system",
 }
 
 type Collection = {
-	name: string;
-	type: CollectionType;
-	createdAt: string;
-	updatedAt: string;
+  name: string;
+  type: CollectionType;
+  createdAt: string;
+  updatedAt: string;
 };
 
 type Admin = {
-	id: string;
-	email: string;
-	password: string;
-	createdAt: string;
-	updatedAt: string;
+  id: string;
+  email: string;
+  password: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type AppConfig = {
-	application: {
-		name: string;
-		url: string;
-	};
-	admins: Admin[];
-	s3: {
-		endpoint: string;
-		bucket: string;
-		region: string;
-		access_key: string;
-		secret: string;
-		createdAt: string;
-		updatedAt: string;
-	} | null;
-	smtp: {
-		host: string;
-		port: number;
-		username: string;
-		password: string;
-		createdAt: string;
-		updatedAt: string;
-	} | null;
-	backup: {
-		auto: boolean;
-		to_s3: boolean;
-		backups: any[];
-	};
-	logs: {
-		retention: number; //days
-		ip_enabled: boolean;
-	};
-	collections: Collection[];
+  application: {
+    name: string;
+    url: string;
+  };
+  admins: Admin[];
+  blobStorage: {
+    useBlobStorage: boolean;
+    serviceName: string;
+    serviceKey: string;
+    storageConnectionString: string;
+    containerName: string;
+    region: string;
+    sas: string;
+    createdAt: string;
+    updatedAt: string;
+  } | null;
+  smtp: {
+    host: string;
+    port: number;
+    username: string;
+    password: string;
+    createdAt: string;
+    updatedAt: string;
+  } | null;
+  backup: {
+    auto: boolean;
+    to_s3: boolean;
+    backups: any[];
+  };
+  logs: {
+    retention: number; //days
+    ip_enabled: boolean;
+  };
+  collections: Collection[];
 };
 
 export async function Initialize() {
@@ -71,22 +73,22 @@ export async function Initialize() {
   // instantiating the Database if its the first time
   Database.getInstance()
 
-	// instantiating the Database if its the first time
-	Database.getInstance();
+  // instantiating the Database if its the first time
+  Database.getInstance();
 
-	const users_db = await LoadUsers();
-	const logs_db = await LoadLogs();
-	const config_db = await LoadConfig();
-	const functions = await LoadFunctions();
+  const users_db = await LoadUsers();
+  const logs_db = await LoadLogs();
+  const config_db = await LoadConfig();
+  const functions = await LoadFunctions();
 
-	await LogCullerSchedule(); // cull logs based on retention
-	await FunctionRunner(); // to run periodic functions
+  await LogCullerSchedule(); // cull logs based on retention
+  await FunctionRunner(); // to run periodic functions
 
-	return {
-		users_db,
-		logs_db,
-		config_db,
-	};
+  return {
+    users_db,
+    logs_db,
+    config_db,
+  };
 }
 
 async function LogCullerSchedule() {
@@ -209,12 +211,12 @@ async function LoadUsers() {
     Database.getInstance().loadCollection('users', { autoload: true, timestampData: true })
   }
 
-	// retrieve the file
-	const db = Database.getInstance().getDataStore()?.["users"];
+  // retrieve the file
+  const db = Database.getInstance().getDataStore()?.["users"];
 
-	// ensure that the username field is unique
+  // ensure that the username field is unique
 
-	// only add email index, if a unique index value is not defined, it errors out
+  // only add email index, if a unique index value is not defined, it errors out
 
   if (!Database.getInstance().getDataStore().hasOwnProperty('indices')) {
     // create the indices log file if it doesn't exist
@@ -268,89 +270,89 @@ async function LoadFunctions() {
 }
 
 async function LoadConfig() {
-	if (!Database.getInstance().getDataStore().hasOwnProperty("config")) {
-		// create the config file if it doesn't exist
-		Database.getInstance().loadCollection("config", {
-			autoload: true,
-			timestampData: true,
-		});
-	}
-	const config = Database.getInstance().getDataStore()?.["config"];
+  if (!Database.getInstance().getDataStore().hasOwnProperty("config")) {
+    // create the config file if it doesn't exist
+    Database.getInstance().loadCollection("config", {
+      autoload: true,
+      timestampData: true,
+    });
+  }
+  const config = Database.getInstance().getDataStore()?.["config"];
 
-	// get the current config object
-	const configObject: any[] = await new Promise((resolve, reject) => {
-		config.findOne({}, function (err, docs) {
-			if (err) {
-				reject(err);
-			}
+  // get the current config object
+  const configObject: any[] = await new Promise((resolve, reject) => {
+    config.findOne({}, function (err, docs) {
+      if (err) {
+        reject(err);
+      }
 
-			resolve(docs);
-		});
-	});
+      resolve(docs);
+    });
+  });
 
-	if (configObject && configObject?.length !== 0) return config; // just return the datastore if a config already exists
+  if (configObject && configObject?.length !== 0) return config; // just return the datastore if a config already exists
 
-	const userAuthKey =
-		Math.random().toString(36).substring(2, 15) +
-		Math.random().toString(36).substring(2, 15);
+  const userAuthKey =
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15);
 
   // write this to the .env file
   Bun.write(".env", `USER_AUTH_KEY=${userAuthKey}\n`);
 
-	const defaultConfig: AppConfig = {
-		application: {
-			name: "Ezbase",
-			url: "http://localhost:3690",
-		},
-		admins: [],
-		s3: null,
-		smtp: null,
-		backup: {
-			auto: false,
-			to_s3: false,
-			backups: [],
-		},
-		logs: {
-			retention: 30,
-			ip_enabled: false,
-		},
-		collections: [
-			{
-				name: "users",
-				type: CollectionType.system,
-				createdAt: new Date().toISOString(),
-				updatedAt: new Date().toISOString(),
-			},
-			{
-				name: "logs",
-				type: CollectionType.system,
-				createdAt: new Date().toISOString(),
-				updatedAt: new Date().toISOString(),
-			},
-			{
-				name: "config",
-				type: CollectionType.system,
-				createdAt: new Date().toISOString(),
-				updatedAt: new Date().toISOString(),
-			},
-			{
-				name: "functions",
-				type: CollectionType.user,
-				createdAt: new Date().toISOString(),
-				updatedAt: new Date().toISOString(),
-			},
-		],
-	};
-	// create a config object if it does not exist
-	const newConfig: any[] = await new Promise((resolve, reject) => {
-		config.insert(defaultConfig, (err, doc: any) => {
-			if (err) {
-				reject(err);
-			}
+  const defaultConfig: AppConfig = {
+    application: {
+      name: "Ezbase",
+      url: "http://localhost:3690",
+    },
+    admins: [],
+    blobStorage: null,
+    smtp: null,
+    backup: {
+      auto: false,
+      to_s3: false,
+      backups: [],
+    },
+    logs: {
+      retention: 30,
+      ip_enabled: false,
+    },
+    collections: [
+      {
+        name: "users",
+        type: CollectionType.system,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      {
+        name: "logs",
+        type: CollectionType.system,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      {
+        name: "config",
+        type: CollectionType.system,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      {
+        name: "functions",
+        type: CollectionType.user,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    ],
+  };
+  // create a config object if it does not exist
+  const newConfig: any[] = await new Promise((resolve, reject) => {
+    config.insert(defaultConfig, (err, doc: any) => {
+      if (err) {
+        reject(err);
+      }
 
-			resolve(doc);
-		});
-	});
+      resolve(doc);
+    });
+  });
 
-	return newConfig;
+  return newConfig;
 }
