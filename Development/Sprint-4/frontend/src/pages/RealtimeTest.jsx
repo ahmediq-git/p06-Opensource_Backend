@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 // import io from 'socket.io-client';
 import SideRail from '../components/SideRail';
 // import ezbase from "./../../../sdk/dist/index";
+import ezbase from 'ezbase-ts';
 
 // const socket = io(`${import.meta.env.VITE_BACKEND_SOCKET_URL}`);
 
@@ -11,7 +12,7 @@ const RealtimeTest = () => {
   const [message, setMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [realtimeService, setRealtimeService] = useState(null);
-  // const eb = new ezbase("http://localhost:3690","http://localhost:3691");
+  const eb = new ezbase("http://localhost:3690","http://localhost:3691");
 
   useEffect(() => {
     // Initialize the RealtimeService

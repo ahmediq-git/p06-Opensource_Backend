@@ -25,7 +25,7 @@ class EzBaseClient {
 
         const headers = {
             'Content-Type': 'application/json',
-            'Cookie': this.authStore.jwtToken,
+            'Authorization': this.authStore.token,
         };
 
         try {

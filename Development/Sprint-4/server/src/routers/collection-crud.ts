@@ -36,7 +36,6 @@ collections.post("/create", async (c: Context) => {
 		return c.json({ data: collection, error: null });
 	} catch (error) {
 		console.log(error);
-
 		return c.json({ error, data: null });
 	}
 });

@@ -39,6 +39,7 @@ process.env.DEV ? app.use("*", logConsoleDev): app.use("*", logConsoleProd)
 app.use("*", parseAuthHeader);
 
 app.get("/", async (c: Context) => {
+  
   return c.text("Hello world");
 });
 

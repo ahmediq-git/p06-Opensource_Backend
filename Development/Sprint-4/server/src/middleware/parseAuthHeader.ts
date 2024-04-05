@@ -10,6 +10,7 @@ export const parseAuthHeader = async (
 
 	if (!authHeader) {
 		console.log("No auth header found");
+		c.set("Authorization", "Guest");
 		return await next();
 
 	}
@@ -18,6 +19,7 @@ export const parseAuthHeader = async (
 
 	if (!token) {
 		console.log("No token found");
+		c.set("Authorization", "Guest");
 		return await next();
 	}
 

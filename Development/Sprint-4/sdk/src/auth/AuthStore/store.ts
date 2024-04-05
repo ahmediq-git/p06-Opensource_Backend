@@ -1,25 +1,24 @@
 class AuthStore {
-    #jwtToken: string = '';
+    token: string = '';
+    user_id: string = '';
+    STORAGE_KEY_TOKEN = 'authToken';
+    STORAGE_KEY_ID = 'userId';
 
-    // Getting a JWT token
-    get jwtToken(): string {
-        return this.#jwtToken;
-    }
-
-    // Helper function to extract the JWT Token from the HTTP response
-    #extractCookieFromRequest(httpResponse: any): string {
-        return httpResponse.headers['set-cookie'][0];
-    }
 
     // Saving the token to the store
-    #persist(jwtToken: string): void {
-        this.#jwtToken = jwtToken || '';
+    #persist(token: string, id:string): void {
+        this.token = token || '';
+        this.user_id = id || '';
+        localStorage.setItem(this.STORAGE_KEY_TOKEN, this.token);
+        localStorage.setItem(this.STORAGE_KEY_ID, this.user_id);
     }
 
     // Saves the token to the store from the HTTP response
     saveTokenFromResponse(httpResponse: any): void {
-        const jwtToken: string = this.#extractCookieFromRequest(httpResponse);
-        this.#persist(jwtToken);
+        const token: string =  httpResponse.data.token;
+        const id: string = httpResponse.data.user._id;
+
+        this.#persist(token,id);
         // console.log(jwtToken);
     }
 }

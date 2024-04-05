@@ -18,7 +18,7 @@ class Auth {
 
             const sendObject = { "email": email, "password": password };
 
-            const response = await this.client.sendToBackend(sendObject, "/signup_email", "POST");
+            const response = await this.client.sendToBackend(sendObject, "/api/auth/user/create", "POST");
             this.authStore.saveTokenFromResponse(response);
         } catch (error) {
             console.log("Error signing in ", error);
@@ -34,7 +34,7 @@ class Auth {
 
             const sendObject = { "email": email, "password": password };
 
-            const response = await this.client.sendToBackend(sendObject, "/signin_email", "POST");
+            const response = await this.client.sendToBackend(sendObject, "/api/auth/user/login", "POST");
             this.authStore.saveTokenFromResponse(response);
         } catch (error) {
             console.log("Error signing in ", error);

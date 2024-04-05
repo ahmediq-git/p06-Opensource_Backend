@@ -121,15 +121,19 @@ auth.post("/user/create", async (c: Context) => {
 
 		if (!email || !password) throw new Error("Invalid email or password");
 
-		// create collection like normal
-		const record = await createRecord(
+		const user = await readRecord({ email }, "users");
+		// console.log("user", user);
+		if (user.length !== 0) throw new Error("User already exists");
+
+		const record: any = await createRecord(
 			{
 				...details,
 				password: await Bun.password.hash(password),
 			},
 			"users"
 		);
-
+		console.log("in create user",record);
+		
 		// remove password from details
 		delete details.password;
 
@@ -137,15 +141,20 @@ auth.post("/user/create", async (c: Context) => {
 			delete record.password;
 		}
 
+		const token = await sign(record, process.env.USER_AUTH_KEY || "user_key");
+		
 		return c.json({
 			error: null,
-			data: record,
+			data: {
+				token,
+				user
+			},
 		});
-	} catch (error) {
-		console.log(error);
-		return c.json({ error, data: null });
+
+	} catch (error: any) {
+
+		return c.json({ error: error?.message, data: null },400);
 	}
-	return c.text("Create user");
 });
 
 auth.post("/user/delete", async (c: Context) => {
@@ -160,12 +169,17 @@ auth.post("/user/delete", async (c: Context) => {
 		if (!deleted) throw new Error("Failed to delete user");
 
 		return c.json({ error: null, data: deleted });
-	} catch (error) {}
-	return c.text("Delete user");
+
+	} catch (error:any) {
+		console.log(error);
+		return c.json({ error: error?.message, data: null });
+	}
 });
 
 auth.post("/user/login", async (c: Context) => {
 	try {
+		 
+		// console.log(c.get("Authorization"));
 		const body = await c.req.json();
 
 		const { email, password } = body;
@@ -183,6 +197,7 @@ auth.post("/user/login", async (c: Context) => {
 		if (user?.length === 0) {
 			return c.json({ error: "User does not exist", data: null });
 		}
+		// console.log("in login", user[0]);
 
 		const loginValid: boolean = await Bun.password.verify(
 			password,
@@ -193,6 +208,12 @@ auth.post("/user/login", async (c: Context) => {
 		if (!loginValid) {
 			return c.json({ error: "Invalid login", data: null });
 		}
+
+		if (user[0]?.password) {
+			delete user[0].password;
+		}
+
+		// console.log(user[0]);
 
 		// sign the token
 		const token = await sign(user[0], process.env.USER_AUTH_KEY || "user_key");
@@ -209,7 +230,7 @@ auth.post("/user/login", async (c: Context) => {
 		});
 	} catch (error) {
 		console.log(error);
-		return c.json({ error, data: null });
+		return c.json({ error, data: null }, 500);
 	}
 });
 
