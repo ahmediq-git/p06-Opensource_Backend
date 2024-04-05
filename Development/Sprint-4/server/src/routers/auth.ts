@@ -46,7 +46,9 @@ auth.get("/admin", async (c: Context) => {
 		const admin: boolean = await checkAdminExists();
 
 		return c.json({ error: null, data: admin });
-	} catch (error) {}
+	} catch (error) {
+		return c.json({ error, data: null });
+	}
 	return c.text("Get admin");
 });
 
@@ -57,7 +59,9 @@ auth.get("/admins", async (c: Context) => {
 		console.log(admins);
 
 		return c.json({ error: null, data: admins });
-	} catch (error) {}
+	} catch (error) {
+
+	}
 	return c.text("Get all admins");
 });
 
@@ -123,7 +127,7 @@ auth.post("/user/create", async (c: Context) => {
 
 		const user = await readRecord({ email }, "users");
 		// console.log("user", user);
-		if (user.length !== 0) throw new Error("User already exists");
+		// if (user.length !== 0) throw new Error("User already exists");
 
 		const record: any = await createRecord(
 			{
@@ -142,12 +146,12 @@ auth.post("/user/create", async (c: Context) => {
 		}
 
 		const token = await sign(record, process.env.USER_AUTH_KEY || "user_key");
-		
+
 		return c.json({
 			error: null,
 			data: {
 				token,
-				user
+				user: record,
 			},
 		});
 

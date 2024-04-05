@@ -15,6 +15,8 @@ export const parseAuthHeader = async (
 
 	}
 
+	console.log("this", authHeader)
+
 	const token = authHeader.split(" ")[1];
 
 	if (!token) {
@@ -26,7 +28,9 @@ export const parseAuthHeader = async (
 	try {
 		const decoded = jwt.verify(token, process.env.USER_AUTH_KEY || "user_key");
 
-		c.req.user = decoded;
+		c.set("user",decoded)
+
+		console.log("decoded", decoded);
 
 		return await next();
 	} catch (error) {
