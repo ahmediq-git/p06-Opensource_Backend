@@ -20,12 +20,12 @@ class EzBaseClient {
     }
 
     // Sends to the backend using the given method and api endpoint
-    async sendToBackend(jsonObject: any, apiEndpoint: string, method: 'POST' | 'DELETE' | 'GET'): Promise<AxiosResponse<any> | void> {
+    async sendToBackend(jsonObject: any, apiEndpoint: string, method: 'POST' | 'DELETE' | 'GET' | 'PATCH'): Promise<AxiosResponse<any> | void> {
         let completeApiEndpoint = `${this.backendUrl}${apiEndpoint}`;
 
         const headers = {
             'Content-Type': 'application/json',
-            'Authorization': this.authStore.token,
+            'Authorization': 'Bearer ' + this.authStore.token,
         };
 
         try {
@@ -35,10 +35,23 @@ class EzBaseClient {
                 case 'POST':
                     response = await axios.post(completeApiEndpoint, jsonObject, { headers });
                     // console.log('Data sent successfully:', response.data);
+                    if (response?.data.error !== null) {
+                       throw new Error(response?.data.error)
+                    }
                     return response;
+                case 'PATCH':
+                        response = await axios.post(completeApiEndpoint, jsonObject, { headers });
+                        // console.log('Data sent successfully:', response.data);
+                        if (response?.data.error !== null) {
+                           throw new Error(response?.data.error)
+                        }
+                        return response;
                 case 'DELETE':
                     response = await axios.delete(completeApiEndpoint, { data: jsonObject, headers });
                     // console.log('Data sent for deletion successfully:', response.data);
+                    if (response?.data.error !== null) {
+                        throw new Error(response?.data.error)
+                     }
                     return response;
                 case 'GET':
                     const values = Object.values(jsonObject);
@@ -47,6 +60,9 @@ class EzBaseClient {
                         console.log(completeApiEndpoint)
                     }
                     response = await axios.get(completeApiEndpoint, { headers });
+                    if (response?.data.error !== null) {
+                        throw new Error(response?.data.error)
+                     }
                     // console.log('Data received successfully:', response.data);
                     return response;
                 default:

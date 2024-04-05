@@ -14,12 +14,27 @@ class AuthStore {
     }
 
     // Saves the token to the store from the HTTP response
-    saveTokenFromResponse(httpResponse: any): void {
-        const token: string =  httpResponse.data.token;
-        const id: string = httpResponse.data.user._id;
+    saveTokenFromResponse(data: any): void {
+        console.log("data from server",data)
+        const token: string =  data.token;
+        const id: string = data.user._id;
 
         this.#persist(token,id);
         // console.log(jwtToken);
+    }
+
+    removeToken(): void {
+        this.token = '';
+        this.user_id = '';
+        localStorage.removeItem(this.STORAGE_KEY_TOKEN);
+        localStorage.removeItem(this.STORAGE_KEY_ID);
+    }
+
+    isAuthenticated(): boolean {
+        
+        if (this.token !== '') return true;
+
+        return false;
     }
 }
 
