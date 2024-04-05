@@ -54,7 +54,8 @@ export default function Files() {
                 formData,
                 {
                     headers: {
-                        'Content-Type': 'multipart/form-data'
+                        'Content-Type': 'multipart/form-data',
+						'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
                     },
                 }
             );

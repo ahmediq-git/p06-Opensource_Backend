@@ -28,6 +28,7 @@ export default function ApplicationSettings() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
         },
         body: JSON.stringify({
           setting_name: "application",

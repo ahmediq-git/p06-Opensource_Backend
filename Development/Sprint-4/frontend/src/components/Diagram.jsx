@@ -14,7 +14,11 @@ const Diagram = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/schema/get_schema`);
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/schema/get_schema`, {
+          headers: {
+            'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
+          }
+        });
         if (!response.ok) {
           alert("Unable to generate schema");
           throw new Error('Failed to fetch data');
@@ -26,7 +30,7 @@ const Diagram = () => {
         const initialNodes = apiData.data.map(([collection, { concrete, loose }], index) => ({
           id: `node-${collection}`,
           type: 'textUpdater',
-          position: { x: x_start + 170*index, y: y_start },
+          position: { x: x_start + 170 * index, y: y_start },
           data: { collection, concrete, loose }
         }));
         setNodes(initialNodes);
@@ -60,7 +64,7 @@ const Diagram = () => {
           }
         }
         setEdges(edges);
-        setLoading(false); 
+        setLoading(false);
       } catch (error) {
         alert("Unable to generate schema")
         console.error('Error fetching data:', error);

@@ -12,6 +12,7 @@ import {
 	readRecord,
 } from "@src/controllers/record-crud";
 import sign from "@src/utils/auth/sign";
+import Database from "@src/database/database_handler";
 
 const auth = new Hono();
 
@@ -25,13 +26,23 @@ auth.post("/admin/create", async (c: Context) => {
 
 		if (!admin) throw new Error("Failed to create admin");
 
-		setCookie(c, "admin", JSON.stringify(email), {
-			httpOnly: true,
-			secure: true,
-			sameSite: "Strict",
-			maxAge: 60 * 60 * 24 * 7,
-		});
-		return c.json({ error: null, data: admin });
+		const payload = {
+			email,
+			role: 'admin',
+			authenticated: true,
+		}
+
+		const token = await sign(payload, process.env.USER_AUTH_KEY || "user_key");
+
+		console.log(token);
+
+		// setCookie(c, "admin", JSON.stringify(email), {
+		// 	httpOnly: true,
+		// 	secure: true,
+		// 	sameSite: "Strict",
+		// 	maxAge: 60 * 60 * 24 * 7,
+		// });
+		return c.json({ error: null, data: token });
 	} catch (error) {
 		console.log(error);
 
@@ -44,9 +55,9 @@ auth.get("/admin", async (c: Context) => {
 	try {
 		// check if an admin exists
 		const admin: boolean = await checkAdminExists();
-
+		console.log('Admin check', admin);
 		return c.json({ error: null, data: admin });
-	} catch (error) {}
+	} catch (error) { }
 	return c.text("Get admin");
 });
 
@@ -57,7 +68,7 @@ auth.get("/admins", async (c: Context) => {
 		console.log(admins);
 
 		return c.json({ error: null, data: admins });
-	} catch (error) {}
+	} catch (error) { }
 	return c.text("Get all admins");
 });
 
@@ -72,7 +83,7 @@ auth.delete("/admin/delete", async (c: Context) => {
 		if (!deleted) throw new Error("Failed to delete admin");
 
 		return c.json({ error: null, data: deleted });
-	} catch (error) {}
+	} catch (error) { }
 	return c.text("Delete admin");
 });
 
@@ -86,16 +97,27 @@ auth.post("/admin/login", async (c: Context) => {
 		const loginValid: boolean | string = await checkLoginValid(email, password);
 
 		if (loginValid) {
-			setCookie(c, "admin", JSON.stringify(email), {
-				httpOnly: true,
-				secure: true,
-				sameSite: "Strict",
-				maxAge: 60 * 60 * 24 * 7,
-			});
+			let payload = {
+				email,
+				role: 'admin',
+				authenticated: true
+			}
+			const token = await sign(payload, process.env.USER_AUTH_KEY || "user_key");
+
+			console.log(token);
+			// setCookie(c, "admin", JSON.stringify(email), {
+			// 	httpOnly: true,
+			// 	secure: true,
+			// 	sameSite: "Strict",
+			// 	maxAge: 60 * 60 * 24 * 7,
+			// });
+
+			return c.json({ error: null, data: token });
+
 		}
 
 		return c.json({ error: null, data: loginValid });
-	} catch (error) {}
+	} catch (error) { }
 	return c.text("Admin login");
 });
 
@@ -109,7 +131,7 @@ auth.post("/admin/logout", async (c: Context) => {
 			maxAge: 0,
 		});
 		return c.json({ error: null, data: "Admin logged out" });
-	} catch (error) {}
+	} catch (error) { }
 	return c.text("Admin logout");
 });
 
@@ -160,7 +182,7 @@ auth.post("/user/delete", async (c: Context) => {
 		if (!deleted) throw new Error("Failed to delete user");
 
 		return c.json({ error: null, data: deleted });
-	} catch (error) {}
+	} catch (error) { }
 	return c.text("Delete user");
 });
 
@@ -216,28 +238,28 @@ auth.post("/user/login", async (c: Context) => {
 // TODO
 auth.post("/user/reset-password", async (c: Context) => {
 	try {
-	} catch (error) {}
+	} catch (error) { }
 	return c.text("Reset user password");
 });
 
 // TODO
 auth.post("/user/forgot-password", async (c: Context) => {
 	try {
-	} catch (error) {}
+	} catch (error) { }
 	return c.text("Forgot user password");
 });
 
 // TODO
 auth.post("/user/verify", async (c: Context) => {
 	try {
-	} catch (error) {}
+	} catch (error) { }
 	return c.text("Verify user");
 });
 
 // TODO
 auth.post("/user/verify-email", async (c: Context) => {
 	try {
-	} catch (error) {}
+	} catch (error) { }
 	return c.text("Verify user email");
 });
 

@@ -28,14 +28,17 @@ export default function ProtectedRoutes() {
 	const location = useLocation();
 
 	useLayoutEffect(() => {
-		if (data && !admin.loggedIn && location.pathname !== "/login") {
+		console.log(admin, data)
+		console.log("Admin null?", admin == null)
+		if (!isLoading && data && admin == null && location.pathname !== "/login") {
+			console.log("HERE, LOG IN REDIRECT")
 			navigate("/login", { replace: true });
 		}
 
 		if (!data && location.pathname !== "/init") {
 			navigate("/init");
 		}
-	}, [data, admin.loggedIn, navigate]);
+	}, [data, admin, navigate]);
 
 	return <Outlet></Outlet>;
 }

@@ -44,7 +44,7 @@ export default function SideRail() {
 	}, [location.pathname]);
 
 	const signOut = async () => {
-		setAdmin({ loggedIn: false, email: "" });
+		setAdmin('jwt', '');
 		navigate("/login");
 	}
 

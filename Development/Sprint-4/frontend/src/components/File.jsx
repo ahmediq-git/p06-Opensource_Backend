@@ -22,7 +22,11 @@ export default function File() {
 				`${import.meta.env.VITE_BACKEND_URL}/files/${id}`,
 				{
 					method: "DELETE",
-				}
+					headers: {
+						'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
+					}
+				},
+
 			);
 
 			const data = await res.json();
@@ -130,7 +134,7 @@ export default function File() {
 					<div className="mx-auto flex flex-col justify-center items-center h-full">
 						{/* <FileIcon size={350} /> */}
 
-						<div style={{ width: '280px', height: '280px', display: 'flex', justifyContent: 'center', alignItems: 'center'  }}>
+						<div style={{ width: '280px', height: '280px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
 							{generateIcon(selection.meta_data.link)}
 						</div>
 

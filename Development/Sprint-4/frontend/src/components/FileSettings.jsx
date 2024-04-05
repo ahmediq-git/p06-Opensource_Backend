@@ -40,6 +40,7 @@ export default function FileSettings() {
         method: "PUT",
         headers: {
           "Content-Type": "blobStorage/json",
+          'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
         },
         body: JSON.stringify({
           setting_name: "blobStorage",

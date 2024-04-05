@@ -18,6 +18,7 @@ export default function StressTestPage() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
                 },
                 body: JSON.stringify({ collection_name: "stress" }),
             });
@@ -32,6 +33,7 @@ export default function StressTestPage() {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
+                    'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
                 },
             });
         } catch (error) {
@@ -65,6 +67,7 @@ export default function StressTestPage() {
                     body: jsonBody,
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
                     },
                 });
                 totalRequestsSent++;
