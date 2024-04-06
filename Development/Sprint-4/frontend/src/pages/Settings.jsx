@@ -21,6 +21,8 @@ export default function Settings() {
         return <MailSettings />;
       case 'file':
         return <FilesStorageSettings />;
+      case 'admins':
+        return <Admins />
       // ... case for other setting components
       default:
         return null;

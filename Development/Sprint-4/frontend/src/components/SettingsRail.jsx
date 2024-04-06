@@ -74,9 +74,9 @@ export default function SettingsRail({ setActiveSetting,activeSetting }) {
         <TicketIcon className="mr-3 h-6 w-6 " />
         Token options{"\n              "}
       </a> */}
-      <a className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${activeSetting === 'admin' ? 'bg-zinc-600' : ''} hover:bg-zinc-600  hover:text-gray-100`}
+      <a className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${activeSetting === 'admins' ? 'bg-zinc-600' : ''} hover:bg-zinc-600  hover:text-gray-100`}
         
-        onClick={() => setActiveSetting('admin')}
+        onClick={() => setActiveSetting('admins')}
       >
         <UsersIcon className="mr-3 h-6 w-6 " />
         Admins{"\n              "}

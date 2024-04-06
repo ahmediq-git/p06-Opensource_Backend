@@ -23,6 +23,7 @@ export default function Admins() {
 			method: "DELETE",
 			headers: {
 				"Content-Type": "application/json",
+				// 'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
 			},
 			body: JSON.stringify({ email }),
 		});
@@ -56,7 +57,7 @@ export default function Admins() {
 						>
 							✕
 						</label>
-						<h2 className="text-xl">Modal title 1</h2>
+						<h2 className="text-xl">New Admin</h2>
 						<AdminSignupForm redirectTo="/settings"/>
 					</div>
 				</div>
