@@ -107,7 +107,11 @@ export default function Documents() {
 
 	const fetchForeignOptions = async (coll) => {
 		try {
-			const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${coll}`);
+			const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${coll}`, {
+				headers: {
+					'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
+				}
+			});
 			const data = await response.json();
 			if (data?.data) {
 				setForeignDocOptions(data?.data?.map(option => ({ _id: option._id })));
@@ -121,9 +125,13 @@ export default function Documents() {
 	useEffect(() => {
 		const fetchForeignCollOptions = async () => {
 			try {
-				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/collections`,);
+				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/collections`, {
+					headers: {
+						'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
+					}
+				});
 				const data = await response.json();
-				
+
 				if (data?.data) {
 					setForeignCollOptions(data.data);
 				}
@@ -147,14 +155,14 @@ export default function Documents() {
 			const data = doc.map((record) => {
 				if (record.type === "boolean" && record.value === null) {
 					record.value = false;
-				}else if(record.type === "foreign") {
+				} else if (record.type === "foreign") {
 					let obj = {
 						"type": "foreign_key",
 						"ref": (record.value != '' && record.value != null) ? record.value : foreignDocOptions[0]._id,
 						"collection": foreignCollSelected
 					}
 					return {
-						[record.field] : obj
+						[record.field]: obj
 					}
 				}
 				return {
@@ -182,6 +190,7 @@ export default function Documents() {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
+						'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
 					},
 					body: JSON.stringify({
 						collection_name: selection.collection,
@@ -229,8 +238,8 @@ export default function Documents() {
 									<li
 										key={doc._id}
 										className={`menu-item ${selection?.document?._id === doc._id
-												? "menu-active"
-												: null
+											? "menu-active"
+											: null
 											} bg-gray-2 flex justify-between`}
 										onClick={() => setDocumentSelected(doc)}
 									>
@@ -278,118 +287,118 @@ export default function Documents() {
 							<div className="flex flex-col gap-6 justify-between w-full overflow-visible">
 								{doc.map((record, index) => (
 									<div key={index}>
-									<div
-										key={index}
-										className="flex gap-6 justify-between items-end"
-									>
-										<div className="form-field w-full">
-											<label className="form-label">Field</label>
+										<div
+											key={index}
+											className="flex gap-6 justify-between items-end"
+										>
+											<div className="form-field w-full">
+												<label className="form-label">Field</label>
 
-											<input
-												placeholder="Type here"
-												type="text"
-												value={record.field}
-												onChange={(e) => {
-													setDoc((prev) => {
-														const newRecord = [...prev];
-														newRecord[index].field = e.target.value;
-														return newRecord;
-													});
-												}}
-												className="input max-w-full"
-											/>
-											{error?.field && (
-												<label className="form-label">
-													<span className="form-label-alt">
-														error.field.message
-													</span>
-												</label>
-											)}
-										</div>
-										<div className="form-field w-full">
-											<label className="form-label">Type</label>
-
-											<select
-												className="select w-full"
-												value={record.type}
-												onChange={(e) => {
-													setDoc((prev) => {
-														const newRecord = [...prev];
-														newRecord[index].type = e.target.value;
-														console.log("newRecord[index].type", newRecord[index].type);
-														return newRecord;
-													});
-												}}
-											>
-												<option value="boolean">bool</option>
-												<option value="number">number</option>
-												<option value="string">string</option>
-												<option value="array">array</option>
-												<option value="object">object</option>
-												<option value="foreign">foreign</option>
-											</select>
-											{error?.type && (
-												<label className="form-label">
-													<span className="form-label-alt">
-														error.type.message
-													</span>
-												</label>
-											)}
-										</div>
-										<div className="form-field w-full">
-											{record.type !== "array" && record.type !=="object" ? (
-													<label className="form-label">Value</label>
-												) : (
-													<div></div>
-											)}
-
-											{record.type === "boolean" ? (
 												<input
-													type="checkbox"
-													className="switch switch-primary switch-xl"
-													value={record.value}
+													placeholder="Type here"
+													type="text"
+													value={record.field}
 													onChange={(e) => {
 														setDoc((prev) => {
 															const newRecord = [...prev];
-															newRecord[index].value = e.target.checked ? true : false;
+															newRecord[index].field = e.target.value;
 															return newRecord;
 														});
 													}}
+													className="input max-w-full"
 												/>
-											) : record.type === "foreign" ? (
-												<div>
-													<select
-														className="select w-full"
-														type="dropdown"
-														onSelect={(e) => {
-															setForeignCollSelected(e.target.value)
-															fetchForeignOptions(e.target.value)
-														}}
-														onChange={(e) => {
-															setForeignCollSelected(e.target.value)
-															fetchForeignOptions(e.target.value)
-														}}>
-														{foreignCollOptions.map(option => (
-															<option key={option} value={option}>{option}</option>
-														))}
-													</select>
-													<select
-														className="select w-full"
+												{error?.field && (
+													<label className="form-label">
+														<span className="form-label-alt">
+															error.field.message
+														</span>
+													</label>
+												)}
+											</div>
+											<div className="form-field w-full">
+												<label className="form-label">Type</label>
+
+												<select
+													className="select w-full"
+													value={record.type}
+													onChange={(e) => {
+														setDoc((prev) => {
+															const newRecord = [...prev];
+															newRecord[index].type = e.target.value;
+															console.log("newRecord[index].type", newRecord[index].type);
+															return newRecord;
+														});
+													}}
+												>
+													<option value="boolean">bool</option>
+													<option value="number">number</option>
+													<option value="string">string</option>
+													<option value="array">array</option>
+													<option value="object">object</option>
+													<option value="foreign">foreign</option>
+												</select>
+												{error?.type && (
+													<label className="form-label">
+														<span className="form-label-alt">
+															error.type.message
+														</span>
+													</label>
+												)}
+											</div>
+											<div className="form-field w-full">
+												{record.type !== "array" && record.type !== "object" ? (
+													<label className="form-label">Value</label>
+												) : (
+													<div></div>
+												)}
+
+												{record.type === "boolean" ? (
+													<input
+														type="checkbox"
+														className="switch switch-primary switch-xl"
 														value={record.value}
 														onChange={(e) => {
 															setDoc((prev) => {
 																const newRecord = [...prev];
-																newRecord[index].value = e.target.value;
+																newRecord[index].value = e.target.checked ? true : false;
 																return newRecord;
 															});
 														}}
-													>
-														{foreignDocOptions.map(option => (
-															<option key={option._id} value={option._id}>{option._id}</option>
-														))}
-													</select>
-												</div>
-											) : record.type === "array" || record.type==="object" ? (
+													/>
+												) : record.type === "foreign" ? (
+													<div>
+														<select
+															className="select w-full"
+															type="dropdown"
+															onSelect={(e) => {
+																setForeignCollSelected(e.target.value)
+																fetchForeignOptions(e.target.value)
+															}}
+															onChange={(e) => {
+																setForeignCollSelected(e.target.value)
+																fetchForeignOptions(e.target.value)
+															}}>
+															{foreignCollOptions.map(option => (
+																<option key={option} value={option}>{option}</option>
+															))}
+														</select>
+														<select
+															className="select w-full"
+															value={record.value}
+															onChange={(e) => {
+																setDoc((prev) => {
+																	const newRecord = [...prev];
+																	newRecord[index].value = e.target.value;
+																	return newRecord;
+																});
+															}}
+														>
+															{foreignDocOptions.map(option => (
+																<option key={option._id} value={option._id}>{option._id}</option>
+															))}
+														</select>
+													</div>
+												) : record.type === "array" || record.type === "object" ? (
 													<div className="max-w-full"></div>
 												) : (
 													<input

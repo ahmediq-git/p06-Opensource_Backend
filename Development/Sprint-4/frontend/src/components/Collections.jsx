@@ -75,6 +75,7 @@ export default function Collections() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
         },
         body: JSON.stringify({ collection_name: name }),
       });

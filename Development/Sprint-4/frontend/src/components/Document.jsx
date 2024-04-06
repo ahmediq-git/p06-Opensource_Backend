@@ -132,6 +132,7 @@ export default function Document() {
 				method: "DELETE",
 				headers: {
 					"Content-Type": "application/json",
+					'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
 				},
 				body: JSON.stringify({
 					collection_name: selection.collection,
@@ -171,6 +172,7 @@ export default function Document() {
 				method: "PATCH",
 				headers: {
 					"Content-Type": "application/json",
+					'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
 				},
 				body: JSON.stringify({
 					collection_name: selection.collection,

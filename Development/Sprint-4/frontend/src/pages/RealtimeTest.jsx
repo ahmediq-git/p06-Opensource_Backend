@@ -31,7 +31,11 @@ const RealtimeTest = () => {
 
   const fetchCollections = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/collections`);
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/collections`, {
+        headers: {
+          'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
+        }
+      });
       const data = await response.json();
       setCollections(data.data);
     } catch (error) {
@@ -63,11 +67,11 @@ const RealtimeTest = () => {
     // Use the RealtimeService to subscribe
     realtimeService?.subscribe(collectionName,
       {}   //{"$and":[{"age":{"$gt":25}},{"male":true}]} query if we want to get records that match specific query leave empty for all records
-    , (data) => {
-      console.log("datataa",data)
-      updateCollectionData(data);
-      //  may want to distinguish between 'recordAdded' and 'recordRemoved' by adding another field in the data sent by the server
-    });
+      , (data) => {
+        console.log("datataa", data)
+        updateCollectionData(data);
+        //  may want to distinguish between 'recordAdded' and 'recordRemoved' by adding another field in the data sent by the server
+      });
     setSubscribedCollections((prev) => [...prev, collectionName]);
   };
 
