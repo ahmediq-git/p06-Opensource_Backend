@@ -34,7 +34,11 @@ export default function HomePage() {
 
     const fetchIndices = async () => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/index/get_all_indices_of_collection?collection_name=${selection.collection}`);
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/index/get_all_indices_of_collection?collection_name=${selection.collection}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
+                }
+            });
             const data = await res.json();
             console.log(data);
             setIndices(data.data); // Update state with fetched indices
@@ -49,6 +53,7 @@ export default function HomePage() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
                 },
                 body: JSON.stringify({
                     collection_name: selection.collection,
@@ -77,6 +82,7 @@ export default function HomePage() {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
+                    'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
                 },
                 body: JSON.stringify({
                     collection_name: selection.collection,
@@ -103,6 +109,7 @@ export default function HomePage() {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
+                    'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
                 },
             });
             const data = await res.json();

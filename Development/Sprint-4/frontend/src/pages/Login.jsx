@@ -21,25 +21,31 @@ export default function Login() {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
+				// 'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
 			},
 			body: JSON.stringify({ email, password }),
 		});
 
 		const resData = await res.json();
 
+		console.log(resData);
+
 		if (resData.error) {
 			setError(resData.error);
 			setLoading(false);
 			return;
 		}
-		if (resData.data){
-			setAdmin({ loggedIn: true, email: email });
+		if (resData.data) {
+			setAdmin(resData.data);
 		} else {
-			setAdmin({ loggedIn: false, email: "" });
+			setAdmin(null);
 		}
+		// window.localStorage.setItem('jwt', resData.data);
 
-		setLoading(false);
-		navigate("/");
+		setTimeout(() => {
+			setLoading(false);
+			navigate("/");
+		}, 100);
 	};
 
 	return (

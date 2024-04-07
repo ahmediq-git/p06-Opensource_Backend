@@ -23,7 +23,7 @@ export default function Admins() {
 			method: "DELETE",
 			headers: {
 				"Content-Type": "application/json",
-				// 'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
+				'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
 			},
 			body: JSON.stringify({ email }),
 		});

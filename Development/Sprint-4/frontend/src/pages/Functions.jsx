@@ -19,7 +19,11 @@ export default function FunctionsPage() {
 
     const fetchCollections = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/collections`);
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/collections`, {
+                headers: {
+                    'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
+                }
+            });
             const data = await response.json();
             console.log("DATA", data.data);
             setCollections(data.data);
@@ -32,7 +36,11 @@ export default function FunctionsPage() {
 
     const fetchRegisteredFunctions = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/functions/registered_functions`);
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/functions/registered_functions`, {
+                headers: {
+                    'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
+                }
+            });
             const data = await response.json();
             console.log("DATA", data.data);
             setRegistered(data.data);
@@ -71,7 +79,9 @@ export default function FunctionsPage() {
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/functions/register_function`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
+
                 },
                 body: JSON.stringify(data)
             });
@@ -95,7 +105,8 @@ export default function FunctionsPage() {
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/functions/delete_function`, {
                 method: 'DELETE',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
                 },
                 body: JSON.stringify({ id })
             });

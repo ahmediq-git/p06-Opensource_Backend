@@ -28,9 +28,9 @@ export const app = new Hono().basePath("/api");
 
 app.use("*", cors({
   origin: '*',
-  allowHeaders: ['X-Custom-Header', 'Upgrade-Insecure-Requests', 'Content-Type'],
+  allowHeaders: ['*'],
   allowMethods: ['POST', 'GET', 'OPTIONS', 'DELETE', 'PUT', 'PATCH'],
-  exposeHeaders: ['Content-Length'],
+  exposeHeaders: ['*'],
   maxAge: 600,
 }));
 

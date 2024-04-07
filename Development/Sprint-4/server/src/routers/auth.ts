@@ -12,6 +12,9 @@ import {
 	readRecord,
 } from "@src/controllers/record-crud";
 import sign from "@src/utils/auth/sign";
+import Database from "@src/database/database_handler";
+import { OAuth2Client } from "google-auth-library";
+import { html } from "hono/html";
 
 const auth = new Hono();
 
@@ -25,13 +28,23 @@ auth.post("/admin/create", async (c: Context) => {
 
 		if (!admin) throw new Error("Failed to create admin");
 
-		setCookie(c, "admin", JSON.stringify(email), {
-			httpOnly: true,
-			secure: true,
-			sameSite: "Strict",
-			maxAge: 60 * 60 * 24 * 7,
-		});
-		return c.json({ error: null, data: admin });
+		const payload = {
+			email,
+			role: 'admin',
+			authenticated: true,
+		}
+
+		const token = await sign(payload, process.env.USER_AUTH_KEY || "user_key");
+
+		console.log(token);
+
+		// setCookie(c, "admin", JSON.stringify(email), {
+		// 	httpOnly: true,
+		// 	secure: true,
+		// 	sameSite: "Strict",
+		// 	maxAge: 60 * 60 * 24 * 7,
+		// });
+		return c.json({ error: null, data: token });
 	} catch (error) {
 		console.log(error);
 
@@ -44,7 +57,7 @@ auth.get("/admin", async (c: Context) => {
 	try {
 		// check if an admin exists
 		const admin: boolean = await checkAdminExists();
-
+		console.log('Admin check', admin);
 		return c.json({ error: null, data: admin });
 	} catch (error) {
 		return c.json({ error, data: null });
@@ -76,7 +89,7 @@ auth.delete("/admin/delete", async (c: Context) => {
 		if (!deleted) throw new Error("Failed to delete admin");
 
 		return c.json({ error: null, data: deleted });
-	} catch (error) {}
+	} catch (error) { }
 	return c.text("Delete admin");
 });
 
@@ -90,16 +103,27 @@ auth.post("/admin/login", async (c: Context) => {
 		const loginValid: boolean | string = await checkLoginValid(email, password);
 
 		if (loginValid) {
-			setCookie(c, "admin", JSON.stringify(email), {
-				httpOnly: true,
-				secure: true,
-				sameSite: "Strict",
-				maxAge: 60 * 60 * 24 * 7,
-			});
+			let payload = {
+				email,
+				role: 'admin',
+				authenticated: true
+			}
+			const token = await sign(payload, process.env.USER_AUTH_KEY || "user_key");
+
+			console.log(token);
+			// setCookie(c, "admin", JSON.stringify(email), {
+			// 	httpOnly: true,
+			// 	secure: true,
+			// 	sameSite: "Strict",
+			// 	maxAge: 60 * 60 * 24 * 7,
+			// });
+
+			return c.json({ error: null, data: token });
+
 		}
 
 		return c.json({ error: null, data: loginValid });
-	} catch (error) {}
+	} catch (error) { }
 	return c.text("Admin login");
 });
 
@@ -113,7 +137,7 @@ auth.post("/admin/logout", async (c: Context) => {
 			maxAge: 0,
 		});
 		return c.json({ error: null, data: "Admin logged out" });
-	} catch (error) {}
+	} catch (error) { }
 	return c.text("Admin logout");
 });
 
@@ -238,31 +262,147 @@ auth.post("/user/login", async (c: Context) => {
 	}
 });
 
+auth.get('/oauth_redirect', async (c: Context) => {
+	const { code } = c.req.query();
+	const oauth2Client = new OAuth2Client({
+		clientId: process.env.CLIENT_ID,
+		clientSecret: process.env.CLIENT_SECRET,
+		redirectUri: 'http://localhost:3690/api/auth/oauth_redirect'
+	})
+
+	let token = (await oauth2Client.getToken(code)).tokens.id_token;
+	if (token != null) {
+		const user_data = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+		console.log(user_data);
+		const user = await readRecord({ email: user_data.email }, "users");
+		console.log("user", user[0]);
+		if (user.length !== 0) {
+			const jwt = await sign(user[0], process.env.USER_AUTH_KEY || "user_key");
+			return c.redirect(`http://localhost:5173/?jwt=${jwt}`, 301);
+		}
+		let details = {
+			email: user_data.email,
+			name: user_data.given_name,
+			providers: ['google']
+		}
+		const record = await createRecord(
+			{
+				...details,
+			},
+			"users"
+		);
+		const jwt = await sign(record, process.env.USER_AUTH_KEY || "user_key");
+		return c.redirect(`http://localhost:5173/?jwt=${jwt}`, 301);
+	}
+	return c.json({
+		error: true,
+		data: null
+	})
+
+})
+
+auth.get('/redirect_test', async (c: Context) => {
+	return c.redirect('http://localhost:5173/', 301)
+})
+
+auth.post('/google_oauth', async (c: Context) => {
+	const oauth2Client = new OAuth2Client({
+		clientId: process.env.CLIENT_ID,
+		clientSecret: process.env.CLIENT_SECRET,
+		redirectUri: 'http://localhost:3690/api/auth/oauth_redirect'
+	})
+	const authorizeUrl = oauth2Client.generateAuthUrl({
+		scope: ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email'],
+	});
+	return c.json({
+		data: authorizeUrl,
+		error: null
+	});
+});
+
+auth.get('/oauth_redirect', async (c: Context) => {
+	const { code } = c.req.query();
+	const oauth2Client = new OAuth2Client({
+		clientId: process.env.CLIENT_ID,
+		clientSecret: process.env.CLIENT_SECRET,
+		redirectUri: 'http://localhost:3690/api/auth/oauth_redirect'
+	})
+
+	let token = (await oauth2Client.getToken(code)).tokens.id_token;
+	if (token != null) {
+		const user_data = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+		console.log(user_data);
+		const user = await readRecord({ email: user_data.email }, "users");
+		console.log("user", user[0]);
+		if (user.length !== 0) {
+			const jwt = await sign(user[0], process.env.USER_AUTH_KEY || "user_key");
+			return c.redirect(`http://localhost:5173/?jwt=${jwt}`, 301);
+		}
+		let details = {
+			email: user_data.email,
+			name: user_data.given_name,
+			providers: ['google']
+		}
+		const record = await createRecord(
+			{
+				...details,
+			},
+			"users"
+		);
+		const jwt = await sign(record, process.env.USER_AUTH_KEY || "user_key");
+		return c.redirect(`http://localhost:5173/?jwt=${jwt}`, 301);
+	}
+	return c.json({
+		error: true,
+		data: null
+	})
+
+})
+
+auth.get('/redirect_test', async (c: Context) => {
+	return c.redirect('http://localhost:5173/', 301)
+})
+
+auth.post('/google_oauth', async (c: Context) => {
+	const oauth2Client = new OAuth2Client({
+		clientId: process.env.CLIENT_ID,
+		clientSecret: process.env.CLIENT_SECRET,
+		redirectUri: 'http://localhost:3690/api/auth/oauth_redirect'
+	})
+	const authorizeUrl = oauth2Client.generateAuthUrl({
+		scope: ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email'],
+	});
+	return c.json({
+		data: authorizeUrl,
+		error: null
+	});
+});
+
 // TODO
 auth.post("/user/reset-password", async (c: Context) => {
 	try {
-	} catch (error) {}
+	} catch (error) { }
 	return c.text("Reset user password");
 });
 
 // TODO
 auth.post("/user/forgot-password", async (c: Context) => {
 	try {
-	} catch (error) {}
+	} catch (error) { }
 	return c.text("Forgot user password");
 });
 
 // TODO
 auth.post("/user/verify", async (c: Context) => {
 	try {
-	} catch (error) {}
+	} catch (error) { }
 	return c.text("Verify user");
 });
 
 // TODO
 auth.post("/user/verify-email", async (c: Context) => {
 	try {
-	} catch (error) {}
+	} catch (error) { }
 	return c.text("Verify user email");
 });
 

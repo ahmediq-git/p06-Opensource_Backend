@@ -6,8 +6,10 @@ export const parseAuthHeader = async (
 	c: Context,
 	next: () => Promise<void>
 ) => {
-	const authHeader = c.req.raw.headers.get("Authorization");
-
+	console.log('Url', c.req.url);
+	console.log(c.req.raw.headers);
+	const authHeader = c.req.raw.headers.get("authorization");
+	console.log('Here', authHeader);
 	if (!authHeader) {
 		console.log("No auth header found");
 		c.set("Authorization", "Guest");
@@ -18,11 +20,15 @@ export const parseAuthHeader = async (
 	console.log("this", authHeader)
 
 	const token = authHeader.split(" ")[1];
-
+	console.log('Token', token);
 	if (!token) {
+		console.log(c.req.url);
 		console.log("No token found");
-		c.set("Authorization", "Guest");
+		if (c.req.url.includes('/login') || c.req.url.includes('/init')) {
+			c.set("Authorization", "Guest");
 		return await next();
+		}
+		return c.json({ 'message': 'Unauthorized', error: true });
 	}
 
 	try {
@@ -34,8 +40,7 @@ export const parseAuthHeader = async (
 
 		return await next();
 	} catch (error) {
-		console.log(error);
+		console.log(error, 'Here');
+		return c.json({ 'message': 'Unauthorized', error: true });
 	}
-
-	await next();
 };

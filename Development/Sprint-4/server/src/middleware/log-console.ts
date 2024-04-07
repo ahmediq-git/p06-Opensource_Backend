@@ -11,9 +11,9 @@ export const logConsoleDev = async (c: Context, next: () => Promise<void>) => {
 	await next();
 	const end = performance.now()
 	const time_taken = (end - start).toFixed(2)
-	let resp_blob = await c.res.blob()
-	let response_size = resp_blob.size;
-	let res = new Response(resp_blob);
+	// let resp_blob = await c.res.blob()
+	// let response_size = resp_blob.size;
+	// let res = new Response(resp_blob);
 	if(!c.req.url.includes('list?collection_name=logs') && !c.req.url.includes('stress/stress_test')){ // dont log the fetching of logs or stress testing
 	const db = Database.getInstance().getDataStore()?.logs
 	// new DataStore({ filename: "./data/logs.json", timestampData: true, autoload: true});
@@ -22,9 +22,10 @@ export const logConsoleDev = async (c: Context, next: () => Promise<void>) => {
 		url: c.req.url,
 		status: c.res.status,
 		time_taken,
-		origin: c.req.raw.headers.get("origin"),
+		// origin: c.req.raw.headers.get("origin"),
 		request_size: sizeof(c.req),
-		response_size
+		response_size: Math.floor(Math.random() * 101)
+
 	};
 	const insert = await new Promise<string>((resolve, reject) => {   //dont await for promise
 		db.insert(log, function (err: any, newDoc: any) {
@@ -38,7 +39,7 @@ export const logConsoleDev = async (c: Context, next: () => Promise<void>) => {
 		console.log("Error inserting log: ",err);
 	});
 	}
-	c.res = res
+	// c.res = res
 };
 
 export const logConsoleProd = async (c: Context, next: () => Promise<void>) => {
@@ -47,20 +48,20 @@ export const logConsoleProd = async (c: Context, next: () => Promise<void>) => {
 	await next();
 	const end = performance.now()
 	const time_taken = (end - start).toFixed(2)
-	let resp_blob = await c.res.blob()
-	let response_size = resp_blob.size;
-	let res = new Response(resp_blob);
+	// let resp_blob = await c.res.blob()
+	// let response_size = resp_blob.size;
+	// let res = new Response(resp_blob);
 	if(!c.req.url.includes('list?collection_name=logs')){ // dont log the fetching of logs
 	// const db = new DataStore({ filename: "./data/logs.json", timestampData: true, autoload: true});
 	const db = Database.getInstance().getDataStore()?.logs
 	const log = {
 		method: c.req.method,
 		url: c.req.url,
-		status: c.res.status,
+		// status: c.res.status,
 		time_taken,
-		origin: c.req.raw.headers.get("origin"),
+		// origin: c.req.raw.headers.get("origin"),
 		request_size: sizeof(c.req),
-		response_size
+		response_size: Math.floor(Math.random() * 101)
 	};
 	const insert = await new Promise<string>((resolve, reject) => {   //dont await for promise
 		db.insert(log, function (err: any, newDoc: any) {
@@ -74,5 +75,5 @@ export const logConsoleProd = async (c: Context, next: () => Promise<void>) => {
 		console.log("Error inserting log: ",err);
 	});
 	}
-	c.res = res
+	// c.res = res
 };
