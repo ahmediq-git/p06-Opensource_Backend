@@ -328,8 +328,8 @@ auth.get("/google_oauth", async (c: Context) => {
   try {
 	console.log("here")
     const oauth2Client = new OAuth2Client({
-      clientId: "",
-      clientSecret: "",
+      clientId: process.env.CLIENT_SECRET,
+      clientSecret: process.env.CLIENT_ID,
       redirectUri: "http://localhost:3690/api/auth/oauth_redirect",
     });
     const authorizeUrl = oauth2Client.generateAuthUrl({
