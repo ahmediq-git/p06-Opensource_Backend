@@ -104,9 +104,10 @@ sse.on('broadcastRecord', (data) => {
 // });
 
 // io.listen(3691);
+console.log("PORT", process.env.PORT, "URL", process.env.URL )
 
 export default {
-  port: 3690,
+  port: process.env.PORT || 3690,
   fetch: app.fetch,
   subscriptions
 };

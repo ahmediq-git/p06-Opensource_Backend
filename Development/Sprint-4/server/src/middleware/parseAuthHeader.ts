@@ -28,7 +28,7 @@ export const parseAuthHeader = async (
 			c.set("Authorization", "Guest");
 		return await next();
 		}
-		return c.json({ 'message': 'Unauthorized', error: true });
+		return c.json({ 'message': 'Unauthorized', error: true },404);
 	}
 
 	try {
@@ -41,6 +41,6 @@ export const parseAuthHeader = async (
 		return await next();
 	} catch (error) {
 		console.log(error, 'Here');
-		return c.json({ 'message': 'Unauthorized', error: true });
+		return c.json({ 'message': 'Unauthorized', error: true },404);
 	}
 };

@@ -25,7 +25,7 @@ class EzBaseClient {
 
         const headers = {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + this.authStore.token,
+            'Authorization': 'Bearer ' + this.authStore.getToken(),
         };
 
         try {

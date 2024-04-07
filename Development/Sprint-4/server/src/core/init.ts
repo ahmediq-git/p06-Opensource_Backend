@@ -302,7 +302,7 @@ async function LoadConfig() {
   const defaultConfig: AppConfig = {
     application: {
       name: "Ezbase",
-      url: "http://localhost:3690",
+      url: process.env.URL || "http://localhost:3690",
     },
     admins: [],
     blobStorage: null,

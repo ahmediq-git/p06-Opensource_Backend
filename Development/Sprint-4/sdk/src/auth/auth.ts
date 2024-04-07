@@ -63,10 +63,26 @@ class Auth {
         return this.authStore.isAuthenticated();
     }
 
-    getToken(): string | undefined {
-        // Assuming synchronous access to token in authStore
-        return this.authStore.token;
+    // getToken(): string | undefined {
+    //     // Assuming synchronous access to token in authStore
+    //     return this.authStore.token;
+    //   }
+    getToken(): string {
+        try{
+            const local_token = localStorage.getItem(this.authStore.STORAGE_KEY_TOKEN);
+            return this.authStore.token = local_token || "";
+        }catch(err){
+            console.log("err in  get token",err);
+            return "";
+        }
+    
       }
+
+    async signInWithGoogle(): Promise<any>{
+        const response = await this.client.sendToBackend({}, "/api/auth/google_oauth", "GET");
+        console.log(response)
+        return response.data;
+    }
     
 
     // Updates user Email (provided the user is already signed in)

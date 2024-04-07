@@ -54,7 +54,7 @@ export default function MailSettings() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          // 'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
+          'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
         },
         body: JSON.stringify({
           setting_name: "smtp",
