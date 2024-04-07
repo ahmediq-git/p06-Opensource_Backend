@@ -65,6 +65,11 @@ export type AppConfig = {
     ip_enabled: boolean;
   };
   collections: Collection[];
+
+  oauth: {
+    client_id: string;
+    client_secret: string;
+  };
 };
 
 export async function Initialize() {
@@ -302,7 +307,7 @@ async function LoadConfig() {
   const defaultConfig: AppConfig = {
     application: {
       name: "Ezbase",
-      url: "http://localhost:3690",
+      url: process.env.URL || "http://localhost:3690",
     },
     admins: [],
     blobStorage: null,
@@ -315,6 +320,10 @@ async function LoadConfig() {
     logs: {
       retention: 30,
       ip_enabled: false,
+    },
+    oauth: {
+      client_id: "",
+      client_secret: "",
     },
     collections: [
       {

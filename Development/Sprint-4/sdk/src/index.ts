@@ -26,4 +26,7 @@ export default class ezbase {
         this.rts = new RealtimeService(this.ezBaseClient,this.authStore); //initialising our realtime object with the
         this.files = new Files(url, this.authStore); //initialising the file object
     }
+    persistAuth(jwtToken: string, user_id: string) {
+        this.authStore.persist(jwtToken,user_id);
+    }
 }

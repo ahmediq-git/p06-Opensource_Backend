@@ -57,7 +57,7 @@ export default function Admins() {
 						>
 							✕
 						</label>
-						<h2 className="text-xl">Modal title 1</h2>
+						<h2 className="text-xl">New Admin</h2>
 						<AdminSignupForm redirectTo="/settings"/>
 					</div>
 				</div>

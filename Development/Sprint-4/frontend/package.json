@@ -14,6 +14,7 @@
     "axios": "^1.6.8",
     "chart.js": "^4.1.1",
     "chartjs-react": "^4.2.1",
+    "ezbase-ts": "^1.0.31",
     "jotai": "^2.4.3",
     "lucide-react": "^0.292.0",
     "react": "^18.2.0",

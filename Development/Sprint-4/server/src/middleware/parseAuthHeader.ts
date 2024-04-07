@@ -12,9 +12,12 @@ export const parseAuthHeader = async (
 	console.log('Here', authHeader);
 	if (!authHeader) {
 		console.log("No auth header found");
+		c.set("Authorization", "Guest");
 		return await next();
 
 	}
+
+	console.log("this", authHeader)
 
 	const token = authHeader.split(" ")[1];
 	console.log('Token', token);
@@ -22,19 +25,22 @@ export const parseAuthHeader = async (
 		console.log(c.req.url);
 		console.log("No token found");
 		if (c.req.url.includes('/login') || c.req.url.includes('/init')) {
-			return await next();
+			c.set("Authorization", "Guest");
+		return await next();
 		}
-		return c.json({ 'message': 'Unauthorized', error: true });
+		return c.json({ 'message': 'Unauthorized', error: true },404);
 	}
 
 	try {
 		const decoded = jwt.verify(token, process.env.USER_AUTH_KEY || "user_key");
-		console.log('Decoded', decoded);
-		c.req.user = decoded;
+
+		c.set("user",decoded)
+
+		console.log("decoded", decoded);
 
 		return await next();
 	} catch (error) {
 		console.log(error, 'Here');
-		return c.json({ 'message': 'Unauthorized', error: true });
+		return c.json({ 'message': 'Unauthorized', error: true },404);
 	}
 };

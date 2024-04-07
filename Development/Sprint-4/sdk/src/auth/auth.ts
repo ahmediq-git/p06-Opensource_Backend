@@ -18,10 +18,11 @@ class Auth {
 
             const sendObject = { "email": email, "password": password };
 
-            const response = await this.client.sendToBackend(sendObject, "/signup_email", "POST");
-            this.authStore.saveTokenFromResponse(response);
+            const response = await this.client.sendToBackend(sendObject, "/api/auth/user/create", "POST");
+            console.log(response.data)
+            this.authStore.saveTokenFromResponse(response.data?.data);
         } catch (error) {
-            console.log("Error signing in ", error);
+            console.log("Error signing up ", error);
         }
     }
 
@@ -34,8 +35,9 @@ class Auth {
 
             const sendObject = { "email": email, "password": password };
 
-            const response = await this.client.sendToBackend(sendObject, "/signin_email", "POST");
-            this.authStore.saveTokenFromResponse(response);
+            const response = await this.client.sendToBackend(sendObject, "/api/auth/user/login", "POST");
+            console.log(response)
+            this.authStore.saveTokenFromResponse(response.data?.data);
         } catch (error) {
             console.log("Error signing in ", error);
         }
@@ -44,7 +46,7 @@ class Auth {
     // Signs out the current user logged in
     async signOut(): Promise<void> {
         try {
-            await this.client.sendToBackend({}, "/signout", "GET");
+            this.authStore.removeToken();
         } catch (error) {
             console.log("Error signing out: ", error);
         }
@@ -53,7 +55,35 @@ class Auth {
     // Returns the json dictionary data pertaining to the user currently signed in
     async currentUser(): Promise<void> {
         // Implementation goes here
+        return this.authStore.user_id;
     }
+
+    async isAuthenticated(): Promise<boolean> {
+        // Implementation goes here
+        return this.authStore.isAuthenticated();
+    }
+
+    // getToken(): string | undefined {
+    //     // Assuming synchronous access to token in authStore
+    //     return this.authStore.token;
+    //   }
+    getToken(): string {
+        try{
+            const local_token = localStorage.getItem(this.authStore.STORAGE_KEY_TOKEN);
+            return this.authStore.token = local_token || "";
+        }catch(err){
+            console.log("err in  get token",err);
+            return "";
+        }
+    
+      }
+
+    async signInWithGoogle(): Promise<any>{
+        const response = await this.client.sendToBackend({}, "/api/auth/google_oauth", "GET");
+        console.log(response)
+        return response.data;
+    }
+    
 
     // Updates user Email (provided the user is already signed in)
     async updateEmail(email: string): Promise<void> {

@@ -57,9 +57,9 @@ export const logConsoleProd = async (c: Context, next: () => Promise<void>) => {
 	const log = {
 		method: c.req.method,
 		url: c.req.url,
-		// status: c.res.status,
+		status: c.res.status,
 		time_taken,
-		// origin: c.req.raw.headers.get("origin"),
+		origin: c.req.raw.headers.get("origin"),
 		request_size: sizeof(c.req),
 		response_size: Math.floor(Math.random() * 101)
 	};

@@ -20,12 +20,12 @@ npm run test
 ### To use the SDK code do the following:
 
 ```javascript
-    npm install ezbase
+    npm install ezbase-ts
 ```
 
 ### After which you can use the SDK in your javascript project as such
 ```javascript
-    import ezbase from 'ezbase'
+    import ezbase from 'ezbase-ts'
 ```
 
 ### If you are using nodejs, also write the following in your package.json file

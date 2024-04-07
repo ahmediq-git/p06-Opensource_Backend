@@ -11,7 +11,7 @@ collections.get("/", async (c: Context) => {
 		const collections = await getAllCollections();
 		// remove system collections
 		// config, logs
-		const systemCollections = ["config", "logs"];
+		const systemCollections = ["config", "logs", "functions"];
 
 		return c.json({
 			data: collections.filter(
@@ -36,7 +36,6 @@ collections.post("/create", async (c: Context) => {
 		return c.json({ data: collection, error: null });
 	} catch (error) {
 		console.log(error);
-
 		return c.json({ error, data: null });
 	}
 });

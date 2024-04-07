@@ -9,8 +9,8 @@ export default async function checkAdminExists() {
 			if (err) {
 				reject(err);
 			} else {
-				console.log("doc[0]", doc[0]);
-				console.log("doc[0]?.admins", doc[0]?.admins);
+				// console.log("doc[0]", doc[0]);
+				// console.log("doc[0]?.admins", doc[0]?.admins);
 				
 				
 				resolve(doc[0]?.admins);

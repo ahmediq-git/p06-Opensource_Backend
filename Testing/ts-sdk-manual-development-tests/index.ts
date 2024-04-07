@@ -1,4 +1,4 @@
-import ezbase from "../../Development/Sprint-2/sdk/dist/index";
+import ezbase from "../../Development/Sprint-4/sdk/dist/index";
 import axios, { AxiosResponse } from 'axios';
 
 const eb = new ezbase("http://localhost:3690");
@@ -65,8 +65,22 @@ async function sendTextMail(): Promise<any> {
     console.log(res);
 }
 
+async function auth (): Promise<any> {
+    
+    console.log("Testing authentication");
+
+    const res = await eb.auth.signUp("moiztest1@gmail.com", "moiztest").then((ans: any) => console.log(ans));
+    console.log("token",eb.auth.getToken())
+    console.log("send req to server")
+    const res2 = await eb.auth.signIn("moiztest1@gmail.com", "moiztest").then((ans: any) => console.log(ans));
+    const cct1 = await eb.db.createCollection("TestSDKCollection2");
+    console.log(cct1);
+
+    console.log("");
+}
 // Calling the functions
-sendTextMail();
+// sendTextMail();
+ auth();
 // createCollectionTest();
 // getCollectionsTest();
 // deleteCollection();
