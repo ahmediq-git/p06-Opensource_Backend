@@ -1,0 +1,3 @@
+This JSON object is temporary and only for testing until we are able to use the Ebay API.
+Keeping a users object in the repository is not best practice. 
+Better to use a protected database, however we are keeping it as such for simplicity and learning
