@@ -17,7 +17,7 @@ export default class ezbase {
     rts: RealtimeService;
     files: Files
 
-    constructor(url: string, socketUrl:string) {
+    constructor(url: string, socketUrl: string = "http://localhost:3691") {
         this.authStore = new AuthStore();
         this.ezBaseClient = new EzBaseClient(url, this.authStore,socketUrl); //initialising our client object with the url provided by the user.
         this.db = new Crud(this.ezBaseClient, this.authStore); //initialising our database object and passing our client object so the CRUD can send to the user
