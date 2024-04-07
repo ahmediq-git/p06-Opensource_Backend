@@ -27,7 +27,7 @@ export const AdminSignupForm = ({ redirectTo }) => {
 	const navigate = useNavigate();
 
 	const handleSubmit = async (e) => {
-		e.preventDefault();
+		// e.preventDefault();
 		setError("");
 		setLoading(true);
 
