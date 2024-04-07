@@ -27,6 +27,8 @@ export default function Files() {
 		fetcher
 	);
 
+	console.log("Files list", data);
+
     const handleFileChange = async(event) => {
         try{
         const file = event.target.files[0];
@@ -59,7 +61,7 @@ export default function Files() {
                     },
                 }
             );
-
+			console.log("Files", res);
 			// const adsa = await res.json();
 
 			// console.log("ADSA", adsa);

@@ -6,6 +6,7 @@ import { fetcher } from "../lib/utils/fetcher";
 import { z } from "zod";
 import { Lock } from "lucide-react";
 import { isAuthCollection } from "../lib/utils/isAuthCollection";
+import { useNavigate } from "react-router-dom";
 
 const collectionNameSchema = z
   .string({
@@ -21,6 +22,7 @@ export default function Collections() {
   const [collectionName, setCollectionName] = useState(null);
   const [collectionData, setCollectionData] = useState(null); // Local state for collection data
   const { mutate } = useSWRConfig();
+  const navigate = useNavigate();
 
   const [collectionNameError, setCollectionNameError] = useState(null);
 
@@ -38,6 +40,9 @@ export default function Collections() {
     console.log("collectionsData", collectionsData);
     console.log("collectionsError", collectionsError);
     console.log("collectionsLoading", collectionsLoading);
+    // if(!collectionsLoading && collectionData!=null && collectionData.hasOwnProperty('message') && collectionData.message == 'Unauthorized') {
+    //   navigate("/login", { replace: true });
+    // }
     setCollectionData(collectionsData); // Update local state with collections data
   }, [collectionsData, collectionsError, collectionsLoading]);
 
