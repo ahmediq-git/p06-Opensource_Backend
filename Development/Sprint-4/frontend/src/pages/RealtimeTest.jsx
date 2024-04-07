@@ -12,7 +12,7 @@ const RealtimeTest = () => {
   const [message, setMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [realtimeService, setRealtimeService] = useState(null);
-  const eb = new ezbase("http://localhost:3690","http://localhost:3691");
+  const eb = new ezbase(`${import.meta.env.VITE_BACKEND_BASE}`,`${import.meta.env.VITE_BACKEND_SOCKET_URL}`);
 
   useEffect(() => {
     // Initialize the RealtimeService
