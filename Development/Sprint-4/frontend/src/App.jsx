@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {Routes, Route } from "react-router-dom";
 import HomePage from "./pages/Homepage";
 import Logs from "./pages/Logs";
 import Login from "./pages/Login";
@@ -13,7 +13,6 @@ import FilesPage from "./pages/FilesPage";
 
 function App() {
 	return (
-		<BrowserRouter>
 			<Routes>
 				<Route path="/" element={<ProtectedRoutes />}>
 					<Route path="/" element={<HomePage />}></Route>
@@ -31,7 +30,6 @@ function App() {
 					<Route path="/files" element={<FilesPage />}></Route>
 				</Route>
 			</Routes>
-		</BrowserRouter>
 	);
 }
 
