@@ -3,6 +3,7 @@ import { setCookie } from "hono/cookie";
 import createAdmin from "@src/utils/auth/admin/createAdmin";
 import { getCollection } from "@src/utils/getCollection";
 import checkAdminExists from "@src/utils/auth/admin/checkAdminExists";
+import getSettings from "@src/utils/misc/getSettings";
 import checkLoginValid from "@src/utils/auth/admin/checkLoginValid";
 import deleteAdmin from "@src/utils/auth/admin/deleteAdmin";
 import getAdmins from "@src/utils/auth/admin/getAdmins";
@@ -269,10 +270,12 @@ auth.post("/user/login", async (c: Context) => {
 auth.get("/oauth_redirect", async (c: Context) => {
   try {
     const { code } = c.req.query();
+	const oauth = await getSettings("oauth");
+	const application = await getSettings("application");
     const oauth2Client = new OAuth2Client({
-      clientId: process.env.CLIENT_ID,
-      clientSecret: process.env.CLIENT_SECRET,
-      redirectUri: "http://localhost:3690/api/auth/oauth_redirect",
+      clientId: oauth?.client_id,
+      clientSecret: oauth?.client_secret,
+      redirectUri: application?.url, // "http://localhost:3690/api/auth/oauth_redirect"
     });
 
     let token = (await oauth2Client.getToken(code)).tokens.id_token;
