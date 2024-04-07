@@ -27,6 +27,8 @@ export default function Files() {
 		fetcher
 	);
 
+	console.log("Files list", data);
+
     const handleFileChange = async(event) => {
         try{
         const file = event.target.files[0];
@@ -59,7 +61,7 @@ export default function Files() {
                     },
                 }
             );
-
+			console.log("Files", res);
 			// const adsa = await res.json();
 
 			// console.log("ADSA", adsa);
@@ -96,7 +98,7 @@ export default function Files() {
 					<section className="menu-section">
 						<ul className="menu-items gap-2">
 							{data?.length !== 0 ? (
-								data?.data.map((cur_file) => (
+								data?.data?.map((cur_file) => (
 									<li
 										key={cur_file._id}
 										className={`menu-item ${selection?.meta_data?._id === cur_file._id

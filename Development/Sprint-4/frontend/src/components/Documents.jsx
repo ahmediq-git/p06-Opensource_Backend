@@ -17,6 +17,7 @@ const dataSchema = z.union([
 	z.literal("object"),
 	z.literal("array"),
 	z.literal("foreign"),
+	z.literal("file"),
 ]);
 
 // // Define the main schema for an array of objects
@@ -68,6 +69,7 @@ export default function Documents() {
 	const [foreignDocOptions, setForeignDocOptions] = useState([]);
 	const [foreignCollOptions, setForeignCollOptions] = useState([]);
 	const [foreignCollSelected, setForeignCollSelected] = useState("");
+	const [fileOptions, setFileOptions] = useState([]);
 
 
 	const { data, error, isLoading } = useSwr(
@@ -121,6 +123,28 @@ export default function Documents() {
 		}
 	};
 
+	useEffect(() => {
+		const fetchFiles = async () => {
+			const response = await fetch(
+				`${import.meta.env.VITE_BACKEND_URL}/files/list`,
+				{
+					headers: {
+						'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
+					}
+				}
+			);
+			const data = await response.json();
+			const mappedFiles = data?.data?.map(obj => ({
+				name: obj.name,
+				link: obj.link
+			}));
+			console.log("Mapped files", mappedFiles)
+			setFileOptions(mappedFiles);
+		}
+		if (doc.some(record => record.type == "file")) {
+			fetchFiles();
+		}
+	}, [doc])
 
 	useEffect(() => {
 		const fetchForeignCollOptions = async () => {
@@ -336,6 +360,7 @@ export default function Documents() {
 													<option value="array">array</option>
 													<option value="object">object</option>
 													<option value="foreign">foreign</option>
+													<option value="file">file</option>
 												</select>
 												{error?.type && (
 													<label className="form-label">
@@ -398,6 +423,29 @@ export default function Documents() {
 															))}
 														</select>
 													</div>
+												) : record.type === "file" ? (
+													<select type="dropdown" className="select w-full" value={record.value}
+														onFocus={(e) => {
+															console.log("In file focus")
+															setDoc((prev) => {
+																const newRecord = [...prev];
+																newRecord[index].value = fileOptions[0].link;
+																return newRecord;
+															});
+														}}
+														onChange={(e) => {
+															console.log('File targ', e.target.value);
+															setDoc((prev) => {
+																const newRecord = [...prev];
+																newRecord[index].value = e.target.value;
+																return newRecord;
+															});
+														}}
+													>
+														{fileOptions.map(option => (
+															<option key={option.name} value={option.link}>{option.name}</option>
+														))}
+													</select>
 												) : record.type === "array" || record.type === "object" ? (
 													<div className="max-w-full"></div>
 												) : (
