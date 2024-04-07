@@ -329,11 +329,12 @@ auth.get("/redirect_test", async (c: Context) => {
 
 auth.get("/google_oauth", async (c: Context) => {
   try {
-	console.log("here")
+	const oauth = await getSettings("oauth");
+	const application = await getSettings("application");
     const oauth2Client = new OAuth2Client({
-      clientId: process.env.CLIENT_SECRET,
-      clientSecret: process.env.CLIENT_ID,
-      redirectUri: "http://localhost:3690/api/auth/oauth_redirect",
+      clientId: oauth?.client_id,
+      clientSecret: oauth?.client_secret,
+      redirectUri: application?.url,
     });
     const authorizeUrl = oauth2Client.generateAuthUrl({
       scope: [
