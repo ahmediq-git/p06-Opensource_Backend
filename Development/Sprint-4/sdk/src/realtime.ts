@@ -14,7 +14,9 @@ class RealtimeService {
   constructor(ezBaseClient: any, authStore: any) {
     this.client = ezBaseClient; 
     this.authStore = authStore;
-    this.socket = io(ezBaseClient.socketUrl);
+    this.socket = io(ezBaseClient.socketUrl,{
+      withCredentials: false,
+    });
     this.setupSocketListeners();
 }
 

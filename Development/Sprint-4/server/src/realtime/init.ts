@@ -1,4 +1,5 @@
 import { Server, Socket } from "socket.io";
+
 import app from "@src/index";
 import sift from "sift";
 
@@ -10,9 +11,11 @@ type Subscription = {
 
 export const io = new Server({
   cors: {
-    origin: "*",
+    origin: ["http://localhost:5173", "*", '*:*'],
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT", "OPTIONS"],
-  },
+    credentials: false,
+    allowedHeaders: ["my-custom-header"],
+  }
 });
 
 io.on("connection", (socket) => {
