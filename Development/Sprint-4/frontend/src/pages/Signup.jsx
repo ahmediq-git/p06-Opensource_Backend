@@ -27,7 +27,7 @@ export const AdminSignupForm = ({ redirectTo }) => {
 	const navigate = useNavigate();
 
 	const handleSubmit = async (e) => {
-		// e.preventDefault();
+		e.preventDefault();
 		setError("");
 		setLoading(true);
 
@@ -60,7 +60,7 @@ export const AdminSignupForm = ({ redirectTo }) => {
 
 		const resData = await res.json();
 		
-		console.log(resData);
+		// console.log("herqwqw",resData);
 
 		if (resData.error) {
 			setError(resData.error);
@@ -150,7 +150,7 @@ export const AdminSignupForm = ({ redirectTo }) => {
 						type="submit"
 						className="block w-full rounded-lg bg-primary px-5 py-3 text-sm font-medium text-white"
 					>
-						Sign in
+						Sign Up
 					</button>
 				</>
 			)}

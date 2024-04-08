@@ -25,10 +25,10 @@ function App() {
 					{/* <Route path="/login" element={<Login />}></Route>
 					<Route path="/init" element={<Signup />}></Route> */}
 					{/* </Route> */}
-					<Route path="/login" element={<Login />}></Route>
 					<Route path="/init" element={<Signup />}></Route>
 					<Route path="/files" element={<FilesPage />}></Route>
 				</Route>
+				<Route path="/login" element={<Login />}></Route>
 			</Routes>
 	);
 }
