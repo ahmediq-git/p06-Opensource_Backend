@@ -287,12 +287,14 @@ auth.get("/oauth_redirect", async (c: Context) => {
       const user = await readRecord({ email: user_data.email }, "users");
       console.log("user", user[0]);
 	  const user_id = user[0]._id
+	  //strip / from url if present
+	  const url = application?.url.replace(/\/$/, "");
       if (user.length !== 0) {
         const jwt = await sign(
           user[0],
           process.env.USER_AUTH_KEY || "user_key"
         );
-        return c.redirect(`http://localhost:5173/?jwt=${jwt}`, 301);
+        return c.redirect(`${url}/?jwt=${jwt}&user_id=${user_id}`, 301);
       }
       let details = {
         email: user_data.email,
@@ -306,7 +308,7 @@ auth.get("/oauth_redirect", async (c: Context) => {
         "users"
       );
       const jwt = await sign(record, process.env.USER_AUTH_KEY || "user_key");
-      return c.redirect(`http://localhost:5173/?jwt=${jwt}`, 301);
+      return c.redirect(`${url}/?jwt=${jwt}&user_id=${user_id}`, 301);
     }
     return c.json({
       error: true,
