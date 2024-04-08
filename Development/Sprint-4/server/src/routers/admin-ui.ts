@@ -90,6 +90,8 @@ admin_ui.put("/settings", async (c: Context) => {
             console.log(numReplaced);
         });
 
+        config.persistence.compactDatafile();
+
         return c.json({
             data: "Settings updated",
             error: null,

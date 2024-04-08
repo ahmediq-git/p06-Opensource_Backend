@@ -10,6 +10,8 @@ import ApplicationSettings from "../components/ApplicationSettings";
 import MailSettings from "../components/MailSettings";
 import FilesStorageSettings from "../components/FileSettings";
 import Admins from "../components/AdminSettings";
+import OAuthSettings from "../components/OAuthSettings";
+import LogSettings from "../components/LogSettings";
 
 export default function Settings() {
   const [activeSetting, setActiveSetting] = useState('application');
@@ -23,6 +25,10 @@ export default function Settings() {
         return <FilesStorageSettings />;
       case 'admins':
         return <Admins />
+      case 'oauth':
+        return <OAuthSettings />
+      case 'logs':
+        return <LogSettings />
       // ... case for other setting components
       default:
         return null;

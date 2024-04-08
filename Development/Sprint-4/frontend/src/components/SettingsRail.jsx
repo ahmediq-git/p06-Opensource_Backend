@@ -62,7 +62,7 @@ export default function SettingsRail({ setActiveSetting,activeSetting }) {
       <p className="mt-4 text-sm font-semibold uppercase">Authentication</p>
       <a className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${activeSetting === 'provider' ? 'bg-zinc-600' : ''} hover:bg-zinc-600  hover:text-gray-100`}
         
-        onClick={() => setActiveSetting('provider')}
+        onClick={() => setActiveSetting('oauth')}
       >
         <LogInIcon className="mr-3 h-6 w-6 " />
         Auth providers{"\n              "}

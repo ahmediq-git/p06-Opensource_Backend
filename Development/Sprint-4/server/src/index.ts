@@ -32,6 +32,7 @@ app.use("*", cors({
   allowMethods: ['POST', 'GET', 'OPTIONS', 'DELETE', 'PUT', 'PATCH'],
   exposeHeaders: ['*'],
   maxAge: 600,
+  credentials: false
 }));
 
 process.env.DEV ? app.use("*", logConsoleDev): app.use("*", logConsoleProd)
