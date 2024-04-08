@@ -13,8 +13,18 @@ export const io = new Server({
     origin: "*",
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT", "OPTIONS"],
     credentials: false,
+    allowedHeaders: ["*"],
+    exposedHeaders: ["*"]
   },
+  // transports: ['websocket']
 });
+io.use((socket, next) => {
+  socket.request.headers["access-control-allow-origin"] = "*";
+  // socket.request.headers('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE');
+  // socket.request.headers('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+}
+);
 
 io.on("connection", (socket) => {
 //   console.log(`socket connected: ${socket.id}`);
