@@ -35,7 +35,7 @@ export default function ProtectedRoutes() {
 			navigate("/login", { replace: true });
 		}
 
-		if (!data && location.pathname !== "/init") {
+		if (admin == null && location.pathname !== "/init") {
 			navigate("/init");
 		}
 	}, [data, admin, navigate]);
