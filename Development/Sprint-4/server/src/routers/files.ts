@@ -15,11 +15,11 @@ const files = new Hono();
 files.post("/", async (c) => {
   try {
 
-    const blobStorageDetails = await getStorageAccountDetails();
-    if (blobStorageDetails.useBlobStorage) {
-      console.log("Blob Storage is enabled:");
-      console.log(blobStorageDetails);
-    }
+    // const blobStorageDetails = await getStorageAccountDetails();
+    // if (blobStorageDetails.useBlobStorage) {
+    //   console.log("Blob Storage is enabled:");
+    //   console.log(blobStorageDetails);
+    // }
 
     const data = await c.req.formData();
     const file = data.get("file");
@@ -42,7 +42,7 @@ files.post("/", async (c) => {
     });
 
     if (!appConfig) throw new Error("Failed to get appConfig");
-
+    
     let bytes_written = await Bun.write(`./files/${id}.${fileExtension}`, file);
 
     if (bytes_written > 0) {
@@ -50,9 +50,8 @@ files.post("/", async (c) => {
       const metadata = createMetaData(file_url, file.name, `${id}.${fileExtension}`, id, bytes_written)
 
       await Bun.write(`./files-metadata/${id}.json`, JSON.stringify(metadata, null, 2));
-
       return c.json({
-        error: false,
+        error: null,
         data: id,
       });
     } else {
@@ -60,8 +59,7 @@ files.post("/", async (c) => {
     }
 
   } catch (err) {
-    console.log(err)
-    return c.json({ error: err, data: null });
+    return c.json({ error: err, data: null }, 500);
   }
 });
 
@@ -80,16 +78,16 @@ files.get("/", async (c: Context) => {
       return new Response(Bun.file(path));
     }
     return c.json({
-      error: true,
+      error: "File does not exist",
       data: null,
-    });
+    },404);
   } catch (error) {
 
     console.log(error);
     return c.json({
       error: "Error retrieving the file",
       data: null,
-    });
+    },500);
 
   }
 
@@ -108,21 +106,21 @@ files.get("/metadata", async (c: Context) => {
     if (id) {
       const meta = await getMetaData(id)
       return c.json({
-        error: false,
+        error: null,
         data: meta
       })
     }
     return c.json({
-      error: true,
+      error: "File does not exist",
       data: null,
-    });
+    },404);
   } catch (error) {
 
     console.log(error);
     return c.json({
       error: "Error retrieving the file",
       data: null,
-    });
+    },500);
 
   }
 })
@@ -131,14 +129,13 @@ files.get("/metadata", async (c: Context) => {
 files.delete("/:id", async (c: Context) => {
   try {
     const { id } = c.req.param();
-    console.log(id)
     const meta = await getMetaData(id)
 
     await unlink(`./files/${meta.stored_name}`);
     await unlink(`./files-metadata/${id}.json`);
 
     return c.json({
-      error: false,
+      error: null,
       data: `Deletion of the file with id ${id} successful`,
     });
   } catch (error) {
@@ -176,7 +173,7 @@ files.get("/list", async (c: Context) => {
     }));
 
     return c.json({
-      error: false,
+      error: null,
       data: meta_data_files,
     });
 
