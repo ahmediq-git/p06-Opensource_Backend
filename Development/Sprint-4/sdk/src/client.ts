@@ -20,7 +20,7 @@ class EzBaseClient {
     }
 
     // Sends to the backend using the given method and api endpoint
-    async sendToBackend(jsonObject: any, apiEndpoint: string, method: 'POST' | 'DELETE' | 'GET' | 'PATCH'): Promise<AxiosResponse<any> | void> {
+    async sendToBackend(jsonObject: any, apiEndpoint: string, method: 'POST' | 'DELETE' | 'GET' | 'PATCH', isFile: boolean = false): Promise<AxiosResponse<any> | void> {
         let completeApiEndpoint = `${this.backendUrl}${apiEndpoint}`;
 
         const headers = {
@@ -28,13 +28,18 @@ class EzBaseClient {
             'Authorization': 'Bearer ' + this.authStore.getToken(),
         };
 
+        if (isFile && method === 'POST') {
+            headers['Content-Type'] ='multipart/form-data';
+            console.log("headers", headers)
+        }
+       
         try {
             let response;
 
             switch (method) {
                 case 'POST':
                     response = await axios.post(completeApiEndpoint, jsonObject, { headers });
-                    // console.log('Data sent successfully:', response.data);
+                    console.log('Data sent successfully:', response.data);
                     if (response?.data.error !== null) {
                        throw new Error(response?.data.error)
                     }
@@ -63,7 +68,7 @@ class EzBaseClient {
                     if (response?.data.error !== null) {
                         throw new Error(response?.data.error)
                      }
-                    // console.log('Data received successfully:', response.data);
+                    console.log('Data received successfully:', response.data);
                     return response;
                 default:
                     console.error('Invalid method:', method);
@@ -78,7 +83,7 @@ class EzBaseClient {
             } else {
                 console.error('Request failed with error:', error);
             }
-            return error
+            throw error
         }
     }
 }

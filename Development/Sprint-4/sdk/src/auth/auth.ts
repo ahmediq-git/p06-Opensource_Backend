@@ -1,5 +1,5 @@
 import ValidationUtils from "../validators/validators";
-
+import { AxiosResponse } from "axios";
 class Auth {
     private client: any;
     private authStore: any;
@@ -10,7 +10,7 @@ class Auth {
     }
 
     // Signs up the user with the given email and password
-    async signUp(email: string, password: string): Promise<void> {
+    async signUp(email: string, password: string): Promise<AxiosResponse<any>> {
         try {
             if (!ValidationUtils.isValidEmail(email)) {
                 throw new Error("Invalid Email name");
@@ -21,13 +21,15 @@ class Auth {
             const response = await this.client.sendToBackend(sendObject, "/api/auth/user/create", "POST");
             console.log(response.data)
             this.authStore.saveTokenFromResponse(response.data?.data);
+            return response;
         } catch (error) {
             console.log("Error signing up ", error);
+            throw error
         }
     }
 
     // Signs in the user with the given email and password
-    async signIn(email: string, password: string): Promise<void> {
+    async signIn(email: string, password: string): Promise<AxiosResponse<any>> {
         try {
             if (!ValidationUtils.isValidEmail(email)) {
                 throw new Error("Invalid Email name");
@@ -38,8 +40,10 @@ class Auth {
             const response = await this.client.sendToBackend(sendObject, "/api/auth/user/login", "POST");
             console.log(response)
             this.authStore.saveTokenFromResponse(response.data?.data);
+            return response;
         } catch (error) {
             console.log("Error signing in ", error);
+            throw error
         }
     }
 
@@ -49,16 +53,17 @@ class Auth {
             this.authStore.removeToken();
         } catch (error) {
             console.log("Error signing out: ", error);
+            throw error
         }
     }
 
     // Returns the json dictionary data pertaining to the user currently signed in
-    async currentUser(): Promise<void> {
+    currentUser(): string {
         // Implementation goes here
         return this.authStore.user_id;
     }
 
-    async isAuthenticated(): Promise<boolean> {
+    isAuthenticated(): boolean {
         // Implementation goes here
         return this.authStore.isAuthenticated();
     }
@@ -78,10 +83,10 @@ class Auth {
     
       }
 
-    async signInWithGoogle(): Promise<any>{
+    async signInWithGoogle(): Promise<AxiosResponse<any>>{
         const response = await this.client.sendToBackend({}, "/api/auth/google_oauth", "GET");
         console.log(response)
-        return response.data;
+        return response;
     }
     
 

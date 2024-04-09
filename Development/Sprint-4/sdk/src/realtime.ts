@@ -22,7 +22,7 @@ class RealtimeService {
     this.socket.on('connect', () => {
       // console.log('Socket connected:', this.socket.id);
       // Reinitialize subscriptions on reconnect
-      this.reinitializeSubscriptions();
+      // this.reinitializeSubscriptions();
     });
 
     this.socket.on('subscribed', (response) => {
@@ -42,10 +42,24 @@ class RealtimeService {
     if (!this.subscriptions[collection]) {
       this.subscriptions[collection] = [];
     }
+    // Check for an existing subscription with the same query
+    const existingSubscription = this.subscriptions[collection].find(sub => 
+      JSON.stringify(sub.query) === JSON.stringify(query)
+    );
+
+    if (existingSubscription) {
+      return
+    }
+
     this.subscriptions[collection].push(subscription);
 
     // Register the event listener for the collection
-    this.socket.on(collection, callback);
+    this.socket.on(collection, (data)=>{
+
+      // console.log("recieving: ", data);
+      callback(data);
+    });
+    // console.log("in subscribe", this.subscriptions);
 
     // Notify the server about the new subscription
     this.socket.emit('subscribe', { collection, query });
@@ -66,13 +80,16 @@ class RealtimeService {
   }
 
   //  to reinitialize subscriptions after reconnecting
-  private reinitializeSubscriptions() {
-    for (const collection in this.subscriptions) {
-      for (const subscription of this.subscriptions[collection]) {
-        this.socket.emit('subscribe', { collection, query: subscription.query });
-      }
-    }
-  }
+  // private reinitializeSubscriptions() {
+  //   console.log("calling reinitializeSubscriptions");
+  //   for (const collection in this.subscriptions) {
+  //     for (const subscription of this.subscriptions[collection]) {
+  //       this.socket.emit('subscribe', { collection, query: subscription.query });
+  //     }
+  //   }
+
+  //   console.log("after reinitializeSubscriptions", this.subscriptions);
+  // }
 }
 
 export default RealtimeService;

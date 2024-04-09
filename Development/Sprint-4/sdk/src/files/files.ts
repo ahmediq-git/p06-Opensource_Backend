@@ -5,11 +5,9 @@ import axios, { AxiosResponse } from "axios";
 class Files {
     private client: any;
     private authStore: any;
-    private backendUrl: string
 
-    constructor(backendUrl: string, authStore: any) {
-        this.backendUrl = backendUrl
-        this.authStore = authStore; //passing the authStore object to send to the user.
+    constructor( ezBaseClient: any) {
+        this.client = ezBaseClient; 
     }
 
     async uploadFile(file:File):Promise<AxiosResponse<any>>{
@@ -17,17 +15,12 @@ class Files {
         formData.append('file', file);
         
         try {
-            const apiEndpoint = `${this.backendUrl}/api/files`;
-            const response = await axios.post(apiEndpoint, formData,{
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    },
-                });
-
+            const apiEndpoint = `/api/files`;
+            const response = await this.client.sendToBackend(formData, apiEndpoint, "POST",true);
             return response;
         } catch (error) {
             // Handle error
-            console.error("Error uploading file:", error);
+            console.log("Error uploading file:", error);
             throw error;
         }
        
@@ -35,36 +28,37 @@ class Files {
 
     async getFile(file_name:string):Promise<AxiosResponse<any>>{
         try{
-            const apiEndpoint=`${this.backendUrl}/api/files?file_name=${file_name}`
-            const response = await axios.get(apiEndpoint);
+            const apiEndpoint=`/api/files?file_name=${file_name}`
+            const response = await this.client.sendToBackend({}, apiEndpoint, "GET");
             return response;
         } catch (error){
             // Handle error
-            console.error("Error getting file:", error);
+            console.log("Error getting file:", error);
             throw error;
         }
     }
 
     async getFileMetaData(id: string):Promise<AxiosResponse<any>>{
         try {
-            const apiEndpoint=`${this.backendUrl}/api/files/metadata?id=${id}`;
-            const response = await axios.get(apiEndpoint);
+            const apiEndpoint=`/api/files/metadata?id=${id}`;
+            const response = await this.client.sendToBackend({}, apiEndpoint, "GET");
             return response;
         } catch (error) {
             // Handle error
-            console.error("Error getting file metadata:", error);
+            console.log("Error getting file metadata:", error);
             throw error;
         }
     }
 
-    async deleteFile(id: string){
+    async deleteFile(id: string): Promise<AxiosResponse<any>>{
         try {
-            const apiEndpoint = `${this.backendUrl}/api/files/${id}`;
-            await axios.delete(apiEndpoint);
+            const apiEndpoint = `/api/files/${id}`;
+            const res = await this.client.sendToBackend({}, apiEndpoint, "DELETE");
             console.log("File deleted successfully");
+            return res;
         } catch (error) {
             // Handle error
-            console.error("Error deleting file:", error);
+            console.log("Error deleting file:", error);
             throw error;
         }
     }

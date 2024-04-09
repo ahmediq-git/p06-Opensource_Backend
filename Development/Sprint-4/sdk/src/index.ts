@@ -24,7 +24,7 @@ export default class ezbase {
         this.auth = new Auth(this.ezBaseClient, this.authStore); //initialising our auth object with the url provided by the user
         this.mail = new Mail(this.ezBaseClient, this.authStore); //initialising our mail object with the url provided by the user
         this.rts = new RealtimeService(this.ezBaseClient,this.authStore); //initialising our realtime object with the
-        this.files = new Files(url, this.authStore); //initialising the file object
+        this.files = new Files(this.ezBaseClient); //initialising the file object
     }
     persistAuth(jwtToken: string, user_id: string) {
         this.authStore.persist(jwtToken,user_id);
