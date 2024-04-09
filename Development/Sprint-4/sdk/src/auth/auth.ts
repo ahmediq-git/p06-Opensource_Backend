@@ -77,7 +77,7 @@ class Auth {
             const local_token = localStorage.getItem(this.authStore.STORAGE_KEY_TOKEN);
             return this.authStore.token = local_token || "";
         }catch(err){
-            console.log("err in  get token",err);
+            // console.log("err in  get token",err);
             return "";
         }
     

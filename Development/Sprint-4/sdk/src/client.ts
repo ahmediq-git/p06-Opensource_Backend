@@ -39,7 +39,7 @@ class EzBaseClient {
             switch (method) {
                 case 'POST':
                     response = await axios.post(completeApiEndpoint, jsonObject, { headers });
-                    console.log('Data sent successfully:', response.data);
+                    // console.log('Data sent successfully:', response.data);
                     if (response?.data.error !== null) {
                        throw new Error(response?.data.error)
                     }
