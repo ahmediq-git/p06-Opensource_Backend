@@ -16,12 +16,19 @@ import schema from "./routers/schema";
 import index from "./routers/indexing";
 import {io, broadcastRecord} from "./realtime/init";
 import { EventEmitter } from "node:events";
-
-
+import { serveStatic } from 'hono/bun'
 import { parseAuthHeader } from "./middleware/parseAuthHeader";
 
 (async () => {
   await Initialize(); //initialize all the system defined parameters and collections
+  console.log("\x1b[34m    ___________   ____  ___   _____ ______");
+  console.log("   / ____/__  /  / __ )/   | / ___// ____/");
+  console.log("  / __/    / /  / __  / /| | \__ \/ __/   ");
+  console.log(" / /___   / /__/ /_/ / ___ |___/ / /___   ");
+  console.log("/_____/  /____/_____/_/  |_/____/_____/   ");
+  console.log("                                          ");
+  console.log('\x1b[37mThe admin UI is available at:', "\x1b[4mhttp://localhost:3690/api/index.html");
+  console.log('\x1b[0m');
 })(); //IIFE
 
 export const app = new Hono().basePath("/api");
@@ -34,6 +41,18 @@ app.use("*", cors({
   maxAge: 600,
   credentials: false
 }));
+
+app.get('/*', serveStatic({
+  root: 'dist',
+  rewriteRequestPath(path) {
+    if (path.endsWith('.js') || path.endsWith('.css')) {
+      path = path.replace("/api/", "/").replace("/api/", "/");
+    } else {
+      path = path.replace("/api", "/");
+    }
+    return path;
+  },
+}))
 
 process.env.DEV ? app.use("*", logConsoleDev): app.use("*", logConsoleProd)
 
