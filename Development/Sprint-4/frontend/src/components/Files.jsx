@@ -27,13 +27,10 @@ export default function Files() {
 		fetcher
 	);
 
-	console.log("Files list", data);
-
     const handleFileChange = async(event) => {
         try{
         const file = event.target.files[0];
         setFile(file);
-        // console.log(file)
         await uploadFile(file)
         } catch (error){
             console.log(error)
@@ -48,9 +45,6 @@ export default function Files() {
 		try {
             const formData = new FormData();
             formData.append('file', file);
-            // console.log(formData)
-            // console.log(file)
-            // console.log(formData.get('file'))
 			const res = await axios.post(
                 `${import.meta.env.VITE_BACKEND_URL}/files`,
                 formData,
@@ -61,10 +55,7 @@ export default function Files() {
                     },
                 }
             );
-			console.log("Files", res);
 			// const adsa = await res.json();
-
-			// console.log("ADSA", adsa);
 
 			mutate(`${import.meta.env.VITE_BACKEND_URL}/files/list`);
 			

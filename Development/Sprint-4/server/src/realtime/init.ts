@@ -27,7 +27,6 @@ io.use((socket, next) => {
 );
 
 io.on("connection", (socket) => {
-//   console.log(`socket connected: ${socket.id}`);
 
   socket.on("subscribe", (data) => {
     const { collection, query } = data;
@@ -40,7 +39,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", (reason) => {
-    // console.log(`socket disconnected: ${socket.id} for ${reason}`);
     for (const collection in app.subscriptions) {
       unsubscribe(socket, collection);
     }
@@ -92,7 +90,6 @@ export function broadcastRecord(collection: string, record: any): void {
       app.subscriptions[collection].forEach((sub) => {
         if (Object.keys(sub.query).length !== 0 ) {
             const test = sift(sub.query);
-            // console.log(test(record))
             if (!test(record)) {
                 return;
             }

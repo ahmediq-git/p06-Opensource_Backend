@@ -40,7 +40,6 @@ export default function HomePage() {
                 }
             });
             const data = await res.json();
-            console.log(data);
             setIndices(data.data); // Update state with fetched indices
         } catch (error) {
             console.log(error);

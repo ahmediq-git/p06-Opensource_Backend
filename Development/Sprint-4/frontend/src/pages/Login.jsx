@@ -28,8 +28,6 @@ export default function Login() {
 
 		const resData = await res.json();
 
-		console.log(resData);
-
 		if (resData.error) {
 			setError(resData.error);
 			setLoading(false);

@@ -37,8 +37,6 @@ export default async function getStorageAccountDetails(): Promise<any> {
         return blobStorage;
 
     } catch (err) {
-        console.log("In getStorageAccountDetails", err);
-
         return err;
     }
 }

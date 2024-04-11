@@ -12,10 +12,6 @@ export default function Admins() {
     const { mutate } = useSWRConfig();
 
 	useEffect(() => {
-		console.log("Admins page");
-		console.log("data", data);
-		console.log("error", error);
-		console.log("isLoading", isLoading);
 	}, [data, error, isLoading]);
 
 	const deleteAdmin = async (email) => {

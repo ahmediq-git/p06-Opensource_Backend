@@ -20,7 +20,6 @@ admin_ui.get("/settings", async (c: Context) => {
             error: null,
         });
     } catch (err) {
-        console.log("get settings", err);
         return c.json({
             data: null,
             error: err
@@ -75,11 +74,7 @@ admin_ui.put("/settings", async (c: Context) => {
 
         const setting = settings.hasOwnProperty(setting_name) ? true : false;
         if (!setting) throw new Error("Failed to get setting");
-
-        console.log("name", setting_name, settings[setting_name]);
-        console.log("value in request", value)
         settings[setting_name] = value;
-        // console.log(settings);
         config.update({
             _id: settings._id
         }, settings, {}, function (err, numReplaced) {
@@ -87,7 +82,6 @@ admin_ui.put("/settings", async (c: Context) => {
                 console.log(err);
                 throw new Error("Failed to update settings");
             }
-            console.log(numReplaced);
         });
 
         config.persistence.compactDatafile();
@@ -99,7 +93,6 @@ admin_ui.put("/settings", async (c: Context) => {
 
 
     } catch (err) {
-        console.log("put settings", err);
         return c.json({
             data: null,
             error: err,

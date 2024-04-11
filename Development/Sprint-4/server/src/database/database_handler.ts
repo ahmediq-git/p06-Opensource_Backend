@@ -25,7 +25,6 @@ class Database {
     // Loading every single existing collection to the Database singleton
     fileList?.forEach((file) => {
       const filePath = `${dir}/${file}`;
-      console.log(filePath)
       this.dataStore[path.parse(file).name] = new DataStore({
         filename: filePath,
         timestampData: true,

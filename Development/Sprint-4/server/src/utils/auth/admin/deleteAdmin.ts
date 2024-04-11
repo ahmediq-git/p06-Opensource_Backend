@@ -53,7 +53,5 @@ export default async function deleteAdmin(email: string): Promise<any> {
 		);
 	});
 
-	console.log(removed);
-
 	return removed;
 }
