@@ -152,9 +152,9 @@ export default function Documents() {
 					}
 				});
 				const data = await response.json();
-
 				if (data?.data) {
 					setForeignCollOptions(data.data);
+					fetchForeignOptions(foreignCollSelected ? foreignCollSelected : data.data[0]);
 				}
 			} catch (error) {
 				console.error("Error fetching foreign options:", error);
@@ -216,6 +216,8 @@ export default function Documents() {
 
 			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}&embed=false`);
 			setSelection({ collection: selection.collection, document: "" });
+			setForeignCollSelected("");
+			setForeignDocOptions([]);
 			setDoc([
 				{
 					field: "",
