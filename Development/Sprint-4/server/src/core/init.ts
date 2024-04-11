@@ -73,7 +73,7 @@ export type AppConfig = {
 };
 
 export async function Initialize() {
-  console.log("Initializing app");
+  console.log("Initializing Ezbase");
 
   // instantiating the Database if its the first time
   Database.getInstance()
