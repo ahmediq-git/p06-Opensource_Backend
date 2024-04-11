@@ -54,7 +54,5 @@ export default async function createAdmin(
 		);
 	});
 
-	console.log(updated);
-
 	return updated;
 }

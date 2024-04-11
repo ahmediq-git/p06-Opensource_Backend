@@ -129,15 +129,6 @@ records.delete("/delete", async (c) => {
 		if (typeof query !== "object") throw new Error("Query must be an object");
 
 		const record = await deleteRecord(query, queryOptions, collection_name);
-		// try{
-		// 	app.subscriptions[collection_name]?.forEach((socket: Socket) => {
-		// 		socket.emit('recordRemoved', {
-		// 			collection_name,
-		// 		});
-		// 	})
-		// 	}catch(err){
-		// 		console.log(err);
-		// 	}
 		return c.json({
 			data: record,
 			error: null,
@@ -241,36 +232,5 @@ records.get("/count", async (c) => {
 		});
 	}
 });
-
-// records.put("/update", async (c) => {
-// 	try {
-// 		const { collection_name, query, queryOptions, update } = await c.req.json();
-
-// 		if (!collection_name) throw new Error("No collection name provided");
-// 		if (!query) throw new Error("No query provided");
-// 		if (typeof query !== "object") throw new Error("Query must be an object");
-// 		if (!update) throw new Error("No update provided");
-// 		if (typeof update !== "object") throw new Error("Update must be an object");
-
-// 		const record = await updateRecord(
-// 			query,
-// 			queryOptions,
-// 			update,
-// 			collection_name
-// 		);
-
-// 		return c.json({
-// 			data: record,
-// 			error: null,
-// 		});
-// 	} catch (error) {
-// 		console.log(error);
-
-// 		return c.json({
-// 			data: null,
-// 			error: "Failed to update record",
-// 		});
-// 	}
-// });
 
 export default records;

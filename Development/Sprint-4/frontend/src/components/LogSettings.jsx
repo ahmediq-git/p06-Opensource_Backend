@@ -22,7 +22,6 @@ export default function LogSettings() {
 
   const updateSettings = async (event) => {
     event.preventDefault();
-    console.log(data)
     // if (!fieldCheck()) {
     //   setMsg("Please fill all fields");
     //   return;

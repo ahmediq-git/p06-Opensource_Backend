@@ -37,8 +37,6 @@ auth.post("/admin/create", async (c: Context) => {
 
 		const token = await sign(payload, process.env.USER_AUTH_KEY || "user_key");
 
-		console.log(token);
-
 		// setCookie(c, "admin", JSON.stringify(email), {
 		// 	httpOnly: true,
 		// 	secure: true,
@@ -61,7 +59,6 @@ auth.get("/admin", async (c: Context) => {
 	try {
 		// check if an admin exists
 		const admin: boolean = await checkAdminExists();
-		console.log('Admin check', admin);
 		return c.json({ error: null, data: admin });
 	} catch (error:any) {
 		const statusCode = error.isOperational ? 401 : 500;
@@ -76,8 +73,6 @@ auth.get("/admins", async (c: Context) => {
 	try {
 		// check if an admin exists
 		const admins: boolean = await getAdmins();
-		console.log(admins);
-
 		return c.json({ error: null, data: admins });
 	} catch (error:any) {
 		const statusCode = error.isOperational ? 401 : 500;
@@ -124,8 +119,6 @@ auth.post("/admin/login", async (c: Context) => {
 				authenticated: true
 			}
 			const token = await sign(payload, process.env.USER_AUTH_KEY || "user_key");
-
-			console.log(token);
 			// setCookie(c, "admin", JSON.stringify(email), {
 			// 	httpOnly: true,
 			// 	secure: true,
@@ -170,7 +163,6 @@ auth.post("/user/create", async (c: Context) => {
 		if (!email || !password) throw new Error("Invalid email or password");
 
 		const user = await readRecord({ email }, "users");
-		// console.log("user", user);
 		if (user.length !== 0) throw new Error("User already exists");
 
 		const record: any = await createRecord(
@@ -180,7 +172,6 @@ auth.post("/user/create", async (c: Context) => {
 			},
 			"users"
 		);
-		// console.log("in create user",record);
 		
 		// remove password from details
 		delete details.password;
@@ -200,7 +191,6 @@ auth.post("/user/create", async (c: Context) => {
 		});
 
 	} catch (error: any) {
-		// console.log("user create",error.message)
 		const statusCode = error.isOperational ? 401 : 500;
     	const message = error.isOperational ? error.message : 'Internal Server Error';
 
@@ -232,7 +222,6 @@ auth.post("/user/delete", async (c: Context) => {
 auth.post("/user/login", async (c: Context) => {
 	try {
 		 
-		// console.log(c.get("Authorization"));
 		const body = await c.req.json();
 
 		const { email, password } = body;
@@ -241,22 +230,15 @@ auth.post("/user/login", async (c: Context) => {
 			return c.json({ error: "Invalid email or password", data: null });
 		}
 
-		console.log(email, password);
-
 		// check if an admin exists
 		const user = await readRecord({ email }, "users");
-		console.log(user);
-
 		if (user?.length === 0) {
 			return c.json({ error: "User does not exist", data: null });
 		}
-		// console.log("in login", user[0]);
-
 		const loginValid: boolean = await Bun.password.verify(
 			password,
 			user[0]?.password
 		);
-		console.log(loginValid);
 
 		if (!loginValid) {
 			return c.json({ error: "Invalid login", data: null });
@@ -265,12 +247,9 @@ auth.post("/user/login", async (c: Context) => {
 		if (user[0]?.password) {
 			delete user[0].password;
 		}
-
-		// console.log(user[0]);
-
 		// sign the token
 		const token = await sign(user[0], process.env.USER_AUTH_KEY || "user_key");
-
+		console.log('TOKEN', token);
 		return c.json({
 			error: null,
 			data: {
@@ -305,9 +284,7 @@ auth.get("/oauth_redirect", async (c: Context) => {
       const user_data = JSON.parse(
         Buffer.from(token.split(".")[1], "base64").toString()
       );
-      console.log(user_data);
       const user = await readRecord({ email: user_data.email }, "users");
-      console.log("user", user[0]);
 	  const user_id = user[0]._id
 	  //strip / from url if present
 	  const url = application?.url.replace(/\/$/, "");

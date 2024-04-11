@@ -77,40 +77,8 @@ sse.on('broadcastRecord', (data) => {
   broadcastRecord(collection_name, record);
 });
 
-// io.on("connection", (socket) => {
-//   console.log(`socket connected: ${socket.id}`);
-
-//   socket.on("subscribe", (msg) => {
-//     if (!subscriptions[msg]) {
-//       subscriptions[msg] = [];
-//     }
-//     subscriptions[msg].push(socket);
-//     io.emit("subscribed", msg);
-//   });
-
-//   socket.on("unsubscribe", (msg) => {
-//     if (subscriptions[msg]) {
-//       let index = subscriptions[msg].indexOf(`${socket}`);
-//       subscriptions[msg].splice(index, 1);
-//       io.emit("unsubscribed", msg);
-//     }
-//   });
-
-//   socket.on("disconnect", (reason) => {
-//     console.log(`socket disconnected: ${socket.id} for ${reason}`);
-//     for (const collection in subscriptions) {
-//       subscriptions[collection] = subscriptions[collection].filter((subbed: Socket) => subbed !== socket);
-//     }
-//   });
-// });
-
-// io.listen(3691);
-console.log("PORT", process.env.PORT, "URL", process.env.URL )
-
 export default {
   port: process.env.PORT || 3690,
   fetch: app.fetch,
   subscriptions
 };
-// io.attach(server);
-//make sdk 

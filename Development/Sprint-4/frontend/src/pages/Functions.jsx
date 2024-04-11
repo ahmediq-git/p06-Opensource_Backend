@@ -25,9 +25,7 @@ export default function FunctionsPage() {
                 }
             });
             const data = await response.json();
-            console.log("DATA", data.data);
             setCollections(data.data);
-            console.log("COLLECTIONS", collections);
         } catch (error) {
             console.error('Error fetching collections:', error);
         }
@@ -42,9 +40,7 @@ export default function FunctionsPage() {
                 }
             });
             const data = await response.json();
-            console.log("DATA", data.data);
             setRegistered(data.data);
-            console.log("COLLECTIONS", registeredFunctions);
         } catch (error) {
             console.error('Error fetching collections:', error);
         }
@@ -89,10 +85,8 @@ export default function FunctionsPage() {
             if (response.ok) {
                 await fetchRegisteredFunctions();
                 alert("Function registered!");
-                console.log('Registration successful');
             } else {
                 alert("There was an error registering your function!")
-                console.error('Registration failed');
             }
         } catch (error) {
             console.error('Error registering:', error);
@@ -113,7 +107,6 @@ export default function FunctionsPage() {
             if (response.error == null) {
                 await fetchRegisteredFunctions();
                 alert("Function deleted!")
-                console.log('Deletion successful');
             } else {
                 alert("There was an error deleting a function!")
                 console.error('Deletion failed');

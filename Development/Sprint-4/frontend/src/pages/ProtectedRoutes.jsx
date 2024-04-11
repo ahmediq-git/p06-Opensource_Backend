@@ -28,10 +28,7 @@ export default function ProtectedRoutes() {
 	const location = useLocation();
 
 	useLayoutEffect(() => {
-		console.log("admin token",admin, data)
-		console.log("Admin null?", admin == null)
 		if (!isLoading && data && admin == null && location.pathname !== "/login") {
-			console.log("HERE, LOG IN REDIRECT")
 			navigate("/login", { replace: true });
 		}
 

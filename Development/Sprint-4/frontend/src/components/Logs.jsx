@@ -15,9 +15,6 @@ export default function Logs() {
 	}, [initialData]);
 
 	useEffect(() => {
-		console.log("data", data);
-		console.log("error", error);
-		console.log("isLoading", isLoading);
 	}, [data, error, isLoading]);
 
 	const formatDateTime = (dateTimeString) => {

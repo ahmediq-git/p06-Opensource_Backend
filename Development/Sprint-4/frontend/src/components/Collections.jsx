@@ -37,9 +37,6 @@ export default function Collections() {
   };
 
   useEffect(() => {
-    console.log("collectionsData", collectionsData);
-    console.log("collectionsError", collectionsError);
-    console.log("collectionsLoading", collectionsLoading);
     // if(!collectionsLoading && collectionData!=null && collectionData.hasOwnProperty('message') && collectionData.message == 'Unauthorized') {
     //   navigate("/login", { replace: true });
     // }
@@ -47,7 +44,6 @@ export default function Collections() {
   }, [collectionsData, collectionsError, collectionsLoading]);
 
   useEffect(() => {
-    console.log("modal", modal);
   }, [modal]);
 
   const closeModal = () => {
@@ -69,7 +65,6 @@ export default function Collections() {
       collectionNameSchema.parse(name);
     } catch (err) {
       console.log(err);
-      console.log("err.formErrors.fieldErrors.name[0]", err.formErrors.fieldErrors.name[0]);
       setCollectionNameError(err.formErrors.fieldErrors.name[0]);
       return;
     }
