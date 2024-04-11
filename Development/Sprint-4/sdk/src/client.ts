@@ -75,15 +75,21 @@ class EzBaseClient {
                     return;
             }
         } catch (error: any) {
+            let errorResponse = {
+                status: error.response?.status || 500,
+                error: error.response?.data?.error || 'An unexpected error occurred',
+                data: null // Assuming there's no data when an error occurs
+            };
+
             if (error.response) {
-                console.error('Error sending data to server:', error);
+                console.error('Error sending data to server:', errorResponse);
             } else if (error.request) {
-                console.error('No response received from server:', error);
+                console.error('No response received from server:', errorResponse);
                 return error;
             } else {
-                console.error('Request failed with error:', error);
+                console.error('Request failed with error:', errorResponse);
             }
-            throw error
+            throw errorResponse;
         }
     }
 }

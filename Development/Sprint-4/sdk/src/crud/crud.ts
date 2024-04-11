@@ -1,6 +1,13 @@
 import ValidationUtils from "../validators/validators.js";
 import axios, { AxiosResponse } from "axios";
 
+interface ListRecordsOptions {
+    sort: {
+        [key: string]: number;
+    };
+    limit: number;
+    offset: number;
+}
 
 
 class Crud {
@@ -114,17 +121,17 @@ class Crud {
     }
 
     // creates a new record in a collection
-    async createRecord(collection_name: string, query: object): Promise<any> {
+    async createRecord(collection_name: string, record: object): Promise<any> {
         try {
             if (!ValidationUtils.isString(collection_name)) {
                 throw new Error("Invalid collection name. Please provide a valid collection name for deletion.")
             }
 
-            if (!ValidationUtils.isObject(query)) {
-                throw new Error(query + " is not a document")
+            if (!ValidationUtils.isObject(record)) {
+                throw new Error(record + " is not a document")
             }
 
-            const sendObject = { "collection_name": collection_name, "query": query };
+            const sendObject = { "collection_name": collection_name, "query": record };
             const apiEndpoint = "/api/record/create";
             const response = await this.client.sendToBackend(sendObject, apiEndpoint, "POST");
 
@@ -154,7 +161,7 @@ class Crud {
         }
     }
 
-    async readRecord(collection_name: string, query: object): Promise<any> {
+    async readRecord(collection_name: string, query: object = {}, embed: boolean = false): Promise<any> {
         try {
             if (!ValidationUtils.isString(collection_name)) {
                 throw new Error(collection_name + " is not a valid collection name. Please provide a valid collection name for reading record.")
@@ -169,7 +176,7 @@ class Crud {
             // The api endpoint will include the query
             // For example, /api/record/read?collection_name=PMTestCollection1&query={"name": "John", "age": 23}
 
-            let apiEndpoint = `/api/record/read?collection_name=${collection_name}&query=${queryStr}`;
+            let apiEndpoint = `/api/record/read?collection_name=${collection_name}&query=${queryStr}&embed=${embed}`;
             const response = await this.client.sendToBackend({}, apiEndpoint, "GET");
 
             if (response.status === 200) {
@@ -243,8 +250,10 @@ class Crud {
         }
     }
 
+
+
     // list the records in a collection
-    async listRecords(collection_name: string, query: object, queryOptions: object): Promise<any> {
+    async listRecords(collection_name: string, query: object, queryOptions: ListRecordsOptions, embed: boolean = false): Promise<any> {
         try {
             if (!ValidationUtils.isString(collection_name)) {
                 throw new Error(collection_name + " is not a valid collection name. Please provide a valid collection name for listing records.")
@@ -264,7 +273,7 @@ class Crud {
             // The api endpoint will include the query
             // For example, /api/record/list?collection_name=PMTestCollection1&query={"name": "John", "age": 23}
 
-            let apiEndpoint = `/api/record/list?collection_name=${collection_name}&query=${queryStr}&queryOptions=${queryOptionsStr}`;
+            let apiEndpoint = `/api/record/list?collection_name=${collection_name}&query=${queryStr}&queryOptions=${queryOptionsStr}&embed=${embed}`;
             const response = await this.client.sendToBackend({}, apiEndpoint, "GET");
 
             if (response.status === 200) {

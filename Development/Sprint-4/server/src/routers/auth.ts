@@ -46,10 +46,13 @@ auth.post("/admin/create", async (c: Context) => {
 		// 	maxAge: 60 * 60 * 24 * 7,
 		// });
 		return c.json({ error: null, data: token });
-	} catch (error) {
+	} catch (error:any) {
 		console.log(error);
 
-		return c.json({ error, data: null });
+		const statusCode = error.isOperational ? 401 : 500;
+    	const message = error.isOperational ? error.message : 'Internal Server Error';
+
+		return c.json({ error: message, data: null },statusCode);
 	}
 	return c.text("Create admin");
 });
@@ -60,8 +63,11 @@ auth.get("/admin", async (c: Context) => {
 		const admin: boolean = await checkAdminExists();
 		console.log('Admin check', admin);
 		return c.json({ error: null, data: admin });
-	} catch (error) {
-		return c.json({ error, data: null });
+	} catch (error:any) {
+		const statusCode = error.isOperational ? 401 : 500;
+    	const message = error.isOperational ? error.message : 'Internal Server Error';
+
+		return c.json({ error: message, data: null },statusCode);
 	}
 	return c.text("Get admin");
 });
@@ -73,8 +79,11 @@ auth.get("/admins", async (c: Context) => {
 		console.log(admins);
 
 		return c.json({ error: null, data: admins });
-	} catch (error) {
+	} catch (error:any) {
+		const statusCode = error.isOperational ? 401 : 500;
+    	const message = error.isOperational ? error.message : 'Internal Server Error';
 
+		return c.json({ error: message, data: null },statusCode);
 	}
 	return c.text("Get all admins");
 });
@@ -90,10 +99,11 @@ auth.delete("/admin/delete", async (c: Context) => {
 		if (!deleted) throw new Error("Failed to delete admin");
 
 		return c.json({ error: null, data: deleted });
-	} catch (error) { 
-		console.log(error)
+	} catch (error:any) { 
+		const statusCode = error.isOperational ? 401 : 500;
+    	const message = error.isOperational ? error.message : 'Internal Server Error';
 
-		return c.json({ error, data: null });
+		return c.json({ error: message, data: null },statusCode);
 	}
 	return c.text("Delete admin");
 });
@@ -128,7 +138,12 @@ auth.post("/admin/login", async (c: Context) => {
 		}
 
 		return c.json({ error: null, data: loginValid });
-	} catch (error) { }
+	} catch (error:any) {
+		const statusCode = error.isOperational ? 401 : 500;
+    	const message = error.isOperational ? error.message : 'Internal Server Error';
+
+		return c.json({ error: message, data: null },statusCode);
+	}
 	return c.text("Admin login");
 });
 
@@ -156,7 +171,7 @@ auth.post("/user/create", async (c: Context) => {
 
 		const user = await readRecord({ email }, "users");
 		// console.log("user", user);
-		// if (user.length !== 0) throw new Error("User already exists");
+		if (user.length !== 0) throw new Error("User already exists");
 
 		const record: any = await createRecord(
 			{
@@ -165,7 +180,7 @@ auth.post("/user/create", async (c: Context) => {
 			},
 			"users"
 		);
-		console.log("in create user",record);
+		// console.log("in create user",record);
 		
 		// remove password from details
 		delete details.password;
@@ -185,8 +200,11 @@ auth.post("/user/create", async (c: Context) => {
 		});
 
 	} catch (error: any) {
+		// console.log("user create",error.message)
+		const statusCode = error.isOperational ? 401 : 500;
+    	const message = error.isOperational ? error.message : 'Internal Server Error';
 
-		return c.json({ error: error?.message, data: null },400);
+		return c.json({ error: message, data: null },statusCode);
 	}
 });
 
@@ -204,8 +222,10 @@ auth.post("/user/delete", async (c: Context) => {
 		return c.json({ error: null, data: deleted });
 
 	} catch (error:any) {
-		console.log(error);
-		return c.json({ error: error?.message, data: null });
+		const statusCode = error.isOperational ? 401 : 500;
+    	const message = error.isOperational ? error.message : 'Internal Server Error';
+
+		return c.json({ error: message, data: null },statusCode);
 	}
 });
 
@@ -261,9 +281,11 @@ auth.post("/user/login", async (c: Context) => {
 				},
 			},
 		});
-	} catch (error) {
-		console.log(error);
-		return c.json({ error, data: null }, 500);
+	} catch (error:any) {
+		const statusCode = error.isOperational ? 401 : 500;
+    	const message = error.isOperational ? error.message : 'Internal Server Error';
+
+		return c.json({ error: message, data: null },statusCode);
 	}
 });
 
@@ -314,14 +336,11 @@ auth.get("/oauth_redirect", async (c: Context) => {
       error: true,
       data: null,
     });
-  } catch (error) {
-    return c.json(
-      {
-        error: error,
-        data: null,
-      },
-      500
-    );
+  } catch (error:any) {
+	const statusCode = error.isOperational ? 401 : 500;
+	const message = error.isOperational ? error.message : 'Internal Server Error';
+
+	return c.json({ error: message, data: null },statusCode);
   }
 });
 
@@ -348,15 +367,12 @@ auth.get("/google_oauth", async (c: Context) => {
       data: authorizeUrl,
       error: null,
     });
-  } catch (error) {
+  } catch (error:any) {
 	console.log(error)
-    return c.json(
-      {
-        error: error,
-        data: null,
-      },
-      500
-    );
+	const statusCode = error.isOperational ? 401 : 500;
+	const message = error.isOperational ? error.message : 'Internal Server Error';
+
+	return c.json({ error: message, data: null },statusCode);
   }
 });
 
