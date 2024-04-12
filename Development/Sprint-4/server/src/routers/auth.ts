@@ -46,11 +46,7 @@ auth.post("/admin/create", async (c: Context) => {
 		return c.json({ error: null, data: token });
 	} catch (error:any) {
 		console.log(error);
-
-		const statusCode = error.isOperational ? 401 : 500;
-    	const message = error.isOperational ? error.message : 'Internal Server Error';
-
-		return c.json({ error: message, data: null },statusCode);
+		return c.json({ error: error.message, data: null },401);
 	}
 	return c.text("Create admin");
 });
@@ -61,10 +57,7 @@ auth.get("/admin", async (c: Context) => {
 		const admin: boolean = await checkAdminExists();
 		return c.json({ error: null, data: admin });
 	} catch (error:any) {
-		const statusCode = error.isOperational ? 401 : 500;
-    	const message = error.isOperational ? error.message : 'Internal Server Error';
-
-		return c.json({ error: message, data: null },statusCode);
+		return c.json({ error: error.message, data: null },401);
 	}
 	return c.text("Get admin");
 });
@@ -75,10 +68,7 @@ auth.get("/admins", async (c: Context) => {
 		const admins: boolean = await getAdmins();
 		return c.json({ error: null, data: admins });
 	} catch (error:any) {
-		const statusCode = error.isOperational ? 401 : 500;
-    	const message = error.isOperational ? error.message : 'Internal Server Error';
-
-		return c.json({ error: message, data: null },statusCode);
+		return c.json({ error: error.message, data: null },401);
 	}
 	return c.text("Get all admins");
 });
@@ -95,10 +85,7 @@ auth.delete("/admin/delete", async (c: Context) => {
 
 		return c.json({ error: null, data: deleted });
 	} catch (error:any) { 
-		const statusCode = error.isOperational ? 401 : 500;
-    	const message = error.isOperational ? error.message : 'Internal Server Error';
-
-		return c.json({ error: message, data: null },statusCode);
+		return c.json({ error: error.message, data: null },401);
 	}
 	return c.text("Delete admin");
 });
@@ -132,10 +119,7 @@ auth.post("/admin/login", async (c: Context) => {
 
 		return c.json({ error: null, data: loginValid });
 	} catch (error:any) {
-		const statusCode = error.isOperational ? 401 : 500;
-    	const message = error.isOperational ? error.message : 'Internal Server Error';
-
-		return c.json({ error: message, data: null },statusCode);
+		return c.json({ error: error.message, data: null },401);
 	}
 	return c.text("Admin login");
 });
@@ -158,7 +142,7 @@ auth.post("/user/create", async (c: Context) => {
 	try {
 		const details = await c.req.json();
 
-		const { email, password } = details;
+		const { email, password, user_metadata } = details;
 
 		if (!email || !password) throw new Error("Invalid email or password");
 
@@ -191,10 +175,8 @@ auth.post("/user/create", async (c: Context) => {
 		});
 
 	} catch (error: any) {
-		const statusCode = error.isOperational ? 401 : 500;
-    	const message = error.isOperational ? error.message : 'Internal Server Error';
 
-		return c.json({ error: message, data: null },statusCode);
+		return c.json({ error: error.message, data: null }, 401);
 	}
 });
 
@@ -212,16 +194,15 @@ auth.post("/user/delete", async (c: Context) => {
 		return c.json({ error: null, data: deleted });
 
 	} catch (error:any) {
-		const statusCode = error.isOperational ? 401 : 500;
-    	const message = error.isOperational ? error.message : 'Internal Server Error';
 
-		return c.json({ error: message, data: null },statusCode);
+		return c.json({ error: error.message, data: null },401);
 	}
 });
 
 auth.post("/user/login", async (c: Context) => {
 	try {
 		 
+		// console.log(c.get("Authorization"));
 		const body = await c.req.json();
 
 		const { email, password } = body;
@@ -232,6 +213,7 @@ auth.post("/user/login", async (c: Context) => {
 
 		// check if an admin exists
 		const user = await readRecord({ email }, "users");
+
 		if (user?.length === 0) {
 			return c.json({ error: "User does not exist", data: null });
 		}
@@ -239,9 +221,10 @@ auth.post("/user/login", async (c: Context) => {
 			password,
 			user[0]?.password
 		);
+		// console.log("is login valid",loginValid);
 
 		if (!loginValid) {
-			return c.json({ error: "Invalid login", data: null });
+			return c.json({ error: "Invalid login", data: null },401);
 		}
 
 		if (user[0]?.password) {
@@ -261,10 +244,8 @@ auth.post("/user/login", async (c: Context) => {
 			},
 		});
 	} catch (error:any) {
-		const statusCode = error.isOperational ? 401 : 500;
-    	const message = error.isOperational ? error.message : 'Internal Server Error';
-
-		return c.json({ error: message, data: null },statusCode);
+		console.log("this ",error);
+		return c.json({ error: error.message, data: null },401);
 	}
 });
 
@@ -273,10 +254,11 @@ auth.get("/oauth_redirect", async (c: Context) => {
     const { code } = c.req.query();
 	const oauth = await getSettings("oauth");
 	const application = await getSettings("application");
+	console.log("app",application?.url )
     const oauth2Client = new OAuth2Client({
       clientId: oauth?.client_id,
       clientSecret: oauth?.client_secret,
-      redirectUri: application?.url, // "http://localhost:3690/api/auth/oauth_redirect"
+      redirectUri: application.url+"/api/auth/oauth_redirect"
     });
 
     let token = (await oauth2Client.getToken(code)).tokens.id_token;
@@ -285,39 +267,40 @@ auth.get("/oauth_redirect", async (c: Context) => {
         Buffer.from(token.split(".")[1], "base64").toString()
       );
       const user = await readRecord({ email: user_data.email }, "users");
-	  const user_id = user[0]._id
-	  //strip / from url if present
-	  const url = application?.url.replace(/\/$/, "");
-      if (user.length !== 0) {
+	  if (user.length !== 0) {
         const jwt = await sign(
           user[0],
           process.env.USER_AUTH_KEY || "user_key"
         );
-        return c.redirect(`${url}/?jwt=${jwt}&user_id=${user_id}`, 301);
+        return c.redirect(`http://localhost:5173?jwt=${jwt}&user_id=${user[0]._id}`, 301);
       }
+	  console.log("user1", user);
+      console.log("user2", user[0]);
+	  //strip / from url if present
+	  const url = application?.url.replace(/\/$/, "");
+
       let details = {
         email: user_data.email,
         name: user_data.given_name,
         providers: ["google"],
+		user_metadata: {}
       };
-      const record = await createRecord(
+      const record:any = await createRecord(
         {
           ...details,
         },
         "users"
       );
+	  const user_id = record._id
       const jwt = await sign(record, process.env.USER_AUTH_KEY || "user_key");
-      return c.redirect(`${url}/?jwt=${jwt}&user_id=${user_id}`, 301);
+      return c.redirect(`http://localhost:5173?jwt=${jwt}&user_id=${user_id}`, 301);
     }
     return c.json({
       error: true,
       data: null,
     });
   } catch (error:any) {
-	const statusCode = error.isOperational ? 401 : 500;
-	const message = error.isOperational ? error.message : 'Internal Server Error';
-
-	return c.json({ error: message, data: null },statusCode);
+	return c.json({ error: error.message, data: null },401);
   }
 });
 
@@ -329,10 +312,11 @@ auth.get("/google_oauth", async (c: Context) => {
   try {
 	const oauth = await getSettings("oauth");
 	const application = await getSettings("application");
+	console.log("app 2",application?.url )
     const oauth2Client = new OAuth2Client({
       clientId: oauth?.client_id,
       clientSecret: oauth?.client_secret,
-      redirectUri: application?.url,
+      redirectUri: application.url+"/api/auth/oauth_redirect"
     });
     const authorizeUrl = oauth2Client.generateAuthUrl({
       scope: [
@@ -345,11 +329,7 @@ auth.get("/google_oauth", async (c: Context) => {
       error: null,
     });
   } catch (error:any) {
-	console.log(error)
-	const statusCode = error.isOperational ? 401 : 500;
-	const message = error.isOperational ? error.message : 'Internal Server Error';
-
-	return c.json({ error: message, data: null },statusCode);
+	return c.json({ error: error.message, data: null },401);
   }
 });
 

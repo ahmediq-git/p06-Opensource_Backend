@@ -9,6 +9,11 @@ interface ListRecordsOptions {
     offset: number;
 }
 
+interface UpdateOptions {
+    multi: boolean;
+    upsert: boolean;
+    returnUpdatedDocs: boolean;
+}
 
 class Crud {
     private client: any;
@@ -42,7 +47,7 @@ class Crud {
                         console.error("An error occurred while creating collection: ", data.error);
                     }
                     // Return data
-                    return data.data;
+                    return response;
                 }
             }
             else {
@@ -59,29 +64,13 @@ class Crud {
         try {
             const apiEndpoint = "/api/collections";
             const response = await this.client.sendToBackend({}, apiEndpoint, "GET");
-            // Check if response is ok
-            if (response.status === 200) {
-                // Extract data and error from response
-                const { data, error } = response;
 
-                // Check if there's an error
-                if (error != null) {
-                    console.error("An error occurred while getting collection names: ", error);
-                } else {
-                    // check if the returned response includes an error
-                    if (data.error != null) {
-                        console.error("An error occurred while getting collections: ", data.error);
-                    }
-                    // Return collections
-                    return data.data;
-                }
-            } else {
-                // Server returned an error status code
-                console.error("An error occurred while getting collections: ", response.error);
-            }
+            return response;
+           
+            
         }
         catch (error) {
-            console.error("An error occurred while getting collections: ", error);
+            throw error
         }
     }
 
@@ -107,7 +96,7 @@ class Crud {
                         console.error("An error occurred while deleting collection:", data.error);
                     }
                     // Return data in case of success
-                    return data.data;
+                    return response;
                 }
             }
             else {
@@ -117,6 +106,7 @@ class Crud {
 
         } catch (error) {
             console.error("An error occurred while deleting collection: ", error)
+            throw error
         }
     }
 
@@ -149,7 +139,7 @@ class Crud {
                         console.error("An error occurred while creating record: ", data.error);
                     }
                     // Return data
-                    return data.data;
+                    return response;
                 }
             }
             else {
@@ -158,6 +148,7 @@ class Crud {
             }
         } catch (error) {
             console.error("An error occurred while creating record: ", error)
+            throw error
         }
     }
 
@@ -192,22 +183,24 @@ class Crud {
                         console.error("An error occurred while reading record: ", data.error);
                     }
                     // Return data
-                    return data.data;
+                    return response;
                 }
             }
             else {
                 // Server returned an error status code
                 console.error("An error occurred while reading record: ", response.error);
+                return response;
             }
         } catch (error) {
             console.error("An error occurred while reading record: ", error)
+            throw error;
         }
     }
 
     // deletes a record from a collection
     // queryOptions: only one option for now, 'multi' which allows the removal of multiple documents if set to true.
     // Default is false
-    async deleteRecord(collection_name: string, query: object, queryOptions: boolean): Promise<any> {
+    async deleteRecord(collection_name: string, query: object, queryOptions: boolean = false): Promise<any> {
         try {
             if (!ValidationUtils.isString(collection_name)) {
                 throw new Error(collection_name + " is not a valid collection name. Please provide a valid collection name for deleting record.")
@@ -238,15 +231,17 @@ class Crud {
                         console.error("An error occurred while deleting record: ", data.error);
                     }
                     // Return data
-                    return data.data;
+                    return response;
                 }
             }
             else {
                 // Server returned an error status code
                 console.error("An error occurred while deleting record: ", response.error);
+                return response
             }
         } catch (error) {
             console.error("An error occurred while deleting record: ", error)
+            throw error
         }
     }
 
@@ -289,15 +284,13 @@ class Crud {
                         console.error("An error occurred while listing collection: ", data.error);
                     }
                     // Return data
-                    return data.data;
+                    return response;
                 }
             }
-            else {
-                // Server returned an error status code
-                console.error("An error occurred while listing collection: ", response.error);
-            }
+            
         } catch (error) {
             console.error("An error occurred while listing collection: ", error)
+            throw error
         }
     }
 
@@ -318,28 +311,27 @@ class Crud {
             let apiEndpoint = `/api/record/count?collection_name=${collection_name}&query=${queryStr}`;
             const response = await this.client.sendToBackend({}, apiEndpoint, "GET");
 
-            if (response.status === 200) {
-                // Extract data and error from response
-                const { data, error } = response;
+            return response;
 
-                // Check if there's an error
-                if (error != null) {
-                    console.error("An error occurred while counting records: ", error);
-                } else {
-                    // check if the returned response includes an error
-                    if (data.error != null) {
-                        console.error("An error occurred while counting records:", data.error);
-                    }
-                    // Return count of records
-                    return data.data.count;
-                }
-            }
-            else {
-                // Server returned an error status code
-                console.error("An error occurred while counting records: ", response.error);
-            }
         } catch (error) {
             console.error("An error occurred while counting records: ", error)
+            throw error
+        }
+    }
+
+
+    async updateRecord(collection_name: string, query:object , new_record: object, options: object = {}): Promise<any> {
+        try {
+
+            const sendObject = { "collection_name": collection_name,query, new_record, options};
+            const apiEndpoint = "/api/record/sdk-update";
+            const response = await this.client.sendToBackend(sendObject, apiEndpoint, "PATCH");
+
+            return response;
+            
+        } catch (error) {
+            
+            throw error;
         }
     }
 
