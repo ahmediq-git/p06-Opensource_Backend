@@ -117,7 +117,7 @@ export default function StressTestPage() {
     };
 
     return (
-        <div className="flex bg-gray-900 text-gray-50 h-screen max-h-screen text-center">
+        <div className="flex bg-black-900 text-gray-50 h-screen max-h-screen text-center">
             <SideRail />
             <div className="flex flex-col justify-center items-center w-full gap-y-12s">
                 <h1 className="text-2xl font-bold mb-8">🚀 API Stress Test 🚀</h1>

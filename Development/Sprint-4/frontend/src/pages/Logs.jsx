@@ -45,7 +45,7 @@ export default function Logs() {
     };
 
     const getTimeTakenData = () => {
-        const last12Logs = data.data.slice(0, 12);
+        const last12Logs = data.data.slice(0, 24);
         last12Logs.reverse();
         const timeTakenData = {
             labels: [],
@@ -53,18 +53,19 @@ export default function Logs() {
                 {
                     label: "Time Taken",
                     data: [],
-                    fill: false,
-                    borderColor: "rgb(75, 192, 192)",
-                    tension: 0.1,
+                    fill: true,
+                    borderColor: [], // Dynamically set borderColor
+                    tension: 0.2,
                 },
             ],
         };
-
+    
         last12Logs.forEach((log) => {
             timeTakenData.labels.push(formatTime(log.createdAt));
             timeTakenData.datasets[0].data.push(log.time_taken);
+            timeTakenData.datasets[0].borderColor.push(log.time_taken > 200 ? 'rgb(255, 99, 132)' : 'rgb(75, 192, 192)');
         });
-
+    
         return timeTakenData;
     };
 
@@ -76,14 +77,14 @@ export default function Logs() {
             datasets: [
                 {
                     label: 'Data Sent',
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    backgroundColor: '#155e75',
                     borderColor: 'rgba(54, 162, 235, 1)',
                     borderWidth: 1,
                     data: last12Logs.map(log => log.request_size)
                 },
                 {
                     label: 'Data Received',
-                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    backgroundColor: '#78350f',
                     borderColor: 'rgba(255, 99, 132, 1)',
                     borderWidth: 1,
                     data: last12Logs.map(log => log.response_size)
@@ -112,11 +113,11 @@ export default function Logs() {
         return {
             labels: labels,
             datasets: [{
-                label: 'URL Frequency',
-                backgroundColor: 'rgba(75, 192, 192, 0.5)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1,
-                data: dataCounts
+                label: 'Endpoint hits',
+                backgroundColor: '#047857',
+                borderColor: '#ecfeff',
+                borderWidth: 1.2,
+                data: dataCounts,
             }]
         };
     };
@@ -139,11 +140,11 @@ export default function Logs() {
     };
 
     return (
-        <div className="flex bg-gray-900 text-gray-50 h-screen max-h-screen">
+        <div className="flex bg-black-900 text-gray-50 h-screen max-h-screen">
             <SideRail />
             <div className="flex flex-col w-full overflow-y-scroll">
                 <p className="text-3xl font-bold mb-4 p-6 text-center">LOGS</p>
-                <div className="mx-auto w-full mb-4 px-4">
+                <div className="mx-auto h-4/6 mb-4 px-4 w-full">
                     <div className="flex justify-center mb-4">
                         <button
                             onClick={() => setChartType('timeTaken')}
@@ -161,31 +162,42 @@ export default function Logs() {
                             onClick={() => setChartType('histogram')}
                             className={`ml-2 px-4 py-2 rounded ${chartType === 'histogram' ? 'bg-blue-500 text-white' : 'bg-gray-600 text-gray-300'}`}
                         >
-                            Histogram
+                            Hit Frequency
                         </button>
                     </div>
                     {data && data.data && data.data.length !== 0 ? (
                         chartType === 'timeTaken' ? (
-                            <Line data={getTimeTakenData()} />
+                            <Line data={getTimeTakenData()} options={{
+                                maintainAspectRatio: true,
+                                aspectRatio: 3
+                            }}/>
                         ) : chartType === 'dataSentReceived' ? (
-                            <Bar data={getDataSentReceived()} />
-                        ) : <div className="flex flex-col w-full overflow-y-scroll">
-                            <p className="text-3xl font-bold mb-4 p-6 text-center">LOGS</p>
-                            <div className="mx-auto w-full mb-4 px-4">
-                                {data && data.data && data.data.length !== 0 ? (
-                                    <Bar data={getUniqueUrlsHistogramData()} />
-                                ) : (
-                                    <p className="text-center text-gray-300">No logs found</p>
-                                )}
+                            <Bar data={getDataSentReceived()} options={{
+                                maintainAspectRatio: true,
+                                aspectRatio: 3
+                            }}/>
+                        ) :(
+                            <div className="h-full w-full">
+                                {/* Chart for histogram */}
+                                <div className="mx-auto">
+                                    {data && data.data && data.data.length !== 0 ? (
+                                        <Bar data={getUniqueUrlsHistogramData()} options={{
+                                            maintainAspectRatio: true,
+                                            aspectRatio: 3.5
+                                        }}/>
+                                    ) : (
+                                        <p className="text-center text-gray-300">No logs found</p>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    ) : (
+                        )
+                    ): (
                         <p className="text-center text-gray-300">No logs found</p>
                     )}
                 </div>
                 {data && data.data && data.data.length !== 0 ? (
                     <>
-                        <div className="px-4">
+                        <div className="px-4 mt-4">
                             {chartType === 'dataSentReceived' && (
                                 <div className="flex justify-center mb-4">
                                     {(() => {
@@ -204,12 +216,12 @@ export default function Logs() {
                                         };
                                         return (
                                             <>
-                                                <div className="border-indigo-600 border-solid border rounded-lg p-4 mr-4">
-                                                    <p className="font-bold">Data sent:</p>
+                                                <div className="mr-12 text-center">
+                                                    <p className="font-bold">Data sent</p>
                                                     <p>{formatBytes(req_sum)}</p>
                                                 </div>
-                                                <div className="border-indigo-600 border-solid border rounded-lg p-4">
-                                                    <p className="font-bold">Data received:</p>
+                                                <div className="ml-12 text-center">
+                                                    <p className="font-bold">Data received</p>
                                                     <p>{formatBytes(res_sum)}</p>
                                                 </div>
                                             </>

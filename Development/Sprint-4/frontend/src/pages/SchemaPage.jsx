@@ -4,7 +4,7 @@ import SideRail from '../components/SideRail';
 const SchemaPage = () => {
 
     return (
-        <div className="flex bg-gray-900 text-gray-50 h-screen max-h-screen">
+        <div className="flex bg-black-900 text-gray-50 h-screen max-h-screen">
             <SideRail />
             <Diagram />
         </div>
