@@ -1,7 +1,7 @@
 import ezbase from "../../Development/Sprint-4/sdk/dist/index";
 import axios, { AxiosResponse } from 'axios';
 
-const eb = new ezbase("http://localhost:3690");
+const eb = new ezbase("http://localhost:3690","http://localhost:3691");
 
 // 1) Test for createCollection()
 async function createCollectionTest(): Promise<any> {

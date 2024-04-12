@@ -58,8 +58,9 @@ files.post("/", async (c) => {
       throw new Error("Failed to write file to disk");
     }
 
-  } catch (err) {
-    return c.json({ error: err, data: null }, 500);
+  } catch (error:any) {
+    console.log(error);
+    return c.json({ error:error.message, data: null },500);
   }
 });
 
@@ -92,6 +93,35 @@ files.get("/", async (c: Context) => {
   }
 
 });
+
+// return file
+//// http://localhost:3690/api/files/url?id=
+files.get("/url", async (c: Context) => {
+  try {
+    const params = c.req.query();
+    const { id } = params as { id: string };
+    console.log(id)
+    if (id) {
+      const meta = await getMetaData(id)
+      return c.json({
+        error: null,
+        data: meta?.link
+      })
+    }
+    return c.json({
+      error: "File does not exist",
+      data: null,
+    },404);
+
+  }catch(error:any){
+    console.log(error);
+    return c.json({
+      error: "Error retrieving the file",
+      data: null,
+    },500);
+  }
+})
+
 
 // return meta data of a file
 // http://localhost:3690/api/files/metadata?id=
@@ -152,11 +182,11 @@ files.delete("/:id", async (c: Context) => {
 files.get("/list", async (c: Context) => {
   try {
 
-    const blobStorageDetails = await getStorageAccountDetails();
-    if (blobStorageDetails.useBlobStorage) {
-      console.log("Blob Storage is enabled:");
-      console.log(blobStorageDetails);
-    }
+    // const blobStorageDetails = await getStorageAccountDetails();
+    // if (blobStorageDetails.useBlobStorage) {
+    //   console.log("Blob Storage is enabled:");
+    //   console.log(blobStorageDetails);
+    // }
 
     const meta_data_file_names = readFilesInDirectory('files-metadata')
     let ids = meta_data_file_names.map(meta_data_file => meta_data_file.replace(".json", ""));

@@ -5,8 +5,8 @@ export async function getMetaData(id: string){
 
         const metaData = await file.json();
         return metaData;
-    } catch (err) {
+    } catch (err:any) {
         console.error('Error reading Meta data:', err);
-        return null;
+        throw err.message;
     }
 }

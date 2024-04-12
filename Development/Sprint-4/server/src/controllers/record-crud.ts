@@ -25,6 +25,24 @@ export async function createRecord(
 	});
 }
 
+export async function readAPIRecord(
+	fields: QueryObject,
+	collection_name: string
+): Promise<any> {
+	const collection = getCollection(collection_name);
+
+	const docs = new Promise((resolve, reject) => {
+		collection.findOne(fields, function (err: Error | null, docs: any) {
+			if (err) {
+				reject(err);
+			}
+			resolve(docs);
+		});
+	});
+
+	return docs;
+}
+
 export async function readRecord(
 	fields: QueryObject,
 	collection_name: string
@@ -50,6 +68,30 @@ export function updateRecord(collection_name: string, id: string, record: any) {
 			{ _id: id },
 			record,
 			{},
+			function (err: Error | null, num_replaced: number) {
+				if (err) {
+					reject(err);
+				}
+
+				resolve(num_replaced);
+			}
+		);
+	});
+}
+
+// interface UpdateOptions {
+//     multi: boolean;
+//     upsert: boolean;
+//     returnUpdatedDocs: boolean;
+// }
+
+export function updateRecordSDK(collection_name: string, query:object , newRecord: object, options: object) {
+	return new Promise((resolve, reject) => {
+		const collection = getCollection(collection_name);
+		collection.update(
+			query,
+			newRecord,
+			options,
 			function (err: Error | null, num_replaced: number) {
 				if (err) {
 					reject(err);
