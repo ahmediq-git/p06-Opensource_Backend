@@ -8,11 +8,7 @@ export default async function checkAdminExists() {
 		db.find({}, (err: any, doc: any) => {
 			if (err) {
 				reject(err);
-			} else {
-				// console.log("doc[0]", doc[0]);
-				// console.log("doc[0]?.admins", doc[0]?.admins);
-				
-				
+			} else {	
 				resolve(doc[0]?.admins);
 			}
 		});

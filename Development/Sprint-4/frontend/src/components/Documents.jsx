@@ -73,7 +73,7 @@ export default function Documents() {
 
 
 	const { data, error, isLoading } = useSwr(
-		`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}&embed=false`,
+		`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}&embed=false&queryOptions=`+ encodeURIComponent(JSON.stringify({ sort: { createdAt: -1 }})),
 		fetcher
 	);
 
@@ -90,8 +90,6 @@ export default function Documents() {
 	};
 
 	useEffect(() => {
-		console.log("data", data);
-		console.log("error", error);
 	}, [data, error, isLoading]);
 
 	useEffect(() => {
@@ -138,7 +136,6 @@ export default function Documents() {
 				name: obj.name,
 				link: obj.link
 			}));
-			console.log("Mapped files", mappedFiles)
 			setFileOptions(mappedFiles);
 		}
 		if (doc.some(record => record.type == "file")) {
@@ -155,9 +152,9 @@ export default function Documents() {
 					}
 				});
 				const data = await response.json();
-
 				if (data?.data) {
 					setForeignCollOptions(data.data);
+					fetchForeignOptions(foreignCollSelected ? foreignCollSelected : data.data[0]);
 				}
 			} catch (error) {
 				console.error("Error fetching foreign options:", error);
@@ -175,7 +172,6 @@ export default function Documents() {
 	const createDocument = async () => {
 		try {
 			// const validatedData = fieldSchema.parse(Object.assign({}, ...doc));
-			console.log("DOC is", doc);
 			const data = doc.map((record) => {
 				if (record.type === "boolean" && record.value === null) {
 					record.value = false;
@@ -194,19 +190,12 @@ export default function Documents() {
 				};
 			});
 
-			console.log("data in createdocument", data);
 
 			// convert array to object
 			const obj = Object.assign({}, ...data);
 
-			console.log("obj", obj);
 
 			// validate data with zod
-
-			console.log({
-				collection_name: selection.collection,
-				data: obj,
-			});
 
 			const res = await fetch(
 				`${import.meta.env.VITE_BACKEND_URL}/record/create`,
@@ -225,10 +214,10 @@ export default function Documents() {
 
 			const adsa = await res.json();
 
-			console.log("ADSA", adsa);
-
-			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}&embed=false`);
+			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}&embed=false&queryOptions=`+ encodeURIComponent(JSON.stringify({ sort: { createdAt: -1 }})));
 			setSelection({ collection: selection.collection, document: "" });
+			setForeignCollSelected("");
+			setForeignDocOptions([]);
 			setDoc([
 				{
 					field: "",
@@ -349,7 +338,6 @@ export default function Documents() {
 														setDoc((prev) => {
 															const newRecord = [...prev];
 															newRecord[index].type = e.target.value;
-															console.log("newRecord[index].type", newRecord[index].type);
 															return newRecord;
 														});
 													}}
@@ -426,7 +414,6 @@ export default function Documents() {
 												) : record.type === "file" ? (
 													<select type="dropdown" className="select w-full" value={record.value}
 														onFocus={(e) => {
-															console.log("In file focus")
 															setDoc((prev) => {
 																const newRecord = [...prev];
 																newRecord[index].value = fileOptions[0].link;
@@ -434,7 +421,6 @@ export default function Documents() {
 															});
 														}}
 														onChange={(e) => {
-															console.log('File targ', e.target.value);
 															setDoc((prev) => {
 																const newRecord = [...prev];
 																newRecord[index].value = e.target.value;
@@ -460,10 +446,6 @@ export default function Documents() {
 																newRecord[index].value = parseValue(
 																	e.target.value,
 																	record.type
-																);
-																console.log(
-																	"newRecord[index].value",
-																	typeof newRecord[index].value
 																);
 																return newRecord;
 															});

@@ -60,8 +60,6 @@ export const AdminSignupForm = ({ redirectTo }) => {
 
 		const resData = await res.json();
 		
-		// console.log("herqwqw",resData);
-
 		if (resData.error) {
 			setError(resData.error);
 			setLoading(false);

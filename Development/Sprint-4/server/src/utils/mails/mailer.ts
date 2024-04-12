@@ -56,8 +56,6 @@ export default async function sendEmail(to: string, subject: string, text: strin
 
 
     } catch (err) {
-        console.log("In mailer", err);
-
         return err;
     }
 }

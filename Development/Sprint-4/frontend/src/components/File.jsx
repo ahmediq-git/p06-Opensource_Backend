@@ -30,7 +30,6 @@ export default function File() {
 			);
 
 			const data = await res.json();
-			console.log(data);
 
 			// remove the deleted file and updata
 			mutate(`${import.meta.env.VITE_BACKEND_URL}/files/list`);

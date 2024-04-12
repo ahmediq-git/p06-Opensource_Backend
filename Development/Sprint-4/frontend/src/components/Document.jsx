@@ -182,7 +182,6 @@ export default function Document() {
 			});
 
 			const adsa = await res.json();
-			console.log("return is", adsa);
 
 			// remove the deleted collection from the list of collections
 			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}&embed=false`);
@@ -211,8 +210,6 @@ export default function Document() {
 	};
 
 	useEffect(() => {
-		console.log("data", data);
-		console.log("error", error);
 	}, [data, error, isLoading]);
 
 
@@ -347,7 +344,6 @@ export default function Document() {
 													setDoc((prev) => {
 														const newRecord = [...prev];
 														newRecord[index].type = e.target.value;
-														console.log("newRecord[index].type", newRecord[index].type);
 														return newRecord;
 													});
 												}}
@@ -398,7 +394,6 @@ export default function Document() {
 														setDoc((prev) => {
 															const newRecord = [...prev];
 															newRecord[index].value = parseValue(e.target.value, record.type);
-															console.log("newRecord[index].value", typeof (newRecord[index].value));
 															return newRecord;
 														});
 													}}

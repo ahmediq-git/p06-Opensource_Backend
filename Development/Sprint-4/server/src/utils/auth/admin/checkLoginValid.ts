@@ -29,8 +29,6 @@ export default async function checkLoginValid(
 			}
 		}
 	}
-
-	console.log("Invalid login");
 	
 	return false;
 }

@@ -53,9 +53,6 @@ export default function ApplicationSettings() {
   };
 
   useEffect(() => {
-    console.log("data", data);
-    console.log("error", error);
-    console.log("isLoading", isLoading);
   }, [data, error, isLoading]);
 
   return (

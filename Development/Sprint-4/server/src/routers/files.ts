@@ -15,12 +15,6 @@ const files = new Hono();
 files.post("/", async (c) => {
   try {
 
-    // const blobStorageDetails = await getStorageAccountDetails();
-    // if (blobStorageDetails.useBlobStorage) {
-    //   console.log("Blob Storage is enabled:");
-    //   console.log(blobStorageDetails);
-    // }
-
     const data = await c.req.formData();
     const file = data.get("file");
     const id = v4().replaceAll('-', '').slice(0, 16);
