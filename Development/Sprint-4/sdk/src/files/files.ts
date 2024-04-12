@@ -29,11 +29,23 @@ class Files {
     async getFile(file_name:string):Promise<AxiosResponse<any>>{
         try{
             const apiEndpoint=`/api/files?file_name=${file_name}`
-            const response = await this.client.sendToBackend({}, apiEndpoint, "GET");
+            const response = await this.client.sendToBackend({}, apiEndpoint, "GET",true);
             return response;
         } catch (error){
             // Handle error
             console.log("Error getting file:", error);
+            throw error;
+        }
+    }
+
+    async getFileUrl(file_id:string):Promise<AxiosResponse<any>>{
+        try {
+            const apiEndpoint = `/api/files/url?id=${file_id}`;
+            const response = await this.client.sendToBackend({}, apiEndpoint, "GET");
+            return response;
+        } catch (error) {
+            // Handle error
+            console.log("Error getting file url:", error);
             throw error;
         }
     }

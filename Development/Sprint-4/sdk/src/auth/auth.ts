@@ -10,17 +10,17 @@ class Auth {
     }
 
     // Signs up the user with the given email and password
-    async signUp(email: string, password: string): Promise<AxiosResponse<any>> {
+    async signUp(email: string, password: string, user_metadata: object = {}): Promise<AxiosResponse<any>> {
         try {
             if (!ValidationUtils.isValidEmail(email)) {
                 throw new Error("Invalid Email name");
             }
 
-            const sendObject = { "email": email, "password": password };
+            const sendObject = { "email": email, "password": password, user_metadata };
 
             const response = await this.client.sendToBackend(sendObject, "/api/auth/user/create", "POST");
             console.log(response.data)
-            this.authStore.saveTokenFromResponse(response.data?.data);
+            this.authStore.saveTokenFromResponse(response.data);
             return response;
         } catch (error) {
             console.log("Error signing up ", error);
@@ -35,11 +35,11 @@ class Auth {
                 throw new Error("Invalid Email name");
             }
 
-            const sendObject = { "email": email, "password": password };
+            const sendObject = { "email": email, "password": password};
 
             const response = await this.client.sendToBackend(sendObject, "/api/auth/user/login", "POST");
             console.log(response)
-            this.authStore.saveTokenFromResponse(response.data?.data);
+            this.authStore.saveTokenFromResponse(response.data);
             return response;
         } catch (error) {
             console.log("Error signing in ", error);

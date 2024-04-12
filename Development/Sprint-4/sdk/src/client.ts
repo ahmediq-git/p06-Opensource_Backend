@@ -1,5 +1,10 @@
 import axios, { AxiosResponse } from "axios";
 import ValidationUtils from "./validators/validators";
+export type CustomResponse = {
+    data: any;
+    error: any;
+    status: number;
+}
 
 class EzBaseClient {
     private backendUrl: string;
@@ -20,7 +25,7 @@ class EzBaseClient {
     }
 
     // Sends to the backend using the given method and api endpoint
-    async sendToBackend(jsonObject: any, apiEndpoint: string, method: 'POST' | 'DELETE' | 'GET' | 'PATCH', isFile: boolean = false): Promise<AxiosResponse<any> | void> {
+    async sendToBackend(jsonObject: any, apiEndpoint: string, method: 'POST' | 'DELETE' | 'GET' | 'PATCH', isFile: boolean = false): Promise<AxiosResponse<any> | void | CustomResponse> {
         let completeApiEndpoint = `${this.backendUrl}${apiEndpoint}`;
 
         const headers = {
@@ -39,25 +44,37 @@ class EzBaseClient {
             switch (method) {
                 case 'POST':
                     response = await axios.post(completeApiEndpoint, jsonObject, { headers });
-                    // console.log('Data sent successfully:', response.data);
+                    console.log('Data sent successfully:', response.data);
                     if (response?.data.error !== null) {
                        throw new Error(response?.data.error)
                     }
-                    return response;
+                    return {
+                        data: response.data.data,
+                        error: null,
+                        status: response.status
+                    }
                 case 'PATCH':
-                        response = await axios.post(completeApiEndpoint, jsonObject, { headers });
+                        response = await axios.patch(completeApiEndpoint, jsonObject, { headers });
                         // console.log('Data sent successfully:', response.data);
                         if (response?.data.error !== null) {
                            throw new Error(response?.data.error)
                         }
-                        return response;
+                        return {
+                            data: response.data.data,
+                            error: null,
+                            status: response.status
+                        }
                 case 'DELETE':
                     response = await axios.delete(completeApiEndpoint, { data: jsonObject, headers });
                     // console.log('Data sent for deletion successfully:', response.data);
                     if (response?.data.error !== null) {
                         throw new Error(response?.data.error)
                      }
-                    return response;
+                    return {
+                        data: response.data.data,
+                        error: null,
+                        status: response.status
+                    };
                 case 'GET':
                     const values = Object.values(jsonObject);
                     if (values.length > 0) {
@@ -69,12 +86,17 @@ class EzBaseClient {
                         throw new Error(response?.data.error)
                      }
                     console.log('Data received successfully:', response.data);
-                    return response;
+                    return {
+                        data: response.data.data,
+                        error: null,
+                        status: response.status
+                    }
                 default:
                     console.error('Invalid method:', method);
                     return;
             }
         } catch (error: any) {
+            console.log("client errir",error)
             let errorResponse = {
                 status: error.response?.status || 500,
                 error: error.response?.data?.error || 'An unexpected error occurred',
