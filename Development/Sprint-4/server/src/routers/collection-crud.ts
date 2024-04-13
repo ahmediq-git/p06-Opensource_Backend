@@ -1,6 +1,8 @@
 import createCollection from "@src/utils/collection-crud/createCollection";
 import deleteCollection from "@src/utils/collection-crud/deleteCollection";
 import getAllCollections from "@src/utils/collection-crud/getAllCollections";
+import { fetchRules } from "@src/utils/rules/fetchRules";
+import { updateRules } from "@src/utils/rules/updateRules";
 import { Context, Hono } from "hono";
 
 const collections = new Hono();
@@ -33,6 +35,35 @@ collections.post("/create", async (c: Context) => {
 
 		if (!collection) throw new Error("Failed to create collection");
 
+		// when collection is created, we need an entry in rules
+		const rules = await fetchRules()
+
+		if (!rules) throw new Error("Failed to fetch rules")
+
+		await updateRules({
+			userRules: {
+				...rules.userRules,
+				[collection_name]: {'1': [['', 'eq', '', 'None'],{
+					createCollection: false,
+					deleteCollection: false,
+					createRecord: false,
+					readRecord: false,
+					updateRecord: false,
+					deleteRecord: false,
+				}]}
+			},
+			defaultRuleObject: {
+				...rules.defaultRuleObject,
+				[collection_name]: {
+					createCollection: false,
+					deleteCollection: false,
+					createRecord: false,
+					readRecord: false,
+					updateRecord: false,
+					deleteRecord: false,
+				}
+			}
+		})
 		return c.json({ data: collection, error: null });
 	} catch (error) {
 		console.log(error);
@@ -50,6 +81,18 @@ collections.delete("/:collection_name", async (c: Context) => {
 		const deleted = await deleteCollection(collection_name, true);
 
 		if (!deleted) throw new Error("Failed to delete collection");
+
+		// when collection is deleted, remove entry from rules
+		const rules = await fetchRules()
+
+		if (!rules) throw new Error("Failed to fetch rules")
+		delete rules.userRules[collection_name];
+		delete rules.defaultRuleObject[collection_name];
+
+		await updateRules({
+			userRules: { ...rules.userRules },
+			defaultRuleObject: { ...rules.defaultRuleObject }
+		});
 
 		return c.json({ data: deleted, error: null });
 	} catch (error) {
@@ -70,6 +113,18 @@ collections.delete("/force/:name", async (c: Context) => {
 
 		if (!deleted) throw new Error("Failed to delete collection");
 
+		// when collection is deleted, remove entry from rules
+		const rules = await fetchRules()
+
+		if (!rules) throw new Error("Failed to fetch rules")
+		delete rules.userRules[collection_name];
+		delete rules.defaultRuleObject[collection_name];
+
+		await updateRules({
+			userRules: { ...rules.userRules },
+			defaultRuleObject: { ...rules.defaultRuleObject }
+		});
+		
 		return c.json({ data: deleted, error: null });
 	} catch (error) {
 		console.log(error);

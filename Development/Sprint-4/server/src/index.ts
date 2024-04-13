@@ -6,6 +6,7 @@ import admin_ui from "@routers/admin-ui";
 import mail from "@routers/mail";
 import auth from "@routers/auth";
 import files from "@routers/files"
+import rules from "@routers/rules";
 import { cors } from "hono/cors";
 import { logConsoleDev, logConsoleProd } from "./middleware/log-console";
 import { Initialize } from "./core/init";
@@ -73,6 +74,7 @@ app.route("/functions", functions);
 app.route("/stress", stress);
 app.route("/schema", schema);
 app.route("/index", index);
+app.route("/rules", rules);
 
 
 io.listen(3691);

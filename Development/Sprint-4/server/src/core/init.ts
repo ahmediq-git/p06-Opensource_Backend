@@ -70,6 +70,13 @@ export type AppConfig = {
     client_id: string;
     client_secret: string;
   };
+
+  // memory for the rule
+  rule: {
+    [key: string]: {
+      [key: string]: any;
+    };
+  };
 };
 
 export async function Initialize() {
@@ -84,6 +91,7 @@ export async function Initialize() {
   const users_db = await LoadUsers();
   const logs_db = await LoadLogs();
   const config_db = await LoadConfig();
+  const rules = await LoadRules();
   const functions = await LoadFunctions();
 
   await LogCullerSchedule(); // cull logs based on retention
@@ -253,6 +261,17 @@ async function LoadLogs() {
   }
 }
 
+async function LoadRules() {
+  if (!Database.getInstance().getDataStore().hasOwnProperty('rules')) {
+    const db = Database.getInstance().loadCollection('rules', { autoload: true, timestampData: true })
+    db.insert({userRules:{}, defaultRuleObject:{}})
+    return db;
+  } else {
+    const db = Database.getInstance().getDataStore()?.['rules']
+    return db;
+  }
+}
+
 async function LoadFunctions() {
   if (!Database.getInstance().getDataStore().hasOwnProperty('functions')) {
     const db = Database.getInstance().loadCollection('functions', { autoload: true, timestampData: true })
@@ -339,7 +358,15 @@ async function LoadConfig() {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
+      {
+        name: "rules",
+        type: CollectionType.user,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
     ],
+
+    rule: {}
   };
   // create a config object if it does not exist
   const newConfig: any[] = await new Promise((resolve, reject) => {
