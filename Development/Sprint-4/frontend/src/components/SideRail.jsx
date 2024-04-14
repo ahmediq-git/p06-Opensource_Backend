@@ -8,13 +8,15 @@ import { Waypoints } from "lucide-react";
 import {Folder} from "lucide-react";
 import {ScrollText} from "lucide-react";
 
+
 export default function SideRail() {
 	const [active, setActive] = useState("");
 	const [admin, setAdmin] = useAtom(adminAtom)
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		switch (location.pathname) {
+		console.log(window.location.hash.split('#')[1])
+		switch (window.location.hash.split('#')[1]) {
 			case "/":
 				setActive("database");
 				break;
@@ -27,25 +29,26 @@ export default function SideRail() {
 			case "/settings":
 				setActive("settings");
 				break;
-			case "realtimedemo":
+			case "/rt":
 				setActive("realtimedemo");
 				break;
-			case "functions":
+			case "/functions":
 				setActive("functions");
 				break;
-			case "stress":
+			case "/stress":
 				setActive("stress");
 				break;
-			case "schema":
+			case "/schema":
+				console.log("HERE");
 				setActive("schema");
 				break;
-			case "files":
+			case "/files":
 				setActive("files");
 				break;
 			default:
 				setActive("");
 		}
-	}, [location.pathname]);
+	}, [window.location.hash.split('#')[1]]);
 
 	const signOut = async () => {
 		setAdmin('jwt', '');
@@ -88,8 +91,7 @@ export default function SideRail() {
 							</li>
 							<li
 								onClick={() => { setActive("schema"); navigate("/schema") }}
-								className={`menu-item ${active === "schema" && "schema"
-									}`}
+								className={`menu-item ${active === "schema" && "menu-active"}`}
 							>
 								<Waypoints />
 							</li>

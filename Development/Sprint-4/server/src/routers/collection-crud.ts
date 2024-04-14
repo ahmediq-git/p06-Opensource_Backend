@@ -25,9 +25,9 @@ collections.get("/", async (c: Context) => {
 			),
 			error: null,
 		});
-	} catch (error) {
+	} catch (error:any) {
 		console.log(error);
-		return c.json({ error, data: null });
+		return c.json({ error: error.message, data: null },500);
 	}
 });
 
@@ -71,9 +71,9 @@ collections.post("/create", async (c: Context) => {
 
 
 		return c.json({ data: collection, error: null });
-	} catch (error) {
+	} catch (error:any) {
 		console.log(error);
-		return c.json({ error, data: null });
+		return c.json({ error: error.message , data: null },500);
 	}
 });
 
@@ -107,7 +107,7 @@ collections.delete("/:collection_name", async (c: Context) => {
 	} catch (error) {
 		console.log(error);
 
-		return c.json({ error: "Failed to delete collection", data: null });
+		return c.json({ error: "Failed to delete collection", data: null },500);
 	}
 });
 
@@ -138,7 +138,7 @@ collections.delete("/force/:name", async (c: Context) => {
 	} catch (error) {
 		console.log(error);
 
-		return c.json({ error: "Failed to delete collection", data: null });
+		return c.json({ error: "Failed to delete collection", data: null },500);
 	}
 });
 

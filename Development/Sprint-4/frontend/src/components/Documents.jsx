@@ -73,7 +73,7 @@ export default function Documents() {
 
 
 	const { data, error, isLoading } = useSwr(
-		`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}&embed=false`,
+		`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}&embed=false&queryOptions=`+ encodeURIComponent(JSON.stringify({ sort: { createdAt: -1 }})),
 		fetcher
 	);
 
@@ -152,9 +152,9 @@ export default function Documents() {
 					}
 				});
 				const data = await response.json();
-
 				if (data?.data) {
 					setForeignCollOptions(data.data);
+					fetchForeignOptions(foreignCollSelected ? foreignCollSelected : data.data[0]);
 				}
 			} catch (error) {
 				console.error("Error fetching foreign options:", error);
@@ -214,8 +214,10 @@ export default function Documents() {
 
 			const adsa = await res.json();
 
-			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}&embed=false`);
+			mutate(`${import.meta.env.VITE_BACKEND_URL}/record/list?collection_name=${selection.collection}&embed=false&queryOptions=`+ encodeURIComponent(JSON.stringify({ sort: { createdAt: -1 }})));
 			setSelection({ collection: selection.collection, document: "" });
+			setForeignCollSelected("");
+			setForeignDocOptions([]);
 			setDoc([
 				{
 					field: "",

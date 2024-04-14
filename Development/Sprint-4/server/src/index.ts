@@ -56,6 +56,7 @@ app.get('/*', serveStatic({
   },
 }))
 
+
 process.env.DEV ? app.use("*", logConsoleDev): app.use("*", logConsoleProd)
 
 app.use("*", parseAuthHeader);

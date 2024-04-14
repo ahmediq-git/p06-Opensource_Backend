@@ -8,9 +8,9 @@ mail.post("/sendTextMail", async (c: Context) => {
     const mail = await sendEmail(to, subject, text, "");
 
     return c.json({ data: mail, error: null });
-  } catch (error) {
+  } catch (error:any) {
     console.log(error);
-    return c.json({ error, data: null });
+    return c.json({ error:error.message, data: null },500);
   }
 });
 
@@ -20,9 +20,9 @@ mail.post("/sendHtmlMail", async (c: Context) => {
     const mail = await sendEmail(to, subject, "", html);
 
     return c.json({ data: mail, error: null });
-  } catch (error) {
+  } catch (error:any) {
     console.log(error);
-    return c.json({ error, data: null });
+    return c.json({ error:error.message, data: null },500);
   }
 });
 

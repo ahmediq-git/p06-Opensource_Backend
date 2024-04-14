@@ -118,9 +118,9 @@ export default function FunctionsPage() {
     }
 
     return (
-        <div className="flex bg-gray-900 text-gray-50 h-screen max-h-screen">
+        <div className="flex bg-black-900 text-gray-50 h-screen max-h-screen">
             <SideRail />
-            <div className="bg-gray-800 p-8 rounded-lg text-l">
+            <div className="bg-gray-900 p-8 rounded-lg text-l">
                 <label htmlFor="dropdown1" className="block mb-2">Run</label>
                 <select id="dropdown1" className="mb-4 select" onChange={(e) => setSelectedFunction(e.target.value)}>
                     <option value="">Select</option>

@@ -6,6 +6,8 @@ import {
 	deleteRecord,
 	listRecords,
 	countRecords,
+	updateRecordSDK,
+	readAPIRecord
 } from "@src/controllers/record-crud";
 import getAllCollections from "@src/utils/collection-crud/getAllCollections";
 import { sse } from "@src/index";
@@ -39,7 +41,7 @@ records.post("/create", async (c) => {
 		return c.json({
 			data: null,
 			error: "Failed to create record",
-		});
+		},500);
 	}
 });
 
@@ -48,7 +50,7 @@ interface ReadQueryParams extends Record<string, string> {
 	collection_name: string;
 	embed: string
 }
-
+// changed readRecord to retrun a single document
 records.get("/read", async (c) => {
 	try {
 		const params = c.req.query();
@@ -60,7 +62,7 @@ records.get("/read", async (c) => {
 
 		const queryJson = JSON.parse(query);
 
-		const record = await readRecord(queryJson, collection_name)
+		const record = await readAPIRecord(queryJson, collection_name)
 		let embed_referenced_doc = false;
 		embed == 'true' ? embed_referenced_doc = true : false
 		if (embed_referenced_doc) {
@@ -87,15 +89,44 @@ records.get("/read", async (c) => {
 			data: record,
 			error: null,
 		});
-	} catch (error) {
+	} catch (error:any) {
 		console.log(error);
 
 		return c.json({
 			data: null,
-			error: "Failed to read record",
-		});
+			error: error.message,
+		},500);
 	}
 });
+
+interface UpdateOptions {
+    multi: boolean;
+    upsert: boolean;
+    returnUpdatedDocs: boolean;
+}
+
+records.patch("/sdk-update", async (c) => {
+	try {
+		const { collection_name, query, new_record, options } = await c.req.json();
+		if (!collection_name) throw new Error("No collection name provided");
+		//check if query object is empty
+		if (JSON.stringify(query) === '{}') throw new Error("No query provided");
+		console.log(collection_name, query, new_record, options);
+		const record = await updateRecordSDK(collection_name, query, new_record, options);
+		
+		return c.json({
+			data: new_record,
+			error: null,
+		});
+
+	}catch(error:any){
+		console.log(error);
+		return c.json({
+			data: null,
+			error: error.message,
+		},500);
+	}
+})
 
 records.patch("/update", async (c) => {
 	try {
@@ -112,13 +143,15 @@ records.patch("/update", async (c) => {
 			error: null
 		});
 
-	} catch (error) {
+	} catch (error:any) {
 		return c.json({
 			data: null,
-			error: "Failed to update record"
-		});
+			error: error.message,
+		},500);
 	}
 })
+
+
 
 records.delete("/delete", async (c) => {
 	try {
@@ -133,13 +166,12 @@ records.delete("/delete", async (c) => {
 			data: record,
 			error: null,
 		});
-	} catch (error) {
-		console.log(error);
+	} catch (error:any) {
 
 		return c.json({
 			data: null,
-			error: "Failed to delete record",
-		});
+			error: error.message,
+		},500);
 	}
 });
 
@@ -191,13 +223,11 @@ records.get("/list", async (c) => {
 			data: records,
 			error: null,
 		});
-	} catch (error) {
-		console.log(error);
-
+	} catch (error:any) {
 		return c.json({
 			data: null,
-			error: "Failed to list records",
-		});
+			error: error.message,
+		},500);
 	}
 });
 

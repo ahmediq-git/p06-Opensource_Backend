@@ -84,7 +84,7 @@ const RealtimeTest = () => {
   };
 
   return (
-    <div className="flex bg-gray-900 text-gray-50 h-screen max-h-screen">
+    <div className="flex bg-black-900 text-gray-50 h-screen max-h-screen">
       <SideRail />
       <div className="flex flex-col justify-center items-center w-full">
         <div className="p-4">

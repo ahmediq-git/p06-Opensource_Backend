@@ -5,7 +5,7 @@ import Database from "@src/database/database_handler";
 export default async function createCollection(
 	collection_name: string
 ): Promise<any> {
-	try {
+
 		if (Database.getInstance().getDataStore()?.[collection_name]){
 			throw new Error("Collection already exists")
 		}
@@ -64,9 +64,7 @@ export default async function createCollection(
 				}
 			}
 		);
-		await config_db.persistence.compactDatafile()
+		config_db.persistence.compactDatafile()
 		return "Collection created successfully";
-	} catch (error) {
-		return error;
-	}
+
 }
