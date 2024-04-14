@@ -227,6 +227,6 @@ export const checkApiPermissions= async (c: Context, next: () => Promise<void>) 
             });
         }
     }
-    console.log("yes")
+
     return await next()
 }
