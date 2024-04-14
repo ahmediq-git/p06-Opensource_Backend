@@ -7,12 +7,13 @@ export const parseAuthHeader = async (
 	next: () => Promise<void>
 ) => {
 	const authHeader = c.req.raw.headers.get("authorization");
+
 	if (!authHeader) {
 		c.set("Authorization", "Guest");
 		return await next();
 
 	}
-
+	
 	const token = authHeader.split(" ")[1];
 	if (!token) {
 		if (c.req.url.includes('/login') || c.req.url.includes('/init')) {
@@ -25,8 +26,9 @@ export const parseAuthHeader = async (
 
 	try {
 		const decoded = jwt.verify(token, process.env.USER_AUTH_KEY || "user_key");
-
+		
 		c.set("user",decoded)
+		c.set("Authorization", "User")
 
 		return await next();
 	} catch (error) {

@@ -6,6 +6,7 @@ import admin_ui from "@routers/admin-ui";
 import mail from "@routers/mail";
 import auth from "@routers/auth";
 import files from "@routers/files"
+import rules from "@routers/rules";
 import { cors } from "hono/cors";
 import { logConsoleDev, logConsoleProd } from "./middleware/log-console";
 import { Initialize } from "./core/init";
@@ -18,7 +19,8 @@ import {io, broadcastRecord} from "./realtime/init";
 import { EventEmitter } from "node:events";
 import { serveStatic } from 'hono/bun'
 import { parseAuthHeader } from "./middleware/parseAuthHeader";
-
+import { checkApiPermissions } from "./middleware/checkRequestPermissions";
+  
 (async () => {
   await Initialize(); //initialize all the system defined parameters and collections
   console.log("\x1b[34m    ___________   ____  ___   _____ ______");
@@ -58,6 +60,7 @@ app.get('/*', serveStatic({
 process.env.DEV ? app.use("*", logConsoleDev): app.use("*", logConsoleProd)
 
 app.use("*", parseAuthHeader);
+app.use("*", checkApiPermissions);
 
 app.get("/", async (c: Context) => {
   
@@ -74,6 +77,7 @@ app.route("/functions", functions);
 app.route("/stress", stress);
 app.route("/schema", schema);
 app.route("/index", index);
+app.route("/rules", rules);
 
 
 io.listen(3691);

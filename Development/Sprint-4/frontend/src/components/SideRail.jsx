@@ -5,7 +5,9 @@ import { adminAtom } from "../lib/state/adminAtom";
 import { useNavigate } from "react-router-dom";
 import { Flame } from "lucide-react";
 import { Waypoints } from "lucide-react";
-import { Folder } from "lucide-react";
+import {Folder} from "lucide-react";
+import {ScrollText} from "lucide-react";
+
 
 export default function SideRail() {
 	const [active, setActive] = useState("");
@@ -17,6 +19,9 @@ export default function SideRail() {
 		switch (window.location.hash.split('#')[1]) {
 			case "/":
 				setActive("database");
+				break;
+			case "/rules":
+				setActive("rules");
 				break;
 			case "/logs":
 				setActive("logs");
@@ -58,7 +63,7 @@ export default function SideRail() {
 					<span>EzBase</span>
 				</div>
 			</section>
-			<section className="sidebar-content h-full min-h-[20rem] overflow-visible mt-4">
+			<section className="sidebar-content h-full min-h-[20rem] overflow-visible mt-4 overflow-y-scroll">
 				<nav className="menu rounded-md">
 					<section className="menu-section px-4">
 						<ul className="menu-items gap-4">
@@ -68,6 +73,14 @@ export default function SideRail() {
 									}`}
 							>
 								<Database />
+							</li>
+
+							<li
+								onClick={() => { setActive("rules"); navigate("/rules") }}
+								className={`menu-item ${active === "rules" && "menu-active"
+									}`}
+							>
+								<ScrollText />
 							</li>
 
 							<li
@@ -122,10 +135,10 @@ export default function SideRail() {
 				</nav>
 			</section>
 
-			<section className="sidebar-footer h-80 justify-end bg-gray-1 pt-2 z-20">
+			<section className="sidebar-footer h-20 justify-end bg-gray-1 pt-2 z-20">
 				<div className="divider my-0"></div>
 				<div className="dropdown w-full cursor-pointer  p-4">
-					<label className="flex items-center justify-center w-full" tabindex="0">
+					<label className="flex items-center justify-center w-full" tabIndex="0">
 						<div className="avatar avatar-md cursor-pointer">
 							<img src="/doge.jpeg" alt="avatar" className="h-20 w-32" />
 						</div>
@@ -133,7 +146,7 @@ export default function SideRail() {
 
 					<div className="dropdown-menu dropdown-menu-top-right">
 
-						<a tabindex="-1" className="dropdown-item text-sm"
+						<a tabIndex="-1" className="dropdown-item text-sm"
 							onClick={signOut}>
 							Sign out
 						</a>
