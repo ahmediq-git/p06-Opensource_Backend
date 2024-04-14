@@ -71,12 +71,6 @@ export type AppConfig = {
     client_secret: string;
   };
 
-  // memory for the rule
-  rule: {
-    [key: string]: {
-      [key: string]: any;
-    };
-  };
 };
 
 export async function Initialize() {
@@ -92,6 +86,7 @@ export async function Initialize() {
   const logs_db = await LoadLogs();
   const config_db = await LoadConfig();
   const rules = await LoadRules();
+  const user_rules = await LoadUserRules();
   const functions = await LoadFunctions();
 
   await LogCullerSchedule(); // cull logs based on retention
@@ -272,6 +267,16 @@ async function LoadRules() {
   }
 }
 
+async function LoadUserRules() {
+  if (!Database.getInstance().getDataStore().hasOwnProperty('user_rules')) {
+    const db = Database.getInstance().loadCollection('user_rules', { autoload: true, timestampData: true })
+    return db;
+  } else {
+    const db = Database.getInstance().getDataStore()?.['user_rules']
+    return db;
+  }
+}
+
 async function LoadFunctions() {
   if (!Database.getInstance().getDataStore().hasOwnProperty('functions')) {
     const db = Database.getInstance().loadCollection('functions', { autoload: true, timestampData: true })
@@ -366,7 +371,6 @@ async function LoadConfig() {
       },
     ],
 
-    rule: {}
   };
   // create a config object if it does not exist
   const newConfig: any[] = await new Promise((resolve, reject) => {

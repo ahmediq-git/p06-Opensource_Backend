@@ -12,10 +12,12 @@ import {
 	deleteRecord,
 	readRecord,
 } from "@src/controllers/record-crud";
+import { fetchRules } from "@src/utils/rules/fetchRules";
 import sign from "@src/utils/auth/sign";
 import Database from "@src/database/database_handler";
 import { OAuth2Client } from "google-auth-library";
 import { html } from "hono/html";
+import { constructRulesMemoryObject } from "@src/utils/rules/constructRulesMemoryObject";
 
 const auth = new Hono();
 
@@ -163,6 +165,7 @@ auth.post("/user/create", async (c: Context) => {
 		if (!email || !password) throw new Error("Invalid email or password");
 
 		const user = await readRecord({ email }, "users");
+
 		if (user.length !== 0) throw new Error("User already exists");
 
 		const record: any = await createRecord(
@@ -172,8 +175,7 @@ auth.post("/user/create", async (c: Context) => {
 			},
 			"users"
 		);
-		
-		// remove password from details
+	
 		delete details.password;
 
 		if (record?.password) {
@@ -181,6 +183,19 @@ auth.post("/user/create", async (c: Context) => {
 		}
 
 		const token = await sign(record, process.env.USER_AUTH_KEY || "user_key");
+
+		const rule_specification = await fetchRules()
+		
+		// remove on merge
+		const user_metadata={}
+		
+		const rule: any = await createRecord(
+			{
+				email:email,
+				permission: constructRulesMemoryObject(user_metadata, rule_specification.userRules, rule_specification.defaultRuleObject)
+			},
+			'user_rules'
+		)
 
 		return c.json({
 			error: null,
@@ -204,10 +219,17 @@ auth.post("/user/delete", async (c: Context) => {
 
 		if (!id) throw new Error("Invalid id");
 
+		const user = await readRecord({_id: id}, "users")
+		const user_email: string = user[0]?.email
+	
 		// delete the user
 		const deleted = await deleteRecord({ _id: id }, { multi: false }, "users");
 
 		if (!deleted) throw new Error("Failed to delete user");
+
+		const rules_deleted = await deleteRecord({email: user_email}, { multi: false }, "user_rules")
+
+		if (!rules_deleted) throw new Error("Failed to delete user rules")
 
 		return c.json({ error: null, data: deleted });
 
@@ -247,6 +269,7 @@ auth.post("/user/login", async (c: Context) => {
 		if (user[0]?.password) {
 			delete user[0].password;
 		}
+
 		// sign the token
 		const token = await sign(user[0], process.env.USER_AUTH_KEY || "user_key");
 		console.log('TOKEN', token);
