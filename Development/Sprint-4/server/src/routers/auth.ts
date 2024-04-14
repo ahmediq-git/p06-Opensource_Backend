@@ -170,8 +170,6 @@ auth.post("/user/create", async (c: Context) => {
 
 		const rule_specification = await fetchRules()
 		
-		// remove on merge
-		const user_metadata={}
 		
 		const rule: any = await createRecord(
 			{
