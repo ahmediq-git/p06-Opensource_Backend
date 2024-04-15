@@ -1,10 +1,11 @@
 import SideRail from "../components/SideRail"
 import { useState, useCallback, useMemo, useEffect} from 'react'
 import { MinusCircle, PlusCircle } from "lucide-react";
+import { set } from "zod";
 
 export default function RulesPage() {
     const [activeState, setActiveState] = useState('rules');
-  
+    const [loading, setLoading] = useState(false);
     // get all the User table rules
     const [userRules, setUserRules] = useState({});
 
@@ -58,16 +59,18 @@ export default function RulesPage() {
     useEffect(()=>{
     const fetchRulesFromBackend = async () => {
         try {
+            setLoading(true);
             // Make an API call to fetch rules from the backend
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/rules/get_rules`);
     
             if (!response.ok) {
+                setLoading(false);
                 throw new Error('Failed to fetch rules from the backend');
             }
             
             // Parse the response
             const rules = await response.json();
-
+            setLoading(false);
             if (!rules) throw new Error("Failed fetch rules")
             
             // console.log(rules.data.userRules)
@@ -169,7 +172,15 @@ export default function RulesPage() {
 
                     </div>
                     {/* display the User Table and Default table only if collections exist and are created */}
-                    {Object.keys(userRules).length !== 0 ?
+                    {
+                        loading ? (<div className="flex flex-col justify-center items-center gap-2 w-full h-full">
+                        <h2 className="text-2xl">Loading Collections...</h2>
+                        <p className="text-gray-500">
+                            Fetching rules
+                        </p>
+                    </div>):(
+                    
+                    Object.keys(userRules).length !== 0 ?
                         (<div>
                             <div className="m-1 ml-4  mr-4">
                                 <div className="flex">
@@ -198,7 +209,9 @@ export default function RulesPage() {
                             <p className="text-gray-500">
                                 Create a collection to view its rules
                             </p>
-                        </div>)}
+                        </div>)
+                                        )
+                    }
                 </div>
             </div>
         </div>

@@ -9,10 +9,10 @@ import { HashRouter } from "react-router-dom";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
 	<HashRouter>
-	<React.StrictMode>
+	{/* <React.StrictMode> */}
 		<SWRConfig value={{ provider: localStorageProvider }}>
 			<App></App>
 		</SWRConfig>
-	</React.StrictMode>
+	{/* </React.StrictMode> */}
 	</HashRouter>
 );

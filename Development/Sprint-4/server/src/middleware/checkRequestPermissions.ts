@@ -1,14 +1,12 @@
-import {checkPermissions} from "../utils/rules/checkPermissions"
 import {Hono, Context} from "hono";
 import { readRecord } from "@src/controllers/record-crud";
 import { checkPermissions } from "../utils/rules/checkPermissions";
-import { Jwt } from "jsonwebtoken";
 import { fetchRules } from "@src/utils/rules/fetchRules";
 
 export const checkApiPermissions= async (c: Context, next: () => Promise<void>) => {
     try {
         if (c.get('user')?.role === 'admin' || (c.get('Authorization')==='Guest' && c.req.url.includes('/api/auth/admin'))) {
-            console.log("Admin Authorized for any action")
+            // console.log("Admin Authorized for any action")
         } else if (c.get('Authorization')==='Guest') {
             const rules = await fetchRules()
 

@@ -65,6 +65,7 @@ export default function Collections() {
       collectionNameSchema.parse(name);
     } catch (err) {
       console.log(err);
+      alert("Invalid collection name");
       setCollectionNameError(err.formErrors.fieldErrors.name[0]);
       return;
     }
