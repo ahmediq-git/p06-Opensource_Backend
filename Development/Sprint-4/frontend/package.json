@@ -17,6 +17,7 @@
     "chartjs-react": "^4.2.1",
     "ezbase-ts": "^1.0.32",
     "jotai": "^2.4.3",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.292.0",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",

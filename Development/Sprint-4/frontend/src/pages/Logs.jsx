@@ -142,6 +142,8 @@ export default function Logs() {
     return (
         <div className="flex bg-black-900 text-gray-50 h-screen max-h-screen">
             <SideRail />
+            <div className="w-[2px] h-screen bg-gray-100 opacity-10"></div>
+
             <div className="flex flex-col w-full overflow-y-scroll">
                 <p className="text-3xl font-bold mb-4 p-6 text-center">LOGS</p>
                 <div className="mx-auto h-4/6 mb-4 px-4 w-full">
@@ -216,11 +218,11 @@ export default function Logs() {
                                         };
                                         return (
                                             <>
-                                                <div className="mr-12 text-center">
+                                                <div className="mr-12 text-center mt-10">
                                                     <p className="font-bold">Data sent</p>
                                                     <p>{formatBytes(req_sum)}</p>
                                                 </div>
-                                                <div className="ml-12 text-center">
+                                                <div className="ml-12 text-center mt-10">
                                                     <p className="font-bold">Data received</p>
                                                     <p>{formatBytes(res_sum)}</p>
                                                 </div>
@@ -230,7 +232,7 @@ export default function Logs() {
                                 </div>
                             )}
 
-                            <table className="table-auto w-full rounded-lg shadow-lg bg-gray-800 overflow-hidden mb-4">
+                            <table className="table-auto w-full rounded-lg shadow-lg bg-gray-800 overflow-hidden mb-4 mt-5">
                                 <thead>
                                     <tr className="bg-gray-200">
                                         <th className="px-4 py-2 text-center bg-black">METHOD</th>
@@ -257,7 +259,7 @@ export default function Logs() {
                                 </tbody>
                             </table>
                         </div>
-                        <div className="flex justify-center mt-4">
+                        <div className="flex justify-center mt-4 mb-3">
                             <button
                                 onClick={handlePreviousPage}
                                 disabled={currentPage === 1}

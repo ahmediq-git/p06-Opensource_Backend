@@ -4,7 +4,8 @@ import { BarChart3} from "lucide-react";
 export default function SettingsRail({ setActiveSetting,activeSetting }) {
 
   return (
-    <aside className="w-64 px-4 py-5 bg-gray-1 border-r">
+    <aside className="w-64 px-4 py-5 bg-gray-1  border-r-2 border-[#2D2D2D]">
+
     <nav className="space-y-1">
       <p className="text-sm font-semibold uppercase mb-2">System</p>
       <a className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${activeSetting === 'application' ? 'bg-zinc-600' : ''} hover:bg-zinc-600  hover:text-gray-100`}
@@ -28,28 +29,28 @@ export default function SettingsRail({ setActiveSetting,activeSetting }) {
         <FileIcon className="mr-3 h-6 w-6 " />
         Files storage{"\n              "}
       </a>
-      <a className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${activeSetting === 'backup' ? 'bg-zinc-600' : ''} hover:bg-zinc-600  hover:text-gray-100`}
+      {/* <a className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${activeSetting === 'backup' ? 'bg-zinc-600' : ''} hover:bg-zinc-600  hover:text-gray-100`}
         
         onClick={() => setActiveSetting('backup')}
       >
         <DatabaseBackupIcon className="mr-3 h-6 w-6 " />
         Backups{"\n              "}
-      </a>
+      </a> */}
       <p className="mt-4 text-sm font-semibold uppercase">Sync</p>
-      <a className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${activeSetting === 'export' ? 'bg-zinc-600' : ''} hover:bg-zinc-600  hover:text-gray-100`}
+      {/* <a className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${activeSetting === 'export' ? 'bg-zinc-600' : ''} hover:bg-zinc-600  hover:text-gray-100`}
         
         onClick={() => setActiveSetting('export')}
       >
         <ImportIcon className="mr-3 h-6 w-6 " />
         Export collections{"\n              "}
-      </a>
-      <a className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${activeSetting === 'import' ? 'bg-zinc-600' : ''} hover:bg-zinc-600  hover:text-gray-100`}
+      </a> */}
+      {/* <a className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${activeSetting === 'import' ? 'bg-zinc-600' : ''} hover:bg-zinc-600  hover:text-gray-100`}
         
         onClick={() => setActiveSetting('import')}
       >
         <ImportIcon className="mr-3 h-6 w-6 " />
         Import collections{"\n              "}
-      </a>
+      </a> */}
       
       <a className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${activeSetting === 'logs' ? 'bg-zinc-600' : ''} hover:bg-zinc-600  hover:text-gray-100`}
         

@@ -39,12 +39,31 @@ functions.get('registered_functions', async (c) => {
     });
     let to_ret = [];
     for (let i = 0; i < allFunctions.length; i++) {
-        let obj = { id: allFunctions[i]._id, data: "" }
+        let obj = { id: allFunctions[i]._id, data: "", function_log: "" }
+        
+        // Extracting date and time
+        const updatedAtString = allFunctions[i]?.updatedAt?.toISOString();
+        let time;
+        if (updatedAtString) {
+            const dateObj = new Date(updatedAtString);
+            const year = dateObj.getFullYear();
+            const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+            const day = dateObj.getDate().toString().padStart(2, '0');
+            const hours = dateObj.getHours().toString().padStart(2, '0');
+            const minutes = dateObj.getMinutes().toString().padStart(2, '0');
+            const seconds = dateObj.getSeconds().toString().padStart(2, '0');
+            time = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        } else {
+            time = 'Unspecified';
+        }
+
         if (allFunctions[i].op == "export") {
             obj["data"] = `Export ${allFunctions[i].toExport} to ${allFunctions[i].outName}.txt every ${allFunctions[i].runAfter} seconds`;
+            obj['function_log'] = `${time}: Export ${allFunctions[i].toExport} to ${allFunctions[i].outName}.txt has occured`;
         }
         else if (allFunctions[i].op == "backup") {
             obj["data"] = `Backup ${allFunctions[i].toBackup} every ${allFunctions[i].runAfter} seconds`;
+            obj['function_log'] = `${time}: Backup ${allFunctions[i].toBackup} to ${allFunctions[i].outName}.txt has occured`;
         }
 
         to_ret.push(obj);

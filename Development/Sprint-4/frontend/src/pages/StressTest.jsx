@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import SideRail from '../components/SideRail';
+import {ServerOff, Server as ServerIcon } from 'lucide-react';
+
 
 export default function StressTestPage() {
     const [duration, setDuration] = useState(0);
@@ -119,8 +121,10 @@ export default function StressTestPage() {
     return (
         <div className="flex bg-black-900 text-gray-50 h-screen max-h-screen text-center">
             <SideRail />
+            <div className="w-[2px] h-screen bg-gray-100 opacity-10"></div>
+
             <div className="flex flex-col justify-center items-center w-full gap-y-12s">
-                <h1 className="text-2xl font-bold mb-8">🚀 API Stress Test 🚀</h1>
+                <h1 className="text-2xl font-bold mb-8"> API Stress Test </h1>
                 <div className="flex items-center mb-4 mr-12">
                     <label htmlFor="duration" className="mr-4 text-l mt-4">
                         Test Duration (seconds):
@@ -130,23 +134,35 @@ export default function StressTestPage() {
                         id="duration"
                         value={duration}
                         onChange={(e) => setDuration(parseInt(e.target.value))}
-                        className="px-4 py-2 border border-gray-300 rounded-md input text-l"
+                        className="px-4 py-2 border border-gray-300 rounded-md input text-l mr-[65px]"
                     />
                 </div>
                 <button
                     onClick={handleStartTest}
                     disabled={isLoading || duration <= 0}
-                    className="bg-blue-500 hover:bg-blue-600 rounded text-white px-4 py-2 disabled:bg-gray-400 disabled:cursor-not-allowed text-l shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                    className="bg-blue-500 hover:bg-blue-600 rounded mb-4 text-white px-4 py-2 disabled:bg-gray-400 disabled:cursor-not-allowed text-l shadow-md transition duration-300 ease-in-out transform hover:scale-105"
                 >
                     {isLoading ? 'Running Test...' : 'Start Test'}
                 </button>
                 {!isLoading && done && (
                     <>
-                        <img src="/sponge.webp" alt="Spongebob" className="h-32 w-40 border-1 border-yellow-500 mt-8 shadow-lg w-52 h-32" />
-                        <h2 className="text-2xl mt-4">Test Completed! 🎉</h2>
+                        {averageResponseTime === 0?
+                        <div className="flex flex-col">
+                            <ServerOff size={200} className="ml-8"/>
+                            <h2 className="text-2xl mt-4">Your Server is switched off</h2>
+                        </div>
+                        : 
+                        (<div>
+                            <ServerIcon size={200}/>
+                            <h2 className="text-2xl mt-4">Test Completed! 🎉</h2>
+                        </div>)
+                        }
+                        
                     </>
                 )}
-                <div className="flex flex-col">
+
+                {averageResponseTime !==0?
+                (<div className="flex flex-col">
                     {totalRequests > 0 && (
                         <div className="mt-4 text-l">
                             <p>Total Requests Sent: {totalRequests}</p>
@@ -164,7 +180,8 @@ export default function StressTestPage() {
                             <p>Total Data Sent: {formatBytes(totalDataSent)}</p>
                         </div>
                     )}
-                </div>
+                </div>) :(<div></div>)
+                }
                 {!done && (
                     <progress className="progress progress-secondary w-80 mt-8" value={progress} max="100"></progress>
                 )}
@@ -172,3 +189,4 @@ export default function StressTestPage() {
         </div>
     );
 };
+

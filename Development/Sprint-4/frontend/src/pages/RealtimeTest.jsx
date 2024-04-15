@@ -86,6 +86,8 @@ const RealtimeTest = () => {
   return (
     <div className="flex bg-black-900 text-gray-50 h-screen max-h-screen">
       <SideRail />
+      <div className="w-[2px] h-screen bg-gray-100 opacity-10"></div>
+
       <div className="flex flex-col justify-center items-center w-full">
         <div className="p-4">
           <h1 className="text-3xl font-bold mb-4">Realtime Data Updates</h1>
