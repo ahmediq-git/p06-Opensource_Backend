@@ -4,63 +4,56 @@ sidebar_position: 2
 
 # CRUD Operations
 With the help of the client-side Javacript SDK, developers can make use of multiple useful Create Read Update Delete (CRUD) actions.
-### Create a Collection
-Creates a new collection.
+### Collection
+Creating and deleteing a collection.
 ```js
-import ezbase from 'ezbase'
-const eb = new ezbase("http://0.0.0.0:3690"); 
-...
-eb.db.createCollection("example-collection");
-```
-### Delete a Collection
-Deletes an existing collection.
-```js
-import ezbase from 'ezbase'
-const eb = new ezbase("http://0.0.0.0:3690"); 
-...
-eb.db.deleteCollection("example-collection");
-```
+import eb from "@src/eb";
 
-### Get Collections' Names
-Get all the collections' names currently present in the database.
-```js
-import ezbase from 'ezbase'
-const eb = new ezbase("http://0.0.0.0:3690"); 
-...
-const getCollections = async (id) => {
-    try {
-        // get the collections' names from the database
-        const collections = await eb.db.getCollectionNames();
-        ...
-    } catch (error) {
-      console.error('Error getting collections:', error);
-    }
-  };
+// Create a collection
+const result = await eb.db.createCollection(`Products`);
+
+// Delete a collection
+const result = await eb.db.deleteCollection(`Products`);
+
+// returns a list of all the collections in the database
+const resuslt = await eb.db.getCollections();
 
 ```
 
-### Create a Single-Field Document
-Creates a single-field document in a collection.
-```js
-import ezbase from 'ezbase'
-const eb = new ezbase("http://0.0.0.0:3690"); 
-...
-const createSingleFieldDoc = async (id) => {
-    try {
-        // create the document from the database
-        const docIndex = await eb.db.insertSingleFieldDoc("newcol1", {"name": "Lorem Ipsum"});
-        ...
-    } catch (error) {
-      console.error('Error creating document:', error);
-    }
-  };
+### Records
+Each collection has a set of records. Since we are using a NoSQL database, we can store any kind of data in a record.
 
+```js
+// Create a record in a collection
+const res = await eb.db.createRecord(`Products`, {
+  title: `iPhone 12`,
+  price: 1200,
+  brand: `Apple`,
+  category: `Smartphone`,
+});
+```
+SDK provides the functionality to query records in a collection through a query object. This query object is similar to that used in MongoDb.
+
+```js
+// Read a record with a query
+const res = await eb.db.readRecord(`Products`, {
+  brand: `Apple`,
+});
+
+// Query on multiple fields
+const res = await eb.db.readRecord(`Products`, {
+  $or: [{ brand: "Apple" }, { brand: "Samsung" }],
+});
+
+const res = await eb.db.readRecord(`Products`, {
+    $not: { brand: "Apple" },
+});
 ```
 
 ### Create a Document
 Creates a new document in a collection.
 ```js
-import ezbase from 'ezbase'
+import ezbase from 'ezbase-ts'
 const eb = new ezbase("http://0.0.0.0:3690"); 
 ...
 const createDocument = async (id) => {
@@ -78,7 +71,7 @@ const createDocument = async (id) => {
 ### Update a Document
 Updates an existing document in a collection.
 ```js
-import ezbase from 'ezbase'
+import ezbase from 'ezbase-ts'
 const eb = new ezbase("http://0.0.0.0:3690"); 
 ...
 const updateDocument = async (id) => {
@@ -96,7 +89,7 @@ const updateDocument = async (id) => {
 ### Insert Multiple Documents
 Creates a multiple new documents in a collection.
 ```js
-import ezbase from 'ezbase'
+import ezbase from 'ezbase-ts'
 const eb = new ezbase("http://0.0.0.0:3690"); 
 ...
 const createDocuments = async (id) => {
@@ -114,7 +107,7 @@ const createDocuments = async (id) => {
 ### Delete a Document
 Deletes an existing document in a collection.
 ```js
-import ezbase from 'ezbase'
+import ezbase from 'ezbase-ts'
 const eb = new ezbase("http://0.0.0.0:3690"); 
 ...
 const deleteDocument = async (id) => {
@@ -131,7 +124,7 @@ const deleteDocument = async (id) => {
 ### Read a Document
 Gets a single document from a specific collection.
 ```js
-import ezbase from 'ezbase'
+import ezbase from 'ezbase-ts'
 const eb = new ezbase("http://0.0.0.0:3690"); 
 ...
 const getDocument = async (id) => {
@@ -147,7 +140,7 @@ const getDocument = async (id) => {
 ### Read a List of Documents
 Gets all documents from a specific collection.
 ```js
-import ezbase from 'ezbase'
+import ezbase from 'ezbase-ts'
 const eb = new ezbase("http://0.0.0.0:3690"); 
 ...
 const getAllDocuments = async (id) => {
@@ -165,7 +158,7 @@ const getAllDocuments = async (id) => {
 ### Find a Document
 Searches for a document from a collection.
 ```js
-import ezbase from 'ezbase'
+import ezbase from 'ezbase-ts'
 const eb = new ezbase("http://0.0.0.0:3690"); 
 ...
 const findDocument = async (id) => {
@@ -184,7 +177,7 @@ const findDocument = async (id) => {
 ### Insert a Field in a Document
 Inserts a new field to a document of a collection. 
 ```js
-import ezbase from 'ezbase'
+import ezbase from 'ezbase-ts'
 const eb = new ezbase("http://0.0.0.0:3690"); 
 ...
 const insertNewField = async (id) => {
@@ -202,7 +195,7 @@ const insertNewField = async (id) => {
 ### Insert Many Fields in a Document
 Inserts many new fields to a document of a collection. 
 ```js
-import ezbase from 'ezbase'
+import ezbase from 'ezbase-ts'
 const eb = new ezbase("http://0.0.0.0:3690"); 
 ...
 const insertNewFields = async (id) => {
