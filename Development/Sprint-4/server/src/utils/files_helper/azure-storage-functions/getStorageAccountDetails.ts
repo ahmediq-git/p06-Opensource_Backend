@@ -2,10 +2,11 @@ import Database from "../../../database/database_handler"
 
 type blobStorage = {
     useBlobStorage: boolean;
-    blobEndpoint: string;
-    region: string;
-    accountKey: string;
+    serviceName: string;
+    serviceKey: string;
     storageConnectionString: string;
+    containerName: string;
+    region: string;
     sas: string;
 }
 

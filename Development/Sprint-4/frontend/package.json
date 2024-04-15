@@ -24,6 +24,7 @@
     "react-json-pretty": "^2.2.0",
     "react-router-dom": "^6.17.0",
     "reactflow": "^11.10.4",
+    "reactjs-popup": "^2.0.6",
     "rippleui": "^1.12.1",
     "socket.io-client": "^4.7.4",
     "swr": "^2.2.4",

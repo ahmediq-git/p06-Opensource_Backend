@@ -24,7 +24,9 @@ async function createContainer(
     containerName: string,
     blobServiceClient: BlobServiceClient
 ): Promise<ContainerClient> {
+    console.log('Creating container', containerName);
     const containerClient = blobServiceClient.getContainerClient(containerName);
+    console.log('Container client created:', containerClient);
     await containerClient.createIfNotExists();
 
     return containerClient;
@@ -36,21 +38,26 @@ export async function uploadBlob(
     fileName: string,
     containerName: string,
     blob: Buffer
-): Promise<string | undefined> {
+): Promise<{ error: string; url: string }> {
     if (!serviceName || !serviceKey || !fileName || !containerName || !blob) {
-        return 'Upload function missing parameters';
+        return { error: 'Upload blob function missing parameters', url: '' };
     }
-
+    console.log('Uploading blob', fileName);
     const blobServiceClient = getBlobServiceClient(serviceName, serviceKey);
-
+    console.log('Blob service client created for', serviceName, serviceKey, "Details: ", blobServiceClient);
     const containerClient = await createContainer(
         containerName,
         blobServiceClient
     );
+    // const containerClient = blobServiceClient.getContainerClient(containerName);
+    console.log('Container client created');
     const blockBlobClient = await containerClient.getBlockBlobClient(fileName);
+    console.log('Block blob client created');
     const response = await blockBlobClient.uploadData(blob);
+    console.log('Blob uploaded');
+    // return the error code if there is one and the URL of the blob in an object
+    return response.errorCode ? { error: response.errorCode, url: '' } : { error: '', url: blockBlobClient.url };
 
-    return response.errorCode ? response.errorCode : undefined;
 }
 
 export const generateSASUrl = async (
@@ -71,6 +78,12 @@ export const generateSASUrl = async (
         blobServiceClient
     );
     const blockBlobClient = await containerClient.getBlockBlobClient(fileName);
+    if (!blockBlobClient) {
+        console.log('Block blob client not created');
+    }
+    else {
+        console.log('Block blob client created', blockBlobClient);
+    }
 
     // Best practice: create time limits
     const SIXTY_MINUTES = timerange * 60 * 1000;
