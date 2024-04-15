@@ -1,4 +1,3 @@
-import DataStore from "nedb";
 import Database from "../database/database_handler"
 
 export interface CrudOptions {

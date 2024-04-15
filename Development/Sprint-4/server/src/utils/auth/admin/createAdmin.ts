@@ -1,5 +1,4 @@
-import Datastore from "nedb";
-import * as jose from "jose";
+
 import Database from "@src/database/database_handler";
 
 export default async function createAdmin(
