@@ -38,6 +38,8 @@ export default function Settings() {
   return (
     <div className="flex h-screen bg-gray-1">
       <SideRail />
+      <div className="w-[2px] h-screen bg-gray-100 opacity-10"></div>
+
       <SettingsRail setActiveSetting={setActiveSetting} activeSetting={activeSetting} />
       <main className="flex-1">
         <div className="px-10 py-6">
