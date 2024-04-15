@@ -1,7 +1,8 @@
 import ezbase from "../../Development/Sprint-4/sdk/dist/index";
 import axios, { AxiosResponse } from 'axios';
+import * as fs from "fs";
 
-const eb = new ezbase("http://localhost:3690","http://localhost:3691");
+const eb = new ezbase("http://localhost:3690", "http://localhost:3691");
 
 // 1) Test for createCollection()
 async function createCollectionTest(): Promise<any> {
@@ -48,10 +49,10 @@ async function deleteRecord(): Promise<void> {
 }
 
 // 7) Test for listRecords()
-function listRecords(): void {
-    console.log("Testing listing of all documents in a collection");
-    eb.db.listRecords("TestSDKCollection1", {}, {}).then((ans: any) => console.log(ans));
-}
+// function listRecords(): void {
+//     console.log("Testing listing of all documents in a collection");
+//     eb.db.listRecords("TestSDKCollection1", {}, {}).then((ans: any) => console.log(ans));
+// }
 
 // 8) Test for countRecords()
 function countRecords(): void {
@@ -65,12 +66,12 @@ async function sendTextMail(): Promise<any> {
     console.log(res);
 }
 
-async function auth (): Promise<any> {
-    
+async function auth(): Promise<any> {
+
     console.log("Testing authentication");
 
     const res = await eb.auth.signUp("moiztest1@gmail.com", "moiztest").then((ans: any) => console.log(ans));
-    console.log("token",eb.auth.getToken())
+    console.log("token", eb.auth.getToken())
     console.log("send req to server")
     const res2 = await eb.auth.signIn("moiztest1@gmail.com", "moiztest").then((ans: any) => console.log(ans));
     const cct1 = await eb.db.createCollection("TestSDKCollection2");
@@ -78,9 +79,22 @@ async function auth (): Promise<any> {
 
     console.log("");
 }
+
+async function getAzureFileSettings(): Promise<any> {
+    console.log("Testing getting azure file settings");
+    const res = await eb.files.getFileSettings().then((ans: any) => console.log(ans));
+}
+
+async function uploadFile(): Promise<any> {
+    console.log("Testing uploading a file");
+    const localFilePath = "./uploadFileTest.txt";
+    const blob = fs.readFileSync(localFilePath);
+    const file = new File([blob], "uploadFileTest.txt"); // Convert Buffer to File
+    const res = await eb.files.uploadFile(file).then((ans: any) => console.log(ans));
+}
 // Calling the functions
 // sendTextMail();
- auth();
+// auth();
 // createCollectionTest();
 // getCollectionsTest();
 // deleteCollection();
@@ -89,3 +103,5 @@ async function auth (): Promise<any> {
 // deleteRecord();
 // listRecords();
 // countRecords();
+// getAzureFileSettings();
+uploadFile();

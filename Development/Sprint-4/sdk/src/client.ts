@@ -34,10 +34,10 @@ class EzBaseClient {
         };
 
         if (isFile && method === 'POST') {
-            headers['Content-Type'] ='multipart/form-data';
+            headers['Content-Type'] = 'multipart/form-data';
             console.log("headers", headers)
         }
-       
+
         try {
             let response;
 
@@ -46,7 +46,7 @@ class EzBaseClient {
                     response = await axios.post(completeApiEndpoint, jsonObject, { headers });
                     console.log('Data sent successfully:', response.data);
                     if (response?.data.error !== null) {
-                       throw new Error(response?.data.error)
+                        throw new Error(response?.data.error)
                     }
                     return {
                         data: response.data.data,
@@ -54,22 +54,22 @@ class EzBaseClient {
                         status: response.status
                     }
                 case 'PATCH':
-                        response = await axios.patch(completeApiEndpoint, jsonObject, { headers });
-                        // console.log('Data sent successfully:', response.data);
-                        if (response?.data.error !== null) {
-                           throw new Error(response?.data.error)
-                        }
-                        return {
-                            data: response.data.data,
-                            error: null,
-                            status: response.status
-                        }
+                    response = await axios.patch(completeApiEndpoint, jsonObject, { headers });
+                    // console.log('Data sent successfully:', response.data);
+                    if (response?.data.error !== null) {
+                        throw new Error(response?.data.error)
+                    }
+                    return {
+                        data: response.data.data,
+                        error: null,
+                        status: response.status
+                    }
                 case 'DELETE':
                     response = await axios.delete(completeApiEndpoint, { data: jsonObject, headers });
                     // console.log('Data sent for deletion successfully:', response.data);
                     if (response?.data.error !== null) {
                         throw new Error(response?.data.error)
-                     }
+                    }
                     return {
                         data: response.data.data,
                         error: null,
@@ -84,8 +84,8 @@ class EzBaseClient {
                     response = await axios.get(completeApiEndpoint, { headers });
                     if (response?.data.error !== null) {
                         throw new Error(response?.data.error)
-                     }
-                    console.log('Data received successfully:', response.data);
+                    }
+                    // console.log('Data received successfully:', response.data);
                     return {
                         data: response.data.data,
                         error: null,
@@ -96,7 +96,7 @@ class EzBaseClient {
                     return;
             }
         } catch (error: any) {
-            console.log("client errir",error)
+            console.log("client errir", error)
             let errorResponse = {
                 status: error.response?.status || 500,
                 error: error.response?.data?.error || 'An unexpected error occurred',

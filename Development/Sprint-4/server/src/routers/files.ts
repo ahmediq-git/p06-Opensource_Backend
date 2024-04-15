@@ -36,7 +36,7 @@ files.post("/", async (c) => {
     });
 
     if (!appConfig) throw new Error("Failed to get appConfig");
-    
+
     let bytes_written = await Bun.write(`./files/${id}.${fileExtension}`, file);
 
     if (bytes_written > 0) {
@@ -52,9 +52,9 @@ files.post("/", async (c) => {
       throw new Error("Failed to write file to disk");
     }
 
-  } catch (error:any) {
+  } catch (error: any) {
     console.log(error);
-    return c.json({ error:error.message, data: null },500);
+    return c.json({ error: error.message, data: null }, 500);
   }
 });
 
@@ -75,14 +75,14 @@ files.get("/", async (c: Context) => {
     return c.json({
       error: "File does not exist",
       data: null,
-    },404);
+    }, 404);
   } catch (error) {
 
     console.log(error);
     return c.json({
       error: "Error retrieving the file",
       data: null,
-    },500);
+    }, 500);
 
   }
 
@@ -105,14 +105,14 @@ files.get("/url", async (c: Context) => {
     return c.json({
       error: "File does not exist",
       data: null,
-    },404);
+    }, 404);
 
-  }catch(error:any){
+  } catch (error: any) {
     console.log(error);
     return c.json({
       error: "Error retrieving the file",
       data: null,
-    },500);
+    }, 500);
   }
 })
 
@@ -137,14 +137,14 @@ files.get("/metadata", async (c: Context) => {
     return c.json({
       error: "File does not exist",
       data: null,
-    },404);
+    }, 404);
   } catch (error) {
 
     console.log(error);
     return c.json({
       error: "Error retrieving the file",
       data: null,
-    },500);
+    }, 500);
 
   }
 })
@@ -204,6 +204,22 @@ files.get("/list", async (c: Context) => {
   } catch (error) {
     return c.json({
       error: "Error Listing files",
+      data: null,
+    });
+  }
+})
+
+files.get("/file_settings", async (c: Context) => {
+  try {
+    const blobStorageDetails = await getStorageAccountDetails();
+    return c.json({
+      error: null,
+      data: blobStorageDetails,
+    });
+  }
+  catch (error) {
+    return c.json({
+      error: "Error fetching file settings",
       data: null,
     });
   }

@@ -1,44 +1,95 @@
 import ValidationUtils from "../validators/validators.js";
 import axios, { AxiosResponse } from "axios";
+import { StorageSharedKeyCredential, BlobServiceClient } from "@azure/storage-blob";
 
 
 class Files {
     private client: any;
     private authStore: any;
 
-    constructor( ezBaseClient: any) {
-        this.client = ezBaseClient; 
+    constructor(ezBaseClient: any) {
+        this.client = ezBaseClient;
     }
 
-    async uploadFile(file:File):Promise<AxiosResponse<any>>{
-        const formData = new FormData();
-        formData.append('file', file);
-        
+    async getFileSettings(): Promise<any> {
         try {
-            const apiEndpoint = `/api/files`;
-            const response = await this.client.sendToBackend(formData, apiEndpoint, "POST",true);
+            const apiEndpoint = `/api/files/file_settings`;
+            const response = await this.client.sendToBackend({}, apiEndpoint, "GET");
+            if (response.status === 200) {
+                const { data, error } = response;
+                if (error != null) {
+                    console.error("An error occured while getting file settings:", error);
+                }
+                else {
+                    if (data.error != null) {
+                        console.error("An error occured while getting file settings:", data.error);
+                    }
+                    return response;
+                }
+            }
+            else {
+                console.error("An error occured while getting file settings:", response.error);
+            }
+        } catch (error) {
+            console.error("An error occured while getting file settings:", error);
+        }
+    }
+
+    async uploadFile(file: File): Promise<any> {
+
+        const blobStorageSettings = await this.getFileSettings();
+        const blobStorageSettingsData = blobStorageSettings.data;
+        const useBlobStorage = blobStorageSettingsData.useBlobStorage;
+        if (useBlobStorage) {
+            const sharedKeyCredential = new StorageSharedKeyCredential(blobStorageSettingsData.accountName, blobStorageSettingsData.accountKey);
+
+            const blobServiceClient = new BlobServiceClient(
+                `https://${blobStorageSettingsData.accountName}.blob.core.windows.net`,
+                sharedKeyCredential
+            );
+
+            const containerClient = blobServiceClient.getContainerClient(blobStorageSettingsData.containerName);
+
+            const blobName = file.name;
+            const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+            // convert file to ArrayBuffer
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(file);
+            const uploadBlobResponse = await blockBlobClient.upload(file, file.size);
+            console.log(`Upload block blob ${blobName} successfully`, 'URL:', blockBlobClient.url);
+            return uploadBlobResponse;
+
+        }
+        else {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const apiEndpoint = `/api/files`;
+                const response = await this.client.sendToBackend(formData, apiEndpoint, "POST", true);
+                return response;
+            } catch (error) {
+                // Handle error
+                console.log("Error uploading file:", error);
+                throw error;
+            }
+        }
+
+    }
+
+    async getFile(file_name: string): Promise<AxiosResponse<any>> {
+        try {
+            const apiEndpoint = `/api/files?file_name=${file_name}`
+            const response = await this.client.sendToBackend({}, apiEndpoint, "GET", true);
             return response;
         } catch (error) {
-            // Handle error
-            console.log("Error uploading file:", error);
-            throw error;
-        }
-       
-    }
-
-    async getFile(file_name:string):Promise<AxiosResponse<any>>{
-        try{
-            const apiEndpoint=`/api/files?file_name=${file_name}`
-            const response = await this.client.sendToBackend({}, apiEndpoint, "GET",true);
-            return response;
-        } catch (error){
             // Handle error
             console.log("Error getting file:", error);
             throw error;
         }
     }
 
-    async getFileUrl(file_id:string):Promise<AxiosResponse<any>>{
+    async getFileUrl(file_id: string): Promise<AxiosResponse<any>> {
         try {
             const apiEndpoint = `/api/files/url?id=${file_id}`;
             const response = await this.client.sendToBackend({}, apiEndpoint, "GET");
@@ -50,9 +101,9 @@ class Files {
         }
     }
 
-    async getFileMetaData(id: string):Promise<AxiosResponse<any>>{
+    async getFileMetaData(id: string): Promise<AxiosResponse<any>> {
         try {
-            const apiEndpoint=`/api/files/metadata?id=${id}`;
+            const apiEndpoint = `/api/files/metadata?id=${id}`;
             const response = await this.client.sendToBackend({}, apiEndpoint, "GET");
             return response;
         } catch (error) {
@@ -62,7 +113,7 @@ class Files {
         }
     }
 
-    async deleteFile(id: string): Promise<AxiosResponse<any>>{
+    async deleteFile(id: string): Promise<AxiosResponse<any>> {
         try {
             const apiEndpoint = `/api/files/${id}`;
             const res = await this.client.sendToBackend({}, apiEndpoint, "DELETE");
