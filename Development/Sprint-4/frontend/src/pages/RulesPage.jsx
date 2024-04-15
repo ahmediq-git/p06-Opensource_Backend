@@ -62,7 +62,7 @@ export default function RulesPage() {
             setLoading(true);
             // Make an API call to fetch rules from the backend
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/rules/get_rules`);
-    
+
             if (!response.ok) {
                 setLoading(false);
                 throw new Error('Failed to fetch rules from the backend');
