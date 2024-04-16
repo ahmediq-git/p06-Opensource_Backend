@@ -1,72 +1,81 @@
-// This follows the singleton design pattern as each collection DataStore object should only be created exactly once
-// This is to ensure that a collection is instantiated just once as NeDB does not allow multiple instances of a DataStore object
 import DataStore from "nedb";
 import fs from "fs";
 import * as path from "path";
 
 class Database {
-  private static instance: Database;
-  private dataStore: { [key: string]: DataStore };
+	private static instance: Database;
+	private dataStore: { [key: string]: DataStore };
+	private rootDirectory: string;
 
-  // Declaring constructor as private so no other function can declare it
-  private constructor() {
-    this.dataStore = {};
-    this.loadExistingCollections();
-  }
+	// Updated constructor to accept a root directory parameter with a default value
+	private constructor(rootDirectory: string) {
+		this.rootDirectory = rootDirectory;
+		this.dataStore = {};
+		this.loadExistingCollections();
+	}
 
-  // Used to load any existing collections to the datastore
-  private loadExistingCollections() {
-    const dir = "./data";
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir);
-    }
-    const fileList = fs.readdirSync(dir);
+	// Load existing collections using the specified root directory
+	private loadExistingCollections() {
+		if (!fs.existsSync(this.rootDirectory)) {
+			fs.mkdirSync(this.rootDirectory);
+		}
+		const fileList = fs.readdirSync(this.rootDirectory);
 
-    // Loading every single existing collection to the Database singleton
-    fileList?.forEach((file) => {
-      const filePath = `${dir}/${file}`;
-      this.dataStore[path.parse(file).name] = new DataStore({
-        filename: filePath,
-        timestampData: true,
-        autoload: true,
-      });
-    });
-  }
+		fileList?.forEach((file) => {
+			const filePath = path.join(this.rootDirectory, file);
+			this.dataStore[path.parse(file).name] = new DataStore({
+				filename: filePath,
+				timestampData: true,
+				autoload: true,
+			});
+		});
+	}
 
-  // to return the instance
-  public static getInstance(): Database {
-    if (!Database.instance) {
-      Database.instance = new Database();
-    }
-    return Database.instance;
-  }
+	// Static method to get the instance
+	public static getInstance(): Database {
+		const rootDirectory = "./data";
+		
+		if (!Database.instance) {
+			if (!rootDirectory) {
+				throw new Error(
+					"Root directory must be specified for the first initialization."
+				);
+			}
+			Database.instance = new Database(rootDirectory);
+		} else if (
+			rootDirectory &&
+			rootDirectory !== Database.instance.rootDirectory
+		) {
+			throw new Error(
+				"Cannot reinitialize singleton with a different root directory."
+			);
+		}
+		return Database.instance;
+	}
+	public getDataStore(): { [key: string]: DataStore } {
+		return this.dataStore;
+	}
 
-  //to obtain the object of all collection's datastore from the instantiated object
-  public getDataStore(): { [key: string]: DataStore } {
-    return this.dataStore;
-  }
+	// Create or load a new collection with options
+	public loadCollection(collectionName: string, options: any) {
+		if (!this.getDataStore()?.[collectionName]) {
+			const filePath = path.join(this.rootDirectory, `${collectionName}.json`);
+			this.dataStore[collectionName] = new DataStore({
+				filename: filePath,
+				...options,
+			});
+		}
+		return this.getDataStore()[collectionName];
+	}
 
-  // To add a new collection to the data store
-  public loadCollection(collectionName: string, options: any) {
-    if (!this.getDataStore()?.[collectionName]) {
-      const filePath = `./data/${collectionName}.json`; // assuming the file extension is .db
-      this.dataStore[collectionName] = new DataStore({
-        filename: filePath,
-        ...options,
-      });
-    }
-    return this.getDataStore()[collectionName];
-  }
-
-  // to remove a collection from the data store
-  public unloadCollection(collectionName: string) {
-    if (this.getDataStore()?.[collectionName]) {
-      delete this.dataStore[collectionName];
-      // deleting file from the filesystem aswell
-      const filePath = `./data/${collectionName}.json`;
-      fs.unlinkSync(filePath);
-    }
-  }
+	// Remove a collection and its file
+	public unloadCollection(collectionName: string) {
+		if (this.getDataStore()?.[collectionName]) {
+			delete this.dataStore[collectionName];
+			const filePath = path.join(this.rootDirectory, `${collectionName}.json`);
+			fs.unlinkSync(filePath);
+		}
+	}
 }
 
 export default Database;

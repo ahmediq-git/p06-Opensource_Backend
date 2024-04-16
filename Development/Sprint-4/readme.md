@@ -7,15 +7,15 @@ Team: 06
 - 24100296 Moiz Raza Amir
 - 24100085 Ahmed Mozammil Iqbal
 
-SPRINT-3 SUBMISSION GUIDELINES
+SPRINT-4 SUBMISSION GUIDELINES
 
 1. Properly tested working system deployed on an online hosting platform.
-2. Code with readable comments uploaded in “Development/Sprint-3” folder of your project’s Github repository.
+2. Code with readable comments uploaded in “Development/Sprint-4” folder of your project’s Github repository.
 3. 3-4 minutes video that explains the functionality of your system developed so far. This must be uploaded in “Sprint-3” folder of your project’s Github repository.
 4. Updated architecture and data model must be uploaded in the respective folders on Github.
 5. Test case execution report.
 6. Update project schedule.
-7. This "Readme" file should be uploaded in Sprint-3 folder.
+7. This "Readme" file should be uploaded in Sprint-4 folder.
 
 
 
@@ -68,19 +68,15 @@ LIST OF REQUIREMENTS COMPLETED SO FAR
 26. Logs page to view requests in real time, as well as view past requests.
 
 27. UI will be bundled with the server
-2. Bug fixes throughout the system
-3. Refactoring in server
-4. Refactoring in sdk
-5. Integrated sdk with all the latest changes and published on npm
-6. Admin page to create new admins
-7. Added file and foreign key field types
-8. Oauth implementation
-9. 2 demo applications using our sdk
-10. Integrated realtime feature on deployed instance
-11. Bundled frontend and server together
-12. Bundled frontend and server together
-13. Oauth implementation
-14. 2 demo applications using our sdk
+28. Bug fixes throughout the system
+29. Refactoring in server
+30. Refactoring in sdk
+31. Integrated sdk with all the latest changes and published on npm
+32. Admin page to create new admins
+33. Added file and foreign key field types
+34. Oauth implementation using our sdk
+35. Integrated realtime feature on deployed instance
+36. Bundled frontend and server together
 
 ------------------------------------------------------------------------------------------------
 

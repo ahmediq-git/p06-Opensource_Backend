@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "test": "bun run src/tests/collection-crud.ts"
+    "test": "bun test tests/test"
   },
   "dependencies": {
     "@azure/functions": "^4.3.0",
