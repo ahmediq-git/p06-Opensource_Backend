@@ -13,6 +13,7 @@
   "dependencies": {
     "@tailwindcss/forms": "^0.5.7",
     "axios": "^1.6.8",
+    "bytes": "^3.1.2",
     "chart.js": "^4.1.1",
     "chartjs-react": "^4.2.1",
     "ezbase-ts": "^1.0.32",
@@ -25,6 +26,7 @@
     "react-dom": "^18.2.0",
     "react-file-icon": "^1.4.0",
     "react-json-pretty": "^2.2.0",
+    "react-minimal-pie-chart": "^8.4.0",
     "react-router-dom": "^6.17.0",
     "reactflow": "^11.10.4",
     "rippleui": "^1.12.1",
