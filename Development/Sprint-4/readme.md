@@ -11,7 +11,7 @@ SPRINT-4 SUBMISSION GUIDELINES
 
 1. Properly tested working system deployed on an online hosting platform.
 2. Code with readable comments uploaded in “Development/Sprint-4” folder of your project’s Github repository.
-3. 3-4 minutes video that explains the functionality of your system developed so far. This must be uploaded in “Sprint-3” folder of your project’s Github repository.
+3. 3-4 minutes video that explains the functionality of your system developed so far. This must be uploaded in “Sprint-4” folder of your project’s Github repository.
 4. Updated architecture and data model must be uploaded in the respective folders on Github.
 5. Test case execution report.
 6. Update project schedule.
@@ -93,7 +93,7 @@ HOW TO ACCESS THE SYSTEM
     - Download executable for your system
     - Run the executable and the server will start as well as the admin UI
     - Use the SDK to develop your app!
-2. The SDK can be downloaded on npm repository on https://www.npmjs.com/package/ezbase-ts
+2. The SDK can be downloaded on npm at https://www.npmjs.com/package/ezbase-ts
 
 The documentation site can be visited on http://ezbase.vercel.app
 
