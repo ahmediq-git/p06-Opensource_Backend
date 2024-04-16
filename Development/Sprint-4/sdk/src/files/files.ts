@@ -15,21 +15,7 @@ class Files {
         try {
             const apiEndpoint = `/api/files/file_settings`;
             const response = await this.client.sendToBackend({}, apiEndpoint, "GET");
-            if (response.status === 200) {
-                const { data, error } = response;
-                if (error != null) {
-                    console.error("An error occured while getting file settings:", error);
-                }
-                else {
-                    if (data.error != null) {
-                        console.error("An error occured while getting file settings:", data.error);
-                    }
-                    return response;
-                }
-            }
-            else {
-                console.error("An error occured while getting file settings:", response.error);
-            }
+            return response;
         } catch (error) {
             console.error("An error occured while getting file settings:", error);
         }
@@ -41,24 +27,26 @@ class Files {
         const blobStorageSettingsData = blobStorageSettings.data;
         const useBlobStorage = blobStorageSettingsData.useBlobStorage;
         if (useBlobStorage) {
-            const sharedKeyCredential = new StorageSharedKeyCredential(blobStorageSettingsData.accountName, blobStorageSettingsData.accountKey);
+            const sharedKeyCredential = new StorageSharedKeyCredential(blobStorageSettingsData.serviceName, blobStorageSettingsData.serviceKey);
 
             const blobServiceClient = new BlobServiceClient(
-                `https://${blobStorageSettingsData.accountName}.blob.core.windows.net`,
+                `https://${blobStorageSettingsData.serviceName}.blob.core.windows.net`,
                 sharedKeyCredential
             );
 
             const containerClient = blobServiceClient.getContainerClient(blobStorageSettingsData.containerName);
-
-            const blobName = file.name;
-            const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-            // convert file to ArrayBuffer
-            const reader = new FileReader();
-            reader.readAsArrayBuffer(file);
-            const uploadBlobResponse = await blockBlobClient.upload(file, file.size);
-            console.log(`Upload block blob ${blobName} successfully`, 'URL:', blockBlobClient.url);
-            return uploadBlobResponse;
-
+            const blockBlobClient = containerClient.getBlockBlobClient(file.name);
+            const blobArrayBuffer = await file.arrayBuffer();
+            const fileBuffer = Buffer.from(blobArrayBuffer);
+            const uploadBlobResponse = await blockBlobClient.uploadData(fileBuffer);
+            const formData = new FormData();
+            const fileObject = { name: file.name, url: blockBlobClient.url, size: file.size};
+            const isBlobFile = true;
+            formData.append('file', JSON.stringify(fileObject));
+            formData.append('isBlobFile', isBlobFile.toString());
+            const apiEndpoint = `/api/files`;
+            const response = await this.client.sendToBackend(formData, apiEndpoint, "POST", true);
+            return response;
         }
         else {
             const formData = new FormData();
@@ -69,7 +57,6 @@ class Files {
                 const response = await this.client.sendToBackend(formData, apiEndpoint, "POST", true);
                 return response;
             } catch (error) {
-                // Handle error
                 console.log("Error uploading file:", error);
                 throw error;
             }
@@ -83,7 +70,7 @@ class Files {
             const response = await this.client.sendToBackend({}, apiEndpoint, "GET", true);
             return response;
         } catch (error) {
-            // Handle error
+            // Handle error`/
             console.log("Error getting file:", error);
             throw error;
         }

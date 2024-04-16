@@ -16,40 +16,62 @@ files.post("/", async (c) => {
   try {
 
     const data = await c.req.formData();
-    const file = data.get("file");
-    const id = v4().replaceAll('-', '').slice(0, 16);
+    // check if there is a isBlobFile field in the form data
+    if (data.has("isBlobFile")) {
+      // const file = data.get("file");
+      const file = JSON.parse(data.get("file") as string);
+      console.log("FILE RECEIVED:", file);
+      const id = v4().replaceAll('-', '').slice(0, 16);
 
-    if (!file) throw new Error("No file provided in the `file` field");
+      if (!file) throw new Error("No file provided in the `file` field");
 
-    const dotIndex = (file.name).lastIndexOf('.');
-    const fileExtension = file.name.slice(dotIndex + 1);
+      const dotIndex = (file.name).lastIndexOf('.');
+      const fileExtension = file.name.slice(dotIndex + 1);
 
-    // obtaining the url of where the service is running
-    const config = getCollection('config')
-    const appConfig: any = await new Promise((resolve, reject) => {
-      config.findOne({}, function (err: any, docs: any) {
-        if (err) {
-          reject(err);
-        }
-        resolve(docs);
-      });
-    });
-
-    if (!appConfig) throw new Error("Failed to get appConfig");
-
-    let bytes_written = await Bun.write(`./files/${id}.${fileExtension}`, file);
-
-    if (bytes_written > 0) {
-      const file_url = `${appConfig.application.url}/api/files?file_name=${id}.${fileExtension}`
-      const metadata = createMetaData(file_url, file.name, `${id}.${fileExtension}`, id, bytes_written)
-
+      const metadata = createMetaData(file.url, file.name, `${id}.${fileExtension}`, id, file.size);
       await Bun.write(`./files-metadata/${id}.json`, JSON.stringify(metadata, null, 2));
+
       return c.json({
         error: null,
         data: id,
       });
-    } else {
-      throw new Error("Failed to write file to disk");
+    }
+    else {
+      const file = data.get("file");
+      const id = v4().replaceAll('-', '').slice(0, 16);
+
+      if (!file) throw new Error("No file provided in the `file` field");
+
+      const dotIndex = (file.name).lastIndexOf('.');
+      const fileExtension = file.name.slice(dotIndex + 1);
+
+      // obtaining the url of where the service is running
+      const config = getCollection('config')
+      const appConfig: any = await new Promise((resolve, reject) => {
+        config.findOne({}, function (err: any, docs: any) {
+          if (err) {
+            reject(err);
+          }
+          resolve(docs);
+        });
+      });
+
+      if (!appConfig) throw new Error("Failed to get appConfig");
+
+      let bytes_written = await Bun.write(`./files/${id}.${fileExtension}`, file);
+
+      if (bytes_written > 0) {
+        const file_url = `${appConfig.application.url}/api/files?file_name=${id}.${fileExtension}`
+        const metadata = createMetaData(file_url, file.name, `${id}.${fileExtension}`, id, bytes_written)
+
+        await Bun.write(`./files-metadata/${id}.json`, JSON.stringify(metadata, null, 2));
+        return c.json({
+          error: null,
+          data: id,
+        });
+      } else {
+        throw new Error("Failed to write file to disk");
+      }
     }
 
   } catch (error: any) {

@@ -137,4 +137,5 @@ function uploadFile() {
 // deleteRecord();
 // listRecords();
 // countRecords();
-getAzureFileSettings();
+// getAzureFileSettings();
+uploadFile();
