@@ -86,25 +86,16 @@ LIST OF REQUIREMENTS COMPLETED SO FAR
 38. Check storage use and files demographic as a pie chart
 
 ------------------------------------------------------------------------------------------------
-
 HOW TO ACCESS THE SYSTEM
 
-1. The documentation site can be visited on http://ezbase.vercel.app
+1. Steps to use our system
+    - Go to the tags section in the repository
+    - Download executable for your system
+    - Run the executable and the server will start as well as the admin UI
+    - Use the SDK to develop your app!
 2. The SDK can be downloaded on npm repository on https://www.npmjs.com/package/ezbase-ts
-3. The steps to use our system
-    - Go to the server repository in Sprint 4
-    - run bun i or pnpm i and then bun/pnpm run dev
-    - Go to sdk folder run npm i and then npm run build
-    - Go to frontend folder run pnpm i and then pnpm run dev
 
-* A deployment does exist at https://ezbase-frontend.vercel.app/ , However the backend is deployed on Koyeb which provides ephemeral disk storage
-and may result in varying performance. Also refrain from stress testing too much as heavy traffic may incur hosting costs. For file related
-stuff please see the demo video as file storage on an actual deployed server is expensive.
+The documentation site can be visited on http://ezbase.vercel.app
 
-Demo link for realtime app: https://www.youtube.com/watch?v=XGZGzHm04qo
-
+* A deployment to demo the admin UI also exists at https://ezbase-frontend.vercel.app/
 ------------------------------------------------------------------------------------------------
-
-
-
-ADDITIONAL INFORMATION
