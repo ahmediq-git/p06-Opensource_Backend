@@ -9,10 +9,13 @@ import {
 } from "lucide-react";
 import { fetcher } from "../lib/utils/fetcher";
 import "/src/assets/custom.css";
+import PieChartCard from "./PieChart";
+import bytes from 'bytes'
 
 export default function File() {
 	const [selection, setSelection] = useAtom(fileSelectionAtom);
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
+
 	const { mutate } = useSWRConfig();
 
 	const deleteFile = async () => {
@@ -46,7 +49,7 @@ export default function File() {
 		`${import.meta.env.VITE_BACKEND_URL}/files/list`,
 		fetcher
 	);
-
+	
 	function generateIcon(fileUrl) {
 		const extension = fileUrl.split('.').pop().toLowerCase();
 
@@ -74,6 +77,7 @@ export default function File() {
 
 			{/* Delete Modal */}
 			<div className="modal modal-open overflow-y-scroll">
+				
 				<label className="modal-overlay" htmlFor="delete-file-modal"></label>
 				<div
 					className={`modal-content flex flex-col gap-5 max-w-6xl transition-all duration-500 w-2/5  
@@ -174,13 +178,21 @@ export default function File() {
 							<hr className="border-t border-gray-500 border-solid h-0.5 my-[1px]" />
 							<div className="text-xl flex justify-between">
 								<span style={{ color: "#908E94" }}>Size: </span>
-								<span className="ml-2">{selection.meta_data.size} bytes</span>
+								<span className="ml-2">{bytes(selection.meta_data.size)}</span>
 							</div>
 							<hr className="border-t border-gray-500 border-solid h-0.5 my-[1px]" />
 							<div className="text-xl flex justify-between">
 								<span style={{ color: "#908E94" }}>Created At: </span>
 								<span className="ml-2">
-									{Date(selection.meta_data.createdAt)}
+								{new Date(selection.meta_data.createdAt).toLocaleString('en-US', {
+										month: 'short',
+										day: '2-digit',
+										year: 'numeric',
+										hour: '2-digit',
+										minute: '2-digit',
+										second: '2-digit',
+										hour12: true
+										})}
 								</span>
 							</div>
 						</div>
