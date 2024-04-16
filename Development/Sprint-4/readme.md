@@ -86,7 +86,7 @@ LIST OF REQUIREMENTS COMPLETED SO FAR
 HOW TO ACCESS THE SYSTEM
 
 1. Steps to use our system
-    - Go to the tags section in the repository
+    - Go to the tags section in the repository (https://github.com/ahmediq-git/p06-Opensource_Backend_In_Rust/releases/tag/v1.0.0)
     - Download executable for your system
     - Run the executable and the server will start as well as the admin UI
     - Use the SDK to develop your app!
