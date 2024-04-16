@@ -7,7 +7,7 @@ Team: 06
 - 24100296 Moiz Raza Amir
 - 24100085 Ahmed Mozammil Iqbal
 
-SPRINT-3 SUBMISSION GUIDELINES
+SPRINT-4 SUBMISSION GUIDELINES
 
 1. Properly tested working system deployed on an online hosting platform.
 2. Code with readable comments uploaded in “Development/Sprint-3” folder of your project’s Github repository.
