@@ -123,10 +123,10 @@ export default function StressTestPage() {
             <SideRail />
             <div className="w-[2px] h-screen bg-gray-100 opacity-10"></div>
 
-            <div className="flex flex-col justify-center items-center w-full gap-y-12s">
+            <div className="flex flex-col justify-center items-center w-full gap-y-12sz">
                 <h1 className="text-2xl font-bold mb-8"> API Stress Test </h1>
-                <div className="flex items-center mb-4 mr-12">
-                    <label htmlFor="duration" className="mr-4 text-l mt-4">
+                <div className="flex items-center mb-4 mr-12 flex-col">
+                    <label htmlFor="duration" className="mr-[-50px] text-l mb-2">
                         Test Duration (seconds):
                     </label>
                     <input
@@ -134,57 +134,50 @@ export default function StressTestPage() {
                         id="duration"
                         value={duration}
                         onChange={(e) => setDuration(parseInt(e.target.value))}
-                        className="px-4 py-2 border border-gray-300 rounded-md input text-l mr-[65px]"
+                        className="px-4 py-2 border border-gray-300 rounded-md input text-l w-[300px] ml-[45px]"
                     />
                 </div>
                 <button
                     onClick={handleStartTest}
                     disabled={isLoading || duration <= 0}
-                    className="bg-blue-500 hover:bg-blue-600 rounded mb-4 text-white px-4 py-2 disabled:bg-gray-400 disabled:cursor-not-allowed text-l shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+                    className="btn btn-outline-primary hover:btn-secondary w-[300px] menu-item duration-75 transition-all mt-2"
                 >
                     {isLoading ? 'Running Test...' : 'Start Test'}
                 </button>
                 {!isLoading && done && (
                     <>
                         {averageResponseTime === 0?
-                        <div className="flex flex-col">
-                            <ServerOff size={200} className="ml-8"/>
+                        <div className="flex flex-col mt-5">
+                            <ServerOff size={150} className="ml-14"/>
                             <h2 className="text-2xl mt-4">Your Server is switched off</h2>
                         </div>
                         : 
                         (<div>
-                            <ServerIcon size={200}/>
-                            <h2 className="text-2xl mt-4">Test Completed! 🎉</h2>
+                            {/* <ServerIcon size={200}/> */}
+                            {/* <h2 className="text-2xl mt-4">Test Completed!</h2> */}
                         </div>)
                         }
                         
                     </>
                 )}
-
-                {averageResponseTime !==0?
-                (<div className="flex flex-col">
-                    {totalRequests > 0 && (
-                        <div className="mt-4 text-l">
-                            <p>Total Requests Sent: {totalRequests}</p>
-                        </div>
-                    )}
-                    {!isLoading && done && (
-                        <div className="mt-4 text-l">
-                            <p>Average Response Time: {averageResponseTime.toFixed(2)} ms</p>
-                        </div>
-                    )}
-                    {!isLoading && done && (
-                        <div className="mt-4 text-xl">
-                            <p className="font-semibold text-red-700">Error Count: {errorCount}</p>
-                            <p className="font-semibold text-green-700">Success Rate: {successRate.toFixed(2)}%</p>
-                            <p>Total Data Sent: {formatBytes(totalDataSent)}</p>
-                        </div>
-                    )}
-                </div>) :(<div></div>)
-                }
-                {!done && (
-                    <progress className="progress progress-secondary w-80 mt-8" value={progress} max="100"></progress>
-                )}
+                
+                            <div className="flex flex-col text-gray-300">  {totalRequests > 0 && (
+                <div className="mt-4 text-sm">  <p>Total Requests Sent: {totalRequests}</p>
+                </div>
+            )}
+            {!isLoading && done && (
+                <div className="mt-4 text-base">  <p>Average Response Time: {averageResponseTime.toFixed(2)} ms</p>
+                </div>
+            )}
+            {!isLoading && done && (
+                <div className="mt-4">
+                <p className="font-semibold text-red-500">Error Count: {errorCount}</p>  <p className="font-semibold text-green-400">Success Rate: {successRate.toFixed(2)}%</p>  <p>Total Data Sent: {formatBytes(totalDataSent)}</p>
+                </div>
+            )}
+            </div>
+            {!done && isLoading && (
+            <progress className="progress progress-secondary w-80 mt-8" value={progress} max="100"></progress>
+            )}
             </div>
         </div>
     );
