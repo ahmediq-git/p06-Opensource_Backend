@@ -40,7 +40,7 @@ class Files {
             const fileBuffer = Buffer.from(blobArrayBuffer);
             const uploadBlobResponse = await blockBlobClient.uploadData(fileBuffer);
             const formData = new FormData();
-            const fileObject = { name: file.name, url: blockBlobClient.url, size: file.size};
+            const fileObject = { name: file.name, url: blockBlobClient.url, size: file.size };
             const isBlobFile = true;
             formData.append('file', JSON.stringify(fileObject));
             formData.append('isBlobFile', isBlobFile.toString());
@@ -72,6 +72,17 @@ class Files {
         } catch (error) {
             // Handle error`/
             console.log("Error getting file:", error);
+            throw error;
+        }
+    }
+
+    async getFileContent(file_id: string): Promise<AxiosResponse<any>> {
+        try {
+            const apiEndpoint = `/api/files/filecontent?id=${file_id}`;
+            const response = await this.client.sendToBackend({}, apiEndpoint, "GET");
+            return response;
+        } catch (error) {
+            console.log("Error downloading file:", error);
             throw error;
         }
     }

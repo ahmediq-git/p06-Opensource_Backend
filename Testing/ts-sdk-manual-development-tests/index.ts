@@ -1,6 +1,7 @@
 import ezbase from "../../Development/Sprint-4/sdk/dist/index";
 import axios, { AxiosResponse } from 'axios';
 import * as fs from "fs";
+import { get } from "http";
 
 const eb = new ezbase("http://localhost:3690", "http://localhost:3691");
 
@@ -92,6 +93,39 @@ async function uploadFile(): Promise<any> {
     const file = new File([blob], "uploadFileTest.txt"); // Convert Buffer to File
     const res = await eb.files.uploadFile(file).then((ans: any) => console.log(ans));
 }
+
+async function getFileMetaData(): Promise<any> {
+    console.log("Testing getting file metadata");
+    const res = await eb.files.getFileMetaData("1fd84ff4785b4b79").then((ans: any) => console.log(ans));
+}
+
+async function getFileUrl(): Promise<any> {
+    console.log("Testing getting file url");
+    const res = await eb.files.getFileUrl("1fd84ff4785b4b79").then((ans: any) => console.log(ans));
+}
+
+async function getFile(): Promise<any> {
+    console.log("Testing getting file");
+    const res = await eb.files.getFile("dde6683657a44e7a.txt");
+    console.log(res.data);
+}
+
+async function deleteFile(): Promise<any> {
+    console.log("Testing deleting a file");
+    const res = await eb.files.deleteFile("42258dc2feb34f9a").then((ans: any) => console.log(ans));
+}
+
+async function getFileContent(): Promise<any> {
+    console.log("Testing downloading a file");
+    const res = await eb.files.getFileContent("ddd0ed62aa42403d")
+        .then((ans: any) => {
+            console.log(ans);
+            const fileBuffer = Buffer.from(ans.data, 'base64');
+            // console.log("File received from server:", fileBuffer);
+            fs.writeFileSync("./downloadedFile.txt", fileBuffer);
+            console.log("File downloaded successfully as downloadedFile.txt");
+        });
+}
 // Calling the functions
 // sendTextMail();
 // auth();
@@ -104,4 +138,9 @@ async function uploadFile(): Promise<any> {
 // listRecords();
 // countRecords();
 // getAzureFileSettings();
-uploadFile();
+// uploadFile();
+// getFileMetaData();
+// getFileUrl();
+// getFile();
+// deleteFile();
+getFileContent();
