@@ -6,7 +6,7 @@ import {
 } from '@azure/functions';
 import { generateSASUrl } from '@src/utils/files_helper/azure-storage';
 
-export async function getGenerateSasToken(
+export default async function getGenerateSasToken(
   request: HttpRequest,
   context: InvocationContext
 ): Promise<HttpResponseInit> {

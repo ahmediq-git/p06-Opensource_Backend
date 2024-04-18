@@ -11,6 +11,7 @@ import blobToString from "@src/utils/files_helper/azure-storage-functions/blobTo
 import streamToBuffer from "@src/utils/files_helper/azure-storage-functions/streamToBuffer";
 import fs from "fs";
 import { BlobServiceClient, StorageSharedKeyCredential, BlobDownloadResponseModel } from '@azure/storage-blob';
+import getGenerateSasToken from "@src/utils/files_helper/azure-storage-functions/sas";
 
 const files = new Hono();
 
@@ -322,5 +323,66 @@ files.get("/file_settings", async (c: Context) => {
     });
   }
 })
+
+files.post("/sas", async (c: Context) => {
+  console.log("Generating SAS URL for file");
+  try {
+    const blobStorageDetails = await getStorageAccountDetails();
+    if (!(blobStorageDetails.useBlobStorage)) {
+      return c.json({
+        error: true,
+        data: "Blob storage is not enabled"
+      });
+    }
+
+    const file = c.req.query('file');
+    const permissions = c.req.query('permission') || 'w';
+    const timerange = parseInt(await c.req.json()) || 1;
+
+    if (!file) {
+      console.log("No file name provided", file);
+      return c.json({
+        error: true,
+        data: "No file name provided"
+      });
+    }
+
+    console.log("Account Name:", blobStorageDetails.serviceName);
+    console.log("Account Key:", blobStorageDetails.serviceKey)
+    console.log("containerName:", blobStorageDetails.containerName);
+    console.log("fileName:", file);
+    console.log("permissions:", permissions);
+    console.log("timerange:", timerange);
+
+    // print the type of each variable to be passed
+    console.log("Type of Account Name:", typeof blobStorageDetails.serviceName);
+    console.log("Type of Account Key:", typeof blobStorageDetails.serviceKey)
+    console.log("Type of containerName:", typeof blobStorageDetails.containerName);
+    console.log("Type of fileName:", typeof file);
+    console.log("Type of permissions:", typeof permissions);
+    console.log("Type of timerange:", typeof timerange);
+
+    console.log("Generating SAS URL for file", file);
+    const sasUrl = await getGenerateSasToken(
+      blobStorageDetails.serviceName,
+      blobStorageDetails.serviceKey,
+      blobStorageDetails.containerName,
+      file,
+      permissions
+    );
+
+    return c.json({
+      error: false,
+      data: sasUrl
+    });
+  }
+  catch (err) {
+    console.log("Error:", err);
+    return c.json({
+      error: true,
+      data: err
+    });
+  }
+});
 
 export default files;
