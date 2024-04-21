@@ -5,6 +5,7 @@ import {
   app
 } from '@azure/functions';
 import { generateSASUrl } from '@src/utils/files_helper/azure-storage';
+import getStorageAccountDetails from "@src/utils/files_helper/azure-storage-functions/getStorageAccountDetails";
 
 export default async function getGenerateSasToken(
   request: HttpRequest,
@@ -13,9 +14,10 @@ export default async function getGenerateSasToken(
   context.log(`Http function processed request for url "${request.url}"`);
 
   try {
+    const blobStorageDetails = await getStorageAccountDetails();
     if (
-      !process.env?.Azure_Storage_AccountName ||
-      !process.env?.Azure_Storage_AccountKey
+      !blobStorageDetails.serviceName ||
+      !blobStorageDetails.serviceKey
     ) {
       return {
         status: 405,
@@ -23,19 +25,19 @@ export default async function getGenerateSasToken(
       };
     }
 
-    const containerName = request.query.get('container') || 'anonymous';
+    const containerName = blobStorageDetails.containerName || 'anonymous';
     const fileName = request.query.get('file') || 'nonamefile';
     const permissions = request.query.get('permission') || 'w';
     const timerange = parseInt(request.query.get('timerange') || '10'); // 10 minutes
 
-    context.log(`containerName: ${containerName}`);
-    context.log(`fileName: ${fileName}`);
-    context.log(`permissions: ${permissions}`);
-    context.log(`timerange: ${timerange}`);
+    console.log(`containerName: ${containerName}`);
+    console.log(`fileName: ${fileName}`);
+    console.log(`permissions: ${permissions}`);
+    console.log(`timerange: ${timerange}`);
 
     const url = await generateSASUrl(
-      process.env?.Azure_Storage_AccountName,
-      process.env?.Azure_Storage_AccountKey,
+      blobStorageDetails.serviceName,
+      blobStorageDetails.serviceKey,
       containerName,
       fileName,
       permissions

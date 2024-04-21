@@ -1,7 +1,8 @@
 import ValidationUtils from "../validators/validators.js";
 import axios, { AxiosResponse } from "axios";
-import { StorageSharedKeyCredential, BlobServiceClient } from "@azure/storage-blob";
-
+import {
+    BlobServiceClient, StorageSharedKeyCredential
+} from '@azure/storage-blob';
 
 class Files {
     private client: any;

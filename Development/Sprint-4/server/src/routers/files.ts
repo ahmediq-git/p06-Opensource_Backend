@@ -10,8 +10,12 @@ import getStorageAccountDetails from "@src/utils/files_helper/azure-storage-func
 import blobToString from "@src/utils/files_helper/azure-storage-functions/blobToString";
 import streamToBuffer from "@src/utils/files_helper/azure-storage-functions/streamToBuffer";
 import fs from "fs";
-import { BlobServiceClient, StorageSharedKeyCredential, BlobDownloadResponseModel } from '@azure/storage-blob';
+import {
+  BlobServiceClient, StorageSharedKeyCredential, BlobDownloadResponseModel, BlobSASPermissions,
+  ContainerClient, SASProtocol
+} from '@azure/storage-blob';
 import getGenerateSasToken from "@src/utils/files_helper/azure-storage-functions/sas";
+import { generateSASUrl } from "@src/utils/files_helper/azure-storage";
 
 const files = new Hono();
 
@@ -335,12 +339,13 @@ files.post("/sas", async (c: Context) => {
       });
     }
 
-    const file = c.req.query('file');
+    const fileName = c.req.query('file') || 'nonamefile';
     const permissions = c.req.query('permission') || 'w';
-    const timerange = parseInt(await c.req.json()) || 1;
+    const timerange = parseInt(c.req.query('timerange') || '10'); // 10 minutes by default
+    const containerName = blobStorageDetails.containerName || 'anonymous';
 
-    if (!file) {
-      console.log("No file name provided", file);
+    if (!fileName) {
+      console.log("No file name provided", fileName);
       return c.json({
         error: true,
         data: "No file name provided"
@@ -350,7 +355,7 @@ files.post("/sas", async (c: Context) => {
     console.log("Account Name:", blobStorageDetails.serviceName);
     console.log("Account Key:", blobStorageDetails.serviceKey)
     console.log("containerName:", blobStorageDetails.containerName);
-    console.log("fileName:", file);
+    console.log("fileName:", fileName);
     console.log("permissions:", permissions);
     console.log("timerange:", timerange);
 
@@ -358,22 +363,45 @@ files.post("/sas", async (c: Context) => {
     console.log("Type of Account Name:", typeof blobStorageDetails.serviceName);
     console.log("Type of Account Key:", typeof blobStorageDetails.serviceKey)
     console.log("Type of containerName:", typeof blobStorageDetails.containerName);
-    console.log("Type of fileName:", typeof file);
+    console.log("Type of fileName:", typeof fileName);
     console.log("Type of permissions:", typeof permissions);
     console.log("Type of timerange:", typeof timerange);
 
-    console.log("Generating SAS URL for file", file);
-    const sasUrl = await getGenerateSasToken(
-      blobStorageDetails.serviceName,
-      blobStorageDetails.serviceKey,
-      blobStorageDetails.containerName,
-      file,
-      permissions
-    );
+    console.log("Generating SAS URL for file", fileName);
+    // const sasUrl = await generateSASUrl(
+    //   blobStorageDetails.serviceName,
+    //   blobStorageDetails.serviceKey,
+    //   containerName,
+    //   file,
+    //   permissions,
+    //   timerange
+    // );
+    const account = blobStorageDetails.serviceName;
+    const accountKey = blobStorageDetails.serviceKey;
+    const sharedKeyCredential = new StorageSharedKeyCredential(account, accountKey);
+    console.log("sharedKeyCredential", sharedKeyCredential);
+    const blobServiceClient = new BlobServiceClient(`https://${account}.blob.core.windows.net`, sharedKeyCredential);
+    console.log("blobServiceClient", blobServiceClient);
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    console.log("containerClient", containerClient);
+    const blockBlobClient = containerClient.getBlobClient(fileName);
+    console.log("blockBlobClient", blockBlobClient);
+    // Best practice: create time limits
+    const SIXTY_MINUTES = timerange * 60 * 1000;
+    const NOW = new Date();
+
+    // Create SAS URL
+    const accountSasTokenUrl = await blockBlobClient.generateSasUrl({
+      startsOn: NOW,
+      expiresOn: new Date(new Date().valueOf() + SIXTY_MINUTES),
+      permissions: BlobSASPermissions.parse(permissions), // Read only permission to the blob
+      protocol: SASProtocol.Https // Only allow HTTPS access to the blob
+    });
+
 
     return c.json({
       error: false,
-      data: sasUrl
+      data: accountSasTokenUrl
     });
   }
   catch (err) {

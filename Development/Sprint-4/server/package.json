@@ -16,6 +16,7 @@
     "object-sizeof": "^2.6.4",
     "sift": "^17.0.1",
     "socket.io": "^4.7.4",
+    "string-to-arraybuffer": "^1.0.2",
     "toad-scheduler": "^3.0.1",
     "uuid": "^9.0.1"
   },
