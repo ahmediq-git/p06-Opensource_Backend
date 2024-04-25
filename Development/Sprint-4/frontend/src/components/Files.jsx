@@ -6,9 +6,7 @@ import useSwr, { useSWRConfig } from "swr";
 import { fetcher } from "../lib/utils/fetcher";
 import { record, z } from "zod";
 import axios from "axios";
-// import {
-// 	BlobServiceClient, StorageSharedKeyCredential
-// } from '@azure/storage-blob';
+import { BlockBlobClient } from '@azure/storage-blob';
 
 // Naming Schema for Files
 const fileNamingSchema = z.string().refine(
@@ -72,70 +70,65 @@ export default function Files() {
 
 	const uploadFile = async (file) => {
 		try {
-			const formData = new FormData();
-			formData.append('file', file);
-			// if (blobStorageSettings.useBlobStorage) {
-			// const permission = 'w';
-			// const timerange = 5;
 
-			// if (!selection) return;
+			if (blobStorageSettings.useBlobStorage) {
 
-			// const res = await axios.post(
-			// 	`${import.meta.env.VITE_BACKEND_URL}/files/sas?file=${encodeURIComponent(
-			// 		file.name
-			// 	)}&permission=${permission}&container=${blobStorageSettings.containerName}&timerange=${timerange}`,
-			// 	{
-			// 		headers: {
-			// 			'Content-Type': 'application/json',
-			// 			'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
-			// 		}
-			// 	}
-			// )
-			// 	.then(response => {
-			// 		console.log("Response:", response);
-			// 		if (response.data.error) {
-			// 			console.log("Error:", response.data.error)
-			// 			return;
-			// 		}
-			// 		setSasTokenUrl(response.data.data)
-			// 	})
-			// 	.catch(error => {
-			// 		console.log("Error:", error)
-			// 	})
-			// 	const account = blobStorageDetails.serviceName;
-			// 	const accountKey = blobStorageDetails.serviceKey;
-			// 	const sharedKeyCredential = new StorageSharedKeyCredential(account, accountKey);
-			// 	console.log("sharedKeyCredential", sharedKeyCredential);
-			// 	const blobServiceClient = new BlobServiceClient(`https://${account}.blob.core.windows.net`, sharedKeyCredential);
-			// 	console.log("blobServiceClient", blobServiceClient);
-			// 	const containerClient = blobServiceClient.getContainerClient(containerName);
-			// 	console.log("containerClient", containerClient);
-			// 	const blockBlobClient = containerClient.getBlockBlobClient(fileName);
-			// 	console.log("blockBlobClient", blockBlobClient);
-			// 	const textEncoded = new TextEncoder().encode(file);
-			// 	const blob = new Blob([textEncoded]);
-			// 	const uploadBlobResponse = await blockBlobClient.uploadData(blob);
-			// 	if (uploadBlobResponse.errorCode) {
-			// 		console.log("Error:", uploadBlobResponse.error)
-			// 		return;
-			// 	}
-			// 	else {
-			// 		console.log("Upload Success:", uploadBlobResponse)
-			// 	}
+				const permission = 'w';
+				const timerange = 5;
 
-			// }
-			// else {
-			const res = await axios.post(
-				`${import.meta.env.VITE_BACKEND_URL}/files`,
-				formData,
-				{
-					headers: {
-						'Content-Type': 'multipart/form-data',
-						'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
-					},
-				}
-			);
-			// }
+				const res = await axios.post(
+					`${import.meta.env.VITE_BACKEND_URL}/files/sas?file=${encodeURIComponent(
+						file.name
+					)}&permission=${permission}&container=${blobStorageSettings.containerName}&timerange=${timerange}`,
+					{
+						headers: {
+							'Content-Type': 'application/json',
+							'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
+						}
+					}
+				)
+					.then(async function (response) {
+						console.log("Response:", response);
+						if (response.data.error) {
+							console.log("Error:", response.data.error)
+							return;
+						}
+						setSasTokenUrl(response.data.data.sas);
+						const fileBuffer = await file.arrayBuffer();
+						const blockBlobClient = new BlockBlobClient(sasTokenUrl);
+						const res = await blockBlobClient.uploadData(fileBuffer);
+						if (res.errorCode) {
+							console.log('Error:', res.errorCode);
+							return;
+						}
+						const formData = new FormData();
+						const fileObject = { name: file.name, url: blockBlobClient.url, size: file.size };
+						const isBlobFile = true;
+						formData.append('file', JSON.stringify(fileObject));
+						formData.append('isBlobFile', isBlobFile.toString());
+						const apiEndpoint = `/api/files`;
+						const resp = await this.client.sendToBackend(formData, apiEndpoint, "POST", true);
+					})
+					.catch(error => {
+						console.log("Error:", error)
+					})
+
+
+			}
+			else {
+				const formData = new FormData();
+				formData.append('file', file);
+				const res = await axios.post(
+					`${import.meta.env.VITE_BACKEND_URL}/files`,
+					formData,
+					{
+						headers: {
+							'Content-Type': 'multipart/form-data',
+							'Authorization': 'Bearer ' + window.localStorage.getItem('jwt').replace(/"/g, '')
+						},
+					}
+				);
+			}
 			// const adsa = await res.json();
 
 			mutate(`${import.meta.env.VITE_BACKEND_URL}/files/list`);
