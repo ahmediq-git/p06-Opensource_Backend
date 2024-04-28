@@ -25,7 +25,9 @@ async function createContainer(
     blobServiceClient: BlobServiceClient
 ): Promise<ContainerClient> {
     const containerClient = blobServiceClient.getContainerClient(containerName);
+    console.log("containerClient", containerClient);
     await containerClient.createIfNotExists();
+    console.log("Container created");
 
     return containerClient;
 }

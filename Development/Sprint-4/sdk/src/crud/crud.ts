@@ -66,8 +66,8 @@ class Crud {
             const response = await this.client.sendToBackend({}, apiEndpoint, "GET");
 
             return response;
-           
-            
+
+
         }
         catch (error) {
             throw error
@@ -287,7 +287,7 @@ class Crud {
                     return response;
                 }
             }
-            
+
         } catch (error) {
             console.error("An error occurred while listing collection: ", error)
             throw error
@@ -320,17 +320,17 @@ class Crud {
     }
 
 
-    async updateRecord(collection_name: string, query:object , new_record: object, options: object = {}): Promise<any> {
+    async updateRecord(collection_name: string, query: object, new_record: object, options: object = {}): Promise<any> {
         try {
 
-            const sendObject = { "collection_name": collection_name,query, new_record, options};
+            const sendObject = { "collection_name": collection_name, query, new_record, options };
             const apiEndpoint = "/api/record/sdk-update";
             const response = await this.client.sendToBackend(sendObject, apiEndpoint, "PATCH");
 
             return response;
-            
+
         } catch (error) {
-            
+
             throw error;
         }
     }
