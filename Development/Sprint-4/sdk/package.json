@@ -1,6 +1,6 @@
 {
   "name": "ezbase-ts",
-  "version": "1.0.35",
+  "version": "1.0.36",
   "description": "This is the official Typescript SDK of the EZBase Backend-as-a-Service",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

@@ -263,41 +263,9 @@ files.delete("/:id", async (c: Context) => {
   try {
     const { id } = c.req.param();
     const metadata = await getMetaData(id);
-
-    if (metadata.storageType === "Blob Storage") {
-      const blobStorageDetails = await getStorageAccountDetails();
-      const account = blobStorageDetails.serviceName;
-      const accountKey = blobStorageDetails.serviceKey;
-      const sharedKeyCredential = new StorageSharedKeyCredential(account, accountKey);
-      const containerName = blobStorageDetails.containerName;
-      const blobName = metadata.name;
-      const blobServiceClient = new BlobServiceClient(`https://${account}.blob.core.windows.net`, sharedKeyCredential);
-      const containerClient = blobServiceClient.getContainerClient(containerName);
-      const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
-      // include: Delete the base blob and all of its snapshots.
-      // only: Delete only the blob's snapshots and not the blob itself.
-      const options: BlobDeleteOptions = {
-        deleteSnapshots: 'include'
-      };
-      const blobDeleteIfExistsResponse: BlobDeleteIfExistsResponse =
-        await blockBlobClient.deleteIfExists(options);
-
-      if (!blobDeleteIfExistsResponse.errorCode) {
-        await unlink(`./files-metadata/${id}.json`);
-        return c.json({
-          error: null,
-          data: `Deletion of the file with id ${id} successful`,
-        });
-      }
-      else {
-        return c.json({
-          error: "Error deleting the file: " + blobDeleteIfExistsResponse.errorCode,
-          data: null,
-        });
-      }
+    if (metadata.storageType === "Local Storage") {
+      await unlink(`./files/${metadata.stored_name}`);
     }
-
-    await unlink(`./files/${metadata.stored_name}`);
     await unlink(`./files-metadata/${id}.json`);
 
     return c.json({
@@ -372,7 +340,7 @@ files.post("/sas", async (c: Context) => {
         data: "Blob storage is not enabled"
       });
     }
-    else if (!blobStorageDetails.serviceName || !blobStorageDetails.serviceKey || !blobStorageDetails.containerName || !blobStorageDetails.sas) {
+    else if (!blobStorageDetails.serviceName || !blobStorageDetails.serviceKey || !blobStorageDetails.containerName) {
       return c.json({
         error: true,
         data: "Blob storage details are missing"

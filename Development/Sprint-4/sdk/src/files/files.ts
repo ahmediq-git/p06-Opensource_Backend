@@ -1,7 +1,7 @@
 import ValidationUtils from "../validators/validators.js";
 import axios, { AxiosResponse } from "axios";
 import {
-    BlobServiceClient, StorageSharedKeyCredential
+    BlobServiceClient, StorageSharedKeyCredential, BlobDeleteIfExistsResponse, BlobDeleteOptions
 } from '@azure/storage-blob';
 
 class Files {
@@ -114,6 +114,30 @@ class Files {
 
     async deleteFile(id: string): Promise<AxiosResponse<any>> {
         try {
+            const metadata = (await this.getFileMetaData(id)).data;
+            if (metadata.storageType == "Blob Storage") {
+                const blobStorageDetails = (await this.getFileSettings()).data;
+                const account = blobStorageDetails.serviceName;
+                const accountKey = blobStorageDetails.serviceKey;
+                const sharedKeyCredential = new StorageSharedKeyCredential(account, accountKey);
+                const containerName = blobStorageDetails.containerName;
+                const blobName = metadata.name;
+                const blobServiceClient = new BlobServiceClient(`https://${account}.blob.core.windows.net`, sharedKeyCredential);
+                const containerClient = blobServiceClient.getContainerClient(containerName);
+                const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+                // include: Delete the base blob and all of its snapshots.
+                // only: Delete only the blob's snapshots and not the blob itself.
+                const options: BlobDeleteOptions = {
+                    deleteSnapshots: 'include'
+                };
+                const blobDeleteIfExistsResponse: BlobDeleteIfExistsResponse =
+                    await blockBlobClient.deleteIfExists(options);
+
+                if (blobDeleteIfExistsResponse.errorCode) {
+                    console.log("Error deleting file:", blobDeleteIfExistsResponse.errorCode);
+                    throw blobDeleteIfExistsResponse.errorCode;
+                }
+            }
             const apiEndpoint = `/api/files/${id}`;
             const res = await this.client.sendToBackend({}, apiEndpoint, "DELETE");
             console.log("File deleted successfully");

@@ -96,28 +96,28 @@ async function uploadFile(): Promise<any> {
 
 async function getFileMetaData(): Promise<any> {
     console.log("Testing getting file metadata");
-    const res = await eb.files.getFileMetaData("1fd84ff4785b4b79").then((ans: any) => console.log(ans));
+    const res = await eb.files.getFileMetaData("b985a955809b46c4").then((ans: any) => console.log(ans));
 }
 
 async function getFileUrl(): Promise<any> {
     console.log("Testing getting file url");
-    const res = await eb.files.getFileUrl("1fd84ff4785b4b79").then((ans: any) => console.log(ans));
+    const res = await eb.files.getFileUrl("b985a955809b46c4").then((ans: any) => console.log(ans));
 }
 
 async function getFile(): Promise<any> {
     console.log("Testing getting file");
-    const res = await eb.files.getFile("dde6683657a44e7a.txt");
+    const res = await eb.files.getFile("b985a955809b46c4.txt");
     console.log(res.data);
 }
 
 async function deleteFile(): Promise<any> {
     console.log("Testing deleting a file");
-    const res = await eb.files.deleteFile("42258dc2feb34f9a").then((ans: any) => console.log(ans));
+    const res = await eb.files.deleteFile("b985a955809b46c4").then((ans: any) => console.log(ans));
 }
 
 async function getFileContent(): Promise<any> {
     console.log("Testing downloading a file");
-    const res = await eb.files.getFileContent("ddd0ed62aa42403d")
+    const res = await eb.files.getFileContent("b985a955809b46c4")
         .then((ans: any) => {
             console.log(ans);
             const fileBuffer = Buffer.from(ans.data, 'base64');
@@ -137,10 +137,13 @@ async function getFileContent(): Promise<any> {
 // deleteRecord();
 // listRecords();
 // countRecords();
+
+// FILE TESTS
+
 // getAzureFileSettings();
 // uploadFile();
 // getFileMetaData();
 // getFileUrl();
 // getFile();
-// deleteFile();
-getFileContent();
+deleteFile();
+// getFileContent();
