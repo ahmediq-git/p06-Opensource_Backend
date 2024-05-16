@@ -13,21 +13,21 @@ Team: 06
 SPRINT-4 EVALUATION [0/100]
  
 1. Properly tested working system deployed on an online hosting platform.
-        [0/30 ]
+        [25/30 ]
 2. Code with readable comments uploaded in “Development/SPRINT-4” folder of your project’s Github repository.
-        [0/10]
+        [5/10]
 3. 3-4 minutes video that explains the functionality of your system developed so far. This must be uploaded in “SPRINT-4” folder of your project’s Github repository.
-       [0/10]
+       [10/10]
 4. Updated architecture and data model must be uploaded in the respective folders on Github.
       
 5. Test case execution report. You just need to update the test cases document with testing result.
-        [0/10]
+        [10/10]
 6. Update project schedule on Github. The schedule must reflect the status of development (completed, in progress, to be done).
-		[0/10]
+		[5/10]
 7. This "Readme" file should be uploaded in SPRINT-4 folder.
 
 8. Size of the work completed
-        [0/30]
+        [30/30]
  
 General Comments:
 
