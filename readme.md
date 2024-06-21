@@ -117,6 +117,10 @@ This is a showcase of the Admin Dashboard of our Project
 
 ![Ezbase](public/images/files.png)
 
+### Functions
+
+![Ezbase](public/images/functions.png)
+
 ### Role-Based-Access-Control
 
 ![Ezbase](public/images/rbac.png)
